@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Radio - Jean</title>
-  <meta name="version" content="1.3">
+  <meta name="version" content="1.0">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -19,7 +19,7 @@
   --accent3: #00d4aa;
   --text: #e8e8f0;
   --text2: #9090a8;
-  --text3: #9090a8;
+  --text3: #5a5a72;
   --live: #ff4d4d;
   --gold: #ffd700;
 }
@@ -888,8 +888,8 @@ body::before {
 <nav class="sidebar">
   <div class="logo">
     <div class="logo-text">Radio - Jean</div>
-    <div class="logo-sub">Music & Streaming</div>
-    <div style="font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:4px;letter-spacing:1px;">v1.3</div>
+    <div class="logo-sub" id="logoSub"></div>
+    <div id="logoVer" style="font-size:9px;font-family:'JetBrains Mono',monospace;margin-top:4px;letter-spacing:1px;"></div>
   </div>
   <div class="nav">
     <div class="nav-item active" onclick="showSection('radio')">
@@ -1181,6 +1181,15 @@ body::before {
 </div>
 
 <script>
+// ===========================
+// CONFIGURAZIONE — modifica qui
+// ===========================
+const CONFIG = {
+  version:  '1.3',
+  subtitle: 'Music & Streaming',
+  subtitleColor: '#ffffff',   // colore sottotitolo e versione — più bianco = più vicino a #ffffff
+};
+
 // ===========================
 // STATE
 // ===========================
@@ -2229,6 +2238,12 @@ function showToast(msg, type = 'success') {
 // ===========================
 // INIT
 // ===========================
+// Applica configurazione
+document.getElementById('logoSub').textContent = CONFIG.subtitle;
+document.getElementById('logoSub').style.color  = CONFIG.subtitleColor;
+document.getElementById('logoVer').textContent  = 'v' + CONFIG.version;
+document.getElementById('logoVer').style.color  = CONFIG.subtitleColor;
+
 applyStoredOverrides();
 renderRadio();
 renderPlaylist();
