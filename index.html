@@ -1,4 +1,4 @@
-a<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -1741,61 +1741,94 @@ async function searchYT() {
   const q = document.getElementById('ytSearchInput').value.trim();
   if (!q) return;
   const btn = document.getElementById('btnSearch');
-  btn.textContent = '...';
+  btn.textContent = '⏳';
   btn.disabled = true;
   const resultsDiv = document.getElementById('ytSearchResults');
   resultsDiv.style.display = 'flex';
   resultsDiv.style.flexDirection = 'column';
   resultsDiv.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">🔎 Ricerca in corso...</div>';
 
-  // Lista di istanze pubbliche da provare in ordine
-  const endpoints = [
-    { type: 'piped',     url: 'https://pipedapi.kavin.rocks/search?q=' + encodeURIComponent(q) + '&filter=videos' },
-    { type: 'piped',     url: 'https://pipedapi.adminforge.de/search?q=' + encodeURIComponent(q) + '&filter=videos' },
-    { type: 'invidious', url: 'https://invidious.fdn.fr/api/v1/search?q=' + encodeURIComponent(q) + '&type=video&fields=videoId,title,author,lengthSeconds&page=1' },
-    { type: 'invidious', url: 'https://iv.datura.network/api/v1/search?q=' + encodeURIComponent(q) + '&type=video&fields=videoId,title,author,lengthSeconds' },
-    { type: 'invidious', url: 'https://invidious.nerdvpn.de/api/v1/search?q=' + encodeURIComponent(q) + '&type=video&fields=videoId,title,author,lengthSeconds' },
+  // Istanze pubbliche con CORS aperto — proviamo tutte in parallelo, prendiamo la prima che risponde
+  const invidiousInstances = [
+    'https://invidious.fdn.fr',
+    'https://iv.datura.network',
+    'https://invidious.privacyredirect.com',
+    'https://invidious.protokolla.fi',
+    'https://inv.perennialte.ch',
+    'https://invidious.nerdvpn.de',
+    'https://invidious.slipfox.xyz',
+  ];
+  const pipedInstances = [
+    'https://pipedapi.kavin.rocks',
+    'https://pipedapi.adminforge.de',
+    'https://piped-api.tokhmi.xyz',
+    'https://pipedapi.yt.artemislena.eu',
   ];
 
+  // Prova un singolo endpoint, restituisce array video o lancia eccezione
+  async function tryInvidious(base) {
+    const url = base + '/api/v1/search?q=' + encodeURIComponent(q) + '&type=video&fields=videoId,title,author,lengthSeconds&page=1';
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('json')) throw new Error('not JSON');
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) throw new Error('empty');
+    return data.slice(0, 6).map(v => ({
+      ytId:    v.videoId || '',
+      title:   v.title || '',
+      channel: v.author || '',
+      dur:     v.lengthSeconds ? fmtSec(v.lengthSeconds) : '',
+      thumb:   'https://img.youtube.com/vi/' + (v.videoId||'') + '/mqdefault.jpg'
+    }));
+  }
+
+  async function tryPiped(base) {
+    const url = base + '/search?q=' + encodeURIComponent(q) + '&filter=videos';
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('json')) throw new Error('not JSON');
+    const data = await res.json();
+    const items = (data.items || []).filter(i => i.url && i.url.startsWith('/watch'));
+    if (!items.length) throw new Error('empty');
+    return items.slice(0, 6).map(v => ({
+      ytId:    (v.url || '').replace('/watch?v=', ''),
+      title:   v.title || '',
+      channel: v.uploaderName || '',
+      dur:     v.duration ? fmtSec(v.duration) : '',
+      thumb:   v.thumbnail || ('https://img.youtube.com/vi/' + (v.url||'').replace('/watch?v=','') + '/mqdefault.jpg')
+    }));
+  }
+
+  // Lancia tutte le richieste in parallelo, prende la prima che ha successo
   let videos = null;
+  const allTries = [
+    ...pipedInstances.map(b => tryPiped(b)),
+    ...invidiousInstances.map(b => tryInvidious(b)),
+  ];
 
-  for (const ep of endpoints) {
-    try {
-      const res = await fetch(ep.url, { signal: AbortSignal.timeout(6000) });
-      if (!res.ok) continue;
-      const ct = res.headers.get('content-type') || '';
-      if (!ct.includes('json')) continue;  // scarta risposte HTML
-      const data = await res.json();
-
-      if (ep.type === 'piped') {
-        const items = (data.items || []).filter(i => i.url && i.url.startsWith('/watch'));
-        if (!items.length) continue;
-        videos = items.slice(0, 6).map(v => ({
-          ytId:    v.url.replace('/watch?v=', ''),
-          title:   v.title || '',
-          channel: v.uploaderName || '',
-          dur:     v.duration ? fmtSec(v.duration) : '',
-          thumb:   v.thumbnail || ''
-        }));
-      } else {
-        const items = Array.isArray(data) ? data : [];
-        if (!items.length) continue;
-        videos = items.slice(0, 6).map(v => ({
-          ytId:    v.videoId || '',
-          title:   v.title || '',
-          channel: v.author || '',
-          dur:     v.lengthSeconds ? fmtSec(v.lengthSeconds) : '',
-          thumb:   'https://img.youtube.com/vi/' + (v.videoId||'') + '/mqdefault.jpg'
-        }));
-      }
-      if (videos && videos.length) break;  // trovato, esci dal loop
-    } catch(e) { continue; }
+  // Promise.any: prende la prima risolta con successo
+  try {
+    videos = await Promise.any(allTries);
+  } catch(e) {
+    videos = null;
   }
 
   resultsDiv.innerHTML = '';
 
   if (!videos || !videos.length) {
-    resultsDiv.innerHTML = '<div style="color:var(--accent);font-size:13px;padding:12px;text-align:center;">❌ Nessun risultato trovato.<br><small style="color:var(--text3)">Incolla un URL YouTube diretto nel campo sotto.</small></div>';
+    // Fallback: apri YouTube search in una nuova scheda
+    resultsDiv.innerHTML =
+      '<div style="color:var(--text3);font-size:13px;padding:12px 4px;text-align:center;">' +
+        'Le API di ricerca non sono raggiungibili al momento.<br>' +
+        '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '" ' +
+           'target="_blank" ' +
+           'style="color:var(--accent2);text-decoration:none;font-weight:600;display:inline-block;margin-top:8px;padding:8px 16px;border:1px solid var(--accent2);border-radius:8px;">' +
+          '🔗 Cerca "' + esc(q) + '" su YouTube' +
+        '</a><br>' +
+        '<small style="color:var(--text3);margin-top:8px;display:block;">Copia il link dal browser e incollalo nel campo URL qui sotto</small>' +
+      '</div>';
     btn.textContent = 'Cerca'; btn.disabled = false;
     return;
   }
@@ -1807,7 +1840,7 @@ async function searchYT() {
     div.onmouseout  = function(){ this.style.borderColor = 'var(--border)'; };
     div.onclick = function() { selectYTItem(v.ytId, v.title, v.channel, v.dur); };
     const img = document.createElement('img');
-    img.src = v.thumb || ('https://img.youtube.com/vi/' + v.ytId + '/mqdefault.jpg');
+    img.src = v.thumb;
     img.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + v.ytId + '/mqdefault.jpg'; };
     img.style.cssText = 'width:80px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg3);';
     const info = document.createElement('div');
