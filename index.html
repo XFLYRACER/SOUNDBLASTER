@@ -1211,12 +1211,12 @@ const builtinRadios = [
   { id:'r1',  name:'Radio Italia',        genre:'Pop Italiano',        emoji:'🇮🇹', group:'it',  logo:'https://www.google.com/s2/favicons?domain=radioitalia.it&sz=64',          url:'https://icecast.unitedradio.it/Radio.Italia.mp3', cors:true },
   { id:'r2',  name:'RTL 102.5',           genre:'Pop / Hit',           emoji:'🎵',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=rtl.it&sz=64',                   url:'https://shoutcast.rtl.it:3010/stream/1/', cors:true },
   { id:'r3',  name:'RDS',                 genre:'Pop / Dance',         emoji:'🔴',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=rds.it&sz=64',                   url:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
-  { id:'r4',  name:'Radio DeeJay',        genre:'Dance / Pop',         emoji:'🎧',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=deejay.it&sz=64',                url:'https://icecast.unitedradio.it/Deejay.mp3', cors:true },
+  { id:'r4',  name:'Radio DeeJay',        genre:'Dance / Pop',         emoji:'🎧',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=deejay.it&sz=64',                url:'https://radiodeejay-lh.akamaihd.net/i/RadioDeejay_Live_1@189857/master.m3u8' },
   { id:'r5',  name:'Virgin Radio',        genre:'Rock / Pop',          emoji:'🤘',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=virginradio.it&sz=64',           url:'https://icecast.unitedradio.it/Virgin.mp3', cors:true },
-  { id:'r6',  name:'Radio 105',           genre:'Hit / Dance',         emoji:'💿',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=105.net&sz=64',                  url:'https://icecast.unitedradio.it/Radio105.mp3', cors:true },
+  { id:'r6',  name:'Radio 105',           genre:'Hit / Dance',         emoji:'💿',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=105.net&sz=64',                  url:'https://icecast.105.net/105.mp3' },
   { id:'r7',  name:'Radio Kiss Kiss',     genre:'Pop / Hit',           emoji:'💋',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=kisskiss.it&sz=64',              url:'https://icecast.fluidstream.net/KissKiss.mp3' },
-  { id:'r8',  name:'R101',                genre:'Pop / Romantico',     emoji:'❤️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=r101.it&sz=64',                  url:'https://icecast.unitedradio.it/r101.mp3', cors:true },
-  { id:'r9',  name:'Radio Capital',       genre:'Rock Classico',       emoji:'🏛️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiocapital.it&sz=64',          url:'https://icecast.unitedradio.it/Capital.mp3', cors:true },
+  { id:'r8',  name:'R101',                genre:'Pop / Romantico',     emoji:'❤️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=r101.it&sz=64',                  url:'https://icecast.unitedradio.it/r101' },
+  { id:'r9',  name:'Radio Capital',       genre:'Rock Classico',       emoji:'🏛️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiocapital.it&sz=64',          url:'https://radiocapital-lh.akamaihd.net/i/RadioCapital_Live_1@196312/master.m3u8' },
   { id:'r10', name:'Radio Monte Carlo',   genre:'Classico / Jazz',     emoji:'🎷',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiomontecarlo.net&sz=64',      url:'https://edge.radiomontecarlo.net/RMC.mp3' },
   { id:'r11', name:'Rai Radio 1',         genre:'News / Varietà',      emoji:'📻',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/1.mp3' },
   { id:'r12', name:'Rai Radio 2',         genre:'Pop / Giovani',       emoji:'🎙️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/2.mp3' },
@@ -1365,14 +1365,6 @@ const CORS_PROXIES = [
   'https://api.allorigins.win/raw?url=',
   'https://thingproxy.freeboard.io/fetch/',
 ];
-let proxyIndex = 0; // proxy corrente
-
-function buildStreamUrl(radio, tryProxy) {
-  if (!tryProxy) return radio.url;
-  const proxy = CORS_PROXIES[proxyIndex % CORS_PROXIES.length];
-  return proxy + encodeURIComponent(radio.url);
-}
-
 function playRadio(id, fallbackIndex, useProxy) {
   const all = [...builtinRadios, ...customRadios];
   const radio = all.find(r => r.id === id);
@@ -1407,40 +1399,40 @@ function playRadio(id, fallbackIndex, useProxy) {
   const card = document.getElementById('rc-' + id);
   if (card) { card.style.borderColor = ''; const e = card.querySelector('.stream-err'); if (e) e.remove(); }
 
-  // Costruisci URL: diretto oppure via proxy cors
-  const streamUrl = (useProxy && radio.cors)
-    ? CORS_PROXIES[proxyIndex % CORS_PROXIES.length] + encodeURIComponent(urls[urlIndex])
-    : urls[urlIndex];
+  // Costruisci URL: diretto (niente proxy per ora — rimuoviamo il loop)
+  const streamUrl = urls[urlIndex];
 
   audio.onerror = null;
+  audio.src = '';          // reset prima di cambiare src — evita onerror spurio
+  audio.load();
   audio.src = streamUrl;
   audio.load();
+
   let started = false;
+  let errorFired = false;  // flag anti-loop
+
   const onPlaying = () => { started = true; };
   audio.addEventListener('playing', onPlaying, { once: true });
+
   const tryNext = () => {
+    if (errorFired) return;   // blocca loop
+    errorFired = true;
+    audio.onerror = null;
     if (!started && currentRadio && currentRadio.id === id) {
       audio.removeEventListener('playing', onPlaying);
-      if (radio.cors && !useProxy) {
-        // Prima prova: fallita, riprova con proxy
-        showToast('🔄 Provo via proxy...', 'success');
-        playRadio(id, urlIndex, true);
-      } else if (radio.cors && useProxy) {
-        // Proxy fallito, prova il prossimo proxy
-        proxyIndex++;
-        if (proxyIndex % CORS_PROXIES.length !== 0) {
-          showToast('🔄 Provo proxy alternativo...', 'success');
-          playRadio(id, urlIndex, true);
-        } else {
-          // Tutti i proxy esauriti, prova URL successivo
-          proxyIndex = 0;
-          playRadio(id, urlIndex + 1, false);
-        }
-      } else {
-        playRadio(id, urlIndex + 1, false);
-      }
+      playRadio(id, urlIndex + 1);
     }
   };
+
+  // Timeout di sicurezza: se dopo 8 secondi non è partita, considera fallita
+  const safetyTimer = setTimeout(() => {
+    if (!started && currentRadio && currentRadio.id === id) {
+      tryNext();
+    }
+  }, 8000);
+
+  audio.addEventListener('playing', () => clearTimeout(safetyTimer), { once: true });
+
   audio.play().catch(tryNext);
   audio.onerror = tryNext;
 
