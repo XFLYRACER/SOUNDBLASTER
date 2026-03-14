@@ -1161,7 +1161,7 @@ body::before {
 <div class="toast" id="toast"></div>
 
 <!-- AUDIO -->
-<audio id="audioPlayer" crossorigin="anonymous"></audio>
+<audio id="audioPlayer" crossorigin="anonymous" controlslist="nodownload"></audio>
 <!-- YT AUDIO CARD -->
 <div id="ytCard" style="display:none;position:fixed;bottom:88px;right:20px;z-index:300;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;width:300px;box-shadow:0 8px 40px rgba(0,0,0,0.6);flex-direction:column;gap:10px;">
   <div style="display:flex;align-items:center;gap:10px;">
@@ -1189,6 +1189,7 @@ let currentYTIndex = -1;
 let isMuted = false;
 
 const audio = document.getElementById('audioPlayer');
+audio.preload = "none";
 audio.volume = 0.8;
 
 // ===========================
@@ -1198,12 +1199,12 @@ const builtinRadios = [
   // ── NAZIONALI ITALIANE ──────────────────────────────────────────────
   { id:'r1',  name:'Radio Italia',        genre:'Pop Italiano',        emoji:'🇮🇹', group:'it',  logo:'https://www.radioitalia.it/favicon.ico',           url:'https://icecast.unitedradio.it/Radio.Italia.mp3' },
   { id:'r2',  name:'RTL 102.5',           genre:'Pop / Hit',           emoji:'🎵',  group:'it',  logo:'https://www.rtl.it/favicon.ico',                   url:'https://shoutcast.rtl.it:3010/stream/1/', fallbacks:['https://rtl-lh.akamaihd.net/i/rtl1025_1@141001/master.m3u8'] },
-  { id:'r3',  name:'RDS',                 genre:'Pop / Dance',         emoji:'🔴',  group:'it',  logo:'https://www.rds.it/favicon.ico',                   url:'https://stream.rds.radio/audio/rds.stream_aac64/chunklist.m3u8', fallbacks:['https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3'] },
+  { id:'r3',  name:'RDS',                 genre:'Pop / Dance',         emoji:'🔴',  group:'it',  logo:'https://www.rds.it/favicon.ico',                   url:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
   { id:'r4',  name:'Radio DeeJay',        genre:'Dance / Pop',         emoji:'🎧',  group:'it',  logo:'https://www.deejay.it/favicon.ico',                url:'https://icecast.unitedradio.it/Deejay.mp3', fallbacks:['https://radiodeejay-lh.akamaihd.net/i/RadioDeejay_Live_1@189857/master.m3u8'] },
   { id:'r5',  name:'Virgin Radio',        genre:'Rock / Pop',          emoji:'🤘',  group:'it',  logo:'https://www.virginradio.it/favicon.ico',           url:'https://icecast.unitedradio.it/Virgin.mp3' },
   { id:'r6',  name:'Radio 105',           genre:'Hit / Dance',         emoji:'💿',  group:'it',  logo:'https://www.105.net/favicon.ico',                  url:'https://icecast.unitedradio.it/Radio105.mp3' },
   { id:'r7',  name:'Radio Kiss Kiss',     genre:'Pop / Hit',           emoji:'💋',  group:'it',  logo:'https://www.kisskiss.it/favicon.ico',              url:'https://icecast.fluidstream.net/KissKiss.mp3', fallbacks:['https://ice07.fluidstream.net/KissKiss.mp3'] },
-  { id:'r8',  name:'R101',               genre:'Pop / Romantico',     emoji:'❤️',  group:'it',  logo:'https://www.r101.it/favicon.ico',                  url:'https://icecast.unitedradio.it/r101' },
+  { id:'r8',  name:'R101',               genre:'Pop / Romantico',     emoji:'❤️',  group:'it',  logo:'https://www.r101.it/favicon.ico',                  url:'https://icecast.unitedradio.it/r101.mp3' },
   { id:'r9',  name:'Radio Capital',       genre:'Rock Classico',       emoji:'🏛️',  group:'it',  logo:'https://www.radiocapital.it/favicon.ico',          url:'https://icecast.unitedradio.it/Capital.mp3' },
   { id:'r10', name:'Radio Monte Carlo',   genre:'Classico / Jazz',     emoji:'🎷',  group:'it',  logo:'https://www.radiomontecarlo.net/favicon.ico',      url:'https://edge.radiomontecarlo.net/RMC.mp3' },
   { id:'r11', name:'Rai Radio 1',         genre:'News / Varietà',      emoji:'📻',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/1.mp3' },
@@ -1212,7 +1213,7 @@ const builtinRadios = [
   { id:'r14', name:'Rai IsoRadio',        genre:'News / Traffico',     emoji:'🚗',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/6.mp3' },
   { id:'r15', name:'Rai Radio Classica',  genre:'Classica',            emoji:'🎼',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/5.mp3' },
   { id:'r16', name:'Radio m2o',           genre:'Dance / Elettronica', emoji:'🔊',  group:'it',  logo:'https://www.m2o.it/favicon.ico',                   url:'https://icecast.unitedradio.it/m2o.mp3' },
-  { id:'r17', name:'Discoradio',          genre:'Dance / Club',        emoji:'🪩',  group:'it',  logo:'https://www.discoradio.it/favicon.ico',            url:'https://stream.discoradio.radio/audio/disco.stream_aac64/playlist.m3u8' },
+  { id:'r17', name:'Discoradio',          genre:'Dance / Club',        emoji:'🪩',  group:'it',  logo:'https://www.discoradio.it/favicon.ico',            url:'https://icecast.unitedradio.it/discoradio.mp3' },
   { id:'r18', name:'Radio Norba',         genre:'Pop / Sud',           emoji:'🌞',  group:'it',  logo:'https://www.radionorba.it/favicon.ico',            url:'http://onair20.xdevel.com:8218/' },
   { id:'r19', name:'Radio LatteMiele',    genre:'Pop / Soft',          emoji:'🍯',  group:'it',  logo:'https://www.lattemiele.com/favicon.ico',           url:'http://onair18.xdevel.com:8014/' },
   { id:'r20', name:'Radio Subasio',       genre:'Liscio / Folk',       emoji:'🪗',  group:'it',  logo:'https://www.radiosubasio.it/favicon.ico',          url:'http://onair18.xdevel.com:8152' },
@@ -1739,62 +1740,50 @@ let selectedYTItem = null;
 async function searchYT() {
   const q = document.getElementById('ytSearchInput').value.trim();
   if (!q) return;
-
   const btn = document.getElementById('btnSearch');
   btn.textContent = '...';
   btn.disabled = true;
-
   const resultsDiv = document.getElementById('ytSearchResults');
   resultsDiv.style.display = 'flex';
-  resultsDiv.innerHTML = '🔎 ricerca...';
-
+  resultsDiv.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">🔎 Ricerca in corso...</div>';
   try {
-
-    const res = await fetch(
-      "https://ytsearch.vercel.app/api/search?q=" + encodeURIComponent(q)
-    );
-
+    const res = await fetch('https://ytsearch.vercel.app/api/search?q=' + encodeURIComponent(q));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    const videos = data.videos.slice(0,6);
-
-    resultsDiv.innerHTML = "";
-
-    videos.forEach(v => {
-
-      const div = document.createElement("div");
-
-      div.style.cssText =
-      "display:flex;gap:12px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--card)";
-
-      div.onclick = () => {
-        selectYTItem(
-          v.videoId,
-          v.title,
-          v.author.name,
-          v.lengthText
-        );
-      };
-
-      div.innerHTML = `
-        <img src="${v.thumbnail}" style="width:80px;height:50px;border-radius:6px;">
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:600">${v.title}</div>
-          <div style="font-size:11px;color:var(--text3)">${v.author.name}</div>
-          <div style="font-size:10px;color:var(--accent3)">${v.lengthText}</div>
-        </div>
-      `;
-
+    const videos = (data.videos || []).slice(0, 6);
+    if (videos.length === 0) throw new Error('Nessun risultato');
+    resultsDiv.innerHTML = '';
+    videos.forEach(function(v) {
+      const ytId    = v.videoId || v.id || '';
+      const title   = v.title || '';
+      const channel = (v.author && v.author.name) ? v.author.name : (v.channel || '');
+      const dur     = v.lengthText || v.duration || '';
+      const thumb   = (v.thumbnail && v.thumbnail.url) ? v.thumbnail.url
+                    : (Array.isArray(v.thumbnail) ? v.thumbnail[0].url : '')
+                    || ('https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg');
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:4px;background:var(--card);transition:border-color 0.2s;';
+      div.onmouseover = function(){ this.style.borderColor = 'var(--accent2)'; };
+      div.onmouseout  = function(){ this.style.borderColor = 'var(--border)'; };
+      div.onclick = function() { selectYTItem(ytId, title, channel, dur); };
+      const img = document.createElement('img');
+      img.src = thumb;
+      img.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg'; };
+      img.style.cssText = 'width:80px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;';
+      const info = document.createElement('div');
+      info.style.cssText = 'flex:1;overflow:hidden;';
+      info.innerHTML =
+        '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + title + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:3px;">' + channel + '</div>' +
+        '<div style="font-size:10px;color:var(--accent3);margin-top:2px;font-family:monospace;">' + dur + '</div>';
+      div.appendChild(img);
+      div.appendChild(info);
       resultsDiv.appendChild(div);
-
     });
-
   } catch(e) {
-
-    resultsDiv.innerHTML = "❌ errore ricerca";
-
+    resultsDiv.innerHTML = '<div style="color:var(--accent);font-size:13px;padding:12px;text-align:center;">❌ ' + (e.message||'Errore ricerca') + '<br><small style="color:var(--text3)">Incolla un URL YouTube diretto nel campo sotto.</small></div>';
   }
-
-  btn.textContent = "Cerca";
+  btn.textContent = 'Cerca';
   btn.disabled = false;
 }
 
