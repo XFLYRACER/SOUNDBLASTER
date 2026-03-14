@@ -1185,9 +1185,9 @@ body::before {
 // CONFIGURAZIONE — modifica qui
 // ===========================
 const CONFIG = {
-  version:  '1.4',
+  version:  '1.3',
   subtitle: 'Music & Streaming',
-  subtitleColor: '#ffffff',   // colore sottotitolo e versione — più bianco = più vicino a #ffffff
+  subtitleColor: '#c8c8e0',   // colore sottotitolo e versione — più bianco = più vicino a #ffffff
 };
 
 // ===========================
@@ -1208,56 +1208,56 @@ audio.volume = 0.8;
 // ===========================
 const builtinRadios = [
   // ── NAZIONALI ITALIANE ──────────────────────────────────────────────
-  { id:'r1',  name:'Radio Italia',        genre:'Pop Italiano',        emoji:'🇮🇹', group:'it',  logo:'https://www.radioitalia.it/favicon.ico',           url:'https://icecast.unitedradio.it/Radio.Italia.mp3', cors:true },
-  { id:'r2',  name:'RTL 102.5',           genre:'Pop / Hit',           emoji:'🎵',  group:'it',  logo:'https://www.rtl.it/favicon.ico',                   url:'https://shoutcast.rtl.it:3010/stream/1/', cors:true },
-  { id:'r3',  name:'RDS',                 genre:'Pop / Dance',         emoji:'🔴',  group:'it',  logo:'https://www.rds.it/favicon.ico',                   url:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
-  { id:'r4',  name:'Radio DeeJay',        genre:'Dance / Pop',         emoji:'🎧',  group:'it',  logo:'https://www.deejay.it/favicon.ico',                url:'https://icecast.unitedradio.it/Deejay.mp3', cors:true },
-  { id:'r5',  name:'Virgin Radio',        genre:'Rock / Pop',          emoji:'🤘',  group:'it',  logo:'https://www.virginradio.it/favicon.ico',           url:'https://icecast.unitedradio.it/Virgin.mp3', cors:true },
-  { id:'r6',  name:'Radio 105',           genre:'Hit / Dance',         emoji:'💿',  group:'it',  logo:'https://www.105.net/favicon.ico',                  url:'https://icecast.unitedradio.it/Radio105.mp3', cors:true },
-  { id:'r7',  name:'Radio Kiss Kiss',     genre:'Pop / Hit',           emoji:'💋',  group:'it',  logo:'https://www.kisskiss.it/favicon.ico',              url:'https://icecast.fluidstream.net/KissKiss.mp3' },
-  { id:'r8',  name:'R101',               genre:'Pop / Romantico',     emoji:'❤️',  group:'it',  logo:'https://www.r101.it/favicon.ico',                  url:'https://icecast.unitedradio.it/r101.mp3', cors:true },
-  { id:'r9',  name:'Radio Capital',       genre:'Rock Classico',       emoji:'🏛️',  group:'it',  logo:'https://www.radiocapital.it/favicon.ico',          url:'https://icecast.unitedradio.it/Capital.mp3', cors:true },
-  { id:'r10', name:'Radio Monte Carlo',   genre:'Classico / Jazz',     emoji:'🎷',  group:'it',  logo:'https://www.radiomontecarlo.net/favicon.ico',      url:'https://edge.radiomontecarlo.net/RMC.mp3' },
-  { id:'r11', name:'Rai Radio 1',         genre:'News / Varietà',      emoji:'📻',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/1.mp3' },
-  { id:'r12', name:'Rai Radio 2',         genre:'Pop / Giovani',       emoji:'🎙️',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/2.mp3' },
-  { id:'r13', name:'Rai Radio 3',         genre:'Classica / Cultura',  emoji:'🎻',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/3.mp3' },
-  { id:'r14', name:'Rai IsoRadio',        genre:'News / Traffico',     emoji:'🚗',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/6.mp3' },
-  { id:'r15', name:'Rai Radio Classica',  genre:'Classica',            emoji:'🎼',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/5.mp3' },
-  { id:'r16', name:'Radio m2o',           genre:'Dance / Elettronica', emoji:'🔊',  group:'it',  logo:'https://www.m2o.it/favicon.ico',                   url:'https://icecast.unitedradio.it/m2o.mp3', cors:true },
-  { id:'r17', name:'Discoradio',          genre:'Dance / Club',        emoji:'🪩',  group:'it',  logo:'https://www.discoradio.it/favicon.ico',            url:'https://icecast.unitedradio.it/discoradio.mp3', cors:true },
-  { id:'r18', name:'Radio Norba',         genre:'Pop / Sud',           emoji:'🌞',  group:'it',  logo:'https://www.radionorba.it/favicon.ico',            url:'http://onair20.xdevel.com:8218/' },
-  { id:'r19', name:'Radio LatteMiele',    genre:'Pop / Soft',          emoji:'🍯',  group:'it',  logo:'https://www.lattemiele.com/favicon.ico',           url:'http://onair18.xdevel.com:8014/' },
-  { id:'r20', name:'Radio Subasio',       genre:'Liscio / Folk',       emoji:'🪗',  group:'it',  logo:'https://www.radiosubasio.it/favicon.ico',          url:'http://onair18.xdevel.com:8152' },
-  { id:'r21', name:'Radio Marte',         genre:'Napoletano',          emoji:'🌋',  group:'it',  logo:'https://www.radiomarte.it/favicon.ico',            url:'http://onair18.xdevel.com:8212/' },
-  { id:'r22', name:'RTL Radiofreccia',    genre:'Rock',                emoji:'⚡',  group:'it',  logo:'https://www.radiofreccia.it/favicon.ico',          url:'https://shoutcast.rtl.it:3060/' },
-  { id:'r23', name:'Radio Zeta',          genre:'Pop / Italiana',      emoji:'🎶',  group:'it',  logo:'https://www.radiozeta.it/favicon.ico',             url:'https://shoutcast.rtl.it:3030/stream/1/' },
-  { id:'r24', name:'Radio 24',            genre:'News / Economia',     emoji:'📰',  group:'it',  logo:'https://www.radio24.ilsole24ore.com/favicon.ico',  url:'https://shoutcast.radio24.it:8000/', fallbacks:['https://www.radio24.ilsole24ore.com/audio/streaming/radio24.mp3'] },
-  { id:'r25', name:'Radio Sportiva',      genre:'Sport / News',        emoji:'⚽',  group:'it',  logo:'https://www.radiosportiva.it/favicon.ico',         url:'https://stream.radiosportiva.it/radiosportiva' },
-  { id:'r26', name:'Kiss Kiss Napoli',    genre:'Pop / Napoli',        emoji:'🧿',  group:'it',  logo:'https://www.kisskiss.it/favicon.ico',              url:'https://icecast.fluidstream.net/KKNapoli.aac', fallbacks:['https://ice08.fluidstream.net/KKNapoli.aac'] },
-  { id:'r27', name:'Radio Maria',         genre:'Religioso',           emoji:'✝️',  group:'it',  logo:'https://www.radiomaria.it/favicon.ico',            url:'https://shoutcast2.omnicast.it:11004/;stream.mp3' },
-  { id:'r28', name:'Radio Monte Carlo 2', genre:'Soft / Ambient',      emoji:'🌊',  group:'it',  logo:'https://www.radiomontecarlo.net/favicon.ico',      url:'https://edge.radiomontecarlo.net/MC2.mp3' },
-  { id:'r29', name:'RTL Best',            genre:'Pop / Grandi Successi',emoji:'🥇', group:'it',  logo:'https://www.rtl.it/favicon.ico',                   url:'https://shoutcast.rtl.it:3020/' },
-  { id:'r30', name:'Radio Cuore',         genre:'Pop / Soft',          emoji:'💜',  group:'it',  logo:'https://www.radiocuore.it/favicon.ico',            url:'https://nr9.newradio.it:9029' },
-  { id:'r31', name:'Rai Radio Opera',     genre:'Opera / Classica',    emoji:'🎭',  group:'it',  logo:'https://www.raiplayradio.it/favicon.ico',          url:'https://icestreaming.rai.it/11.mp3' },
+  { id:'r1',  name:'Radio Italia',        genre:'Pop Italiano',        emoji:'🇮🇹', group:'it',  logo:'https://www.google.com/s2/favicons?domain=radioitalia.it&sz=64',          url:'https://icecast.unitedradio.it/Radio.Italia.mp3', cors:true },
+  { id:'r2',  name:'RTL 102.5',           genre:'Pop / Hit',           emoji:'🎵',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=rtl.it&sz=64',                   url:'https://shoutcast.rtl.it:3010/stream/1/', cors:true },
+  { id:'r3',  name:'RDS',                 genre:'Pop / Dance',         emoji:'🔴',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=rds.it&sz=64',                   url:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
+  { id:'r4',  name:'Radio DeeJay',        genre:'Dance / Pop',         emoji:'🎧',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=deejay.it&sz=64',                url:'https://icecast.unitedradio.it/Deejay.mp3', cors:true },
+  { id:'r5',  name:'Virgin Radio',        genre:'Rock / Pop',          emoji:'🤘',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=virginradio.it&sz=64',           url:'https://icecast.unitedradio.it/Virgin.mp3', cors:true },
+  { id:'r6',  name:'Radio 105',           genre:'Hit / Dance',         emoji:'💿',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=105.net&sz=64',                  url:'https://icecast.unitedradio.it/Radio105.mp3', cors:true },
+  { id:'r7',  name:'Radio Kiss Kiss',     genre:'Pop / Hit',           emoji:'💋',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=kisskiss.it&sz=64',              url:'https://icecast.fluidstream.net/KissKiss.mp3' },
+  { id:'r8',  name:'R101',                genre:'Pop / Romantico',     emoji:'❤️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=r101.it&sz=64',                  url:'https://icecast.unitedradio.it/r101.mp3', cors:true },
+  { id:'r9',  name:'Radio Capital',       genre:'Rock Classico',       emoji:'🏛️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiocapital.it&sz=64',          url:'https://icecast.unitedradio.it/Capital.mp3', cors:true },
+  { id:'r10', name:'Radio Monte Carlo',   genre:'Classico / Jazz',     emoji:'🎷',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiomontecarlo.net&sz=64',      url:'https://edge.radiomontecarlo.net/RMC.mp3' },
+  { id:'r11', name:'Rai Radio 1',         genre:'News / Varietà',      emoji:'📻',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/1.mp3' },
+  { id:'r12', name:'Rai Radio 2',         genre:'Pop / Giovani',       emoji:'🎙️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/2.mp3' },
+  { id:'r13', name:'Rai Radio 3',         genre:'Classica / Cultura',  emoji:'🎻',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/3.mp3' },
+  { id:'r14', name:'Rai IsoRadio',        genre:'News / Traffico',     emoji:'🚗',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/6.mp3' },
+  { id:'r15', name:'Rai Radio Classica',  genre:'Classica',            emoji:'🎼',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/5.mp3' },
+  { id:'r16', name:'Radio m2o',           genre:'Dance / Elettronica', emoji:'🔊',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=m2o.it&sz=64',                   url:'https://icecast.unitedradio.it/m2o.mp3', cors:true },
+  { id:'r17', name:'Discoradio',          genre:'Dance / Club',        emoji:'🪩',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=discoradio.it&sz=64',            url:'https://icecast.unitedradio.it/discoradio.mp3', cors:true },
+  { id:'r18', name:'Radio Norba',         genre:'Pop / Sud',           emoji:'🌞',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radionorba.it&sz=64',            url:'http://onair20.xdevel.com:8218/' },
+  { id:'r19', name:'Radio LatteMiele',    genre:'Pop / Soft',          emoji:'🍯',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=lattemiele.com&sz=64',           url:'http://onair18.xdevel.com:8014/' },
+  { id:'r20', name:'Radio Subasio',       genre:'Liscio / Folk',       emoji:'🪗',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiosubasio.it&sz=64',          url:'http://onair18.xdevel.com:8152' },
+  { id:'r21', name:'Radio Marte',         genre:'Napoletano',          emoji:'🌋',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiomarte.it&sz=64',            url:'http://onair18.xdevel.com:8212/' },
+  { id:'r22', name:'RTL Radiofreccia',    genre:'Rock',                emoji:'⚡',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiofreccia.it&sz=64',          url:'https://shoutcast.rtl.it:3060/' },
+  { id:'r23', name:'Radio Zeta',          genre:'Pop / Italiana',      emoji:'🎶',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiozeta.it&sz=64',             url:'https://shoutcast.rtl.it:3030/stream/1/' },
+  { id:'r24', name:'Radio 24',            genre:'News / Economia',     emoji:'📰',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radio24.ilsole24ore.com&sz=64',  url:'https://shoutcast.radio24.it:8000/' },
+  { id:'r25', name:'Radio Sportiva',      genre:'Sport / News',        emoji:'⚽',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiosportiva.it&sz=64',         url:'https://stream.radiosportiva.it/radiosportiva' },
+  { id:'r26', name:'Kiss Kiss Napoli',    genre:'Pop / Napoli',        emoji:'🧿',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=kisskiss.it&sz=64',              url:'https://icecast.fluidstream.net/KKNapoli.aac' },
+  { id:'r27', name:'Radio Maria',         genre:'Religioso',           emoji:'✝️',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiomaria.it&sz=64',            url:'https://shoutcast2.omnicast.it:11004/;stream.mp3' },
+  { id:'r28', name:'Radio Monte Carlo 2', genre:'Soft / Ambient',      emoji:'🌊',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiomontecarlo.net&sz=64',      url:'https://edge.radiomontecarlo.net/MC2.mp3' },
+  { id:'r29', name:'RTL Best',            genre:'Pop / Grandi Successi',emoji:'🥇', group:'it',  logo:'https://www.google.com/s2/favicons?domain=rtl.it&sz=64',                   url:'https://shoutcast.rtl.it:3020/' },
+  { id:'r30', name:'Radio Cuore',         genre:'Pop / Soft',          emoji:'💜',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=radiocuore.it&sz=64',            url:'https://nr9.newradio.it:9029' },
+  { id:'r31', name:'Rai Radio Opera',     genre:'Opera / Classica',    emoji:'🎭',  group:'it',  logo:'https://www.google.com/s2/favicons?domain=raiplaysound.it&sz=64',          url:'https://icestreaming.rai.it/11.mp3' },
   // ── INTERNAZIONALI ─────────────────────────────────────────────────
-  { id:'r40', name:'BBC Radio 1',         genre:'Pop / UK',            emoji:'🇬🇧',  group:'int', logo:'https://www.bbc.co.uk/favicon.ico',               url:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one' },
-  { id:'r41', name:'BBC Radio 2',         genre:'Pop / UK Classici',   emoji:'🇬🇧',  group:'int', logo:'https://www.bbc.co.uk/favicon.ico',               url:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_two' },
-  { id:'r42', name:'BBC Radio 6 Music',   genre:'Alternative / Indie', emoji:'🇬🇧',  group:'int', logo:'https://www.bbc.co.uk/favicon.ico',               url:'https://stream.live.vc.bbcmedia.co.uk/bbc_6music' },
-  { id:'r43', name:'NRJ France',          genre:'Dance / Pop FR',      emoji:'🇫🇷',  group:'int', logo:'https://www.nrj.fr/favicon.ico',                  url:'https://scdn.nrjaudio.fm/adwz2/fr/30001/mp3_128.mp3' },
-  { id:'r44', name:'Radio Swiss Jazz',    genre:'Jazz / Blues',        emoji:'🇨🇭',  group:'int', logo:'https://www.srgssr.ch/favicon.ico',               url:'https://stream.srg-ssr.ch/m/rsj/mp3_128' },
-  { id:'r45', name:'Radio Swiss Classic', genre:'Classica',            emoji:'🇨🇭',  group:'int', logo:'https://www.srgssr.ch/favicon.ico',               url:'https://stream.srg-ssr.ch/m/rsc_de/mp3_128' },
-  { id:'r46', name:'SomaFM Groove Salad', genre:'Soul / Ambient',      emoji:'🎺',  group:'int', logo:'https://somafm.com/img/groovesalad-400.jpg',       url:'https://ice1.somafm.com/groovesalad-256-mp3' },
-  { id:'r47', name:'SomaFM Lush',         genre:'Ambient / Electronic',emoji:'🌙',  group:'int', logo:'https://somafm.com/img/lush-400.png',              url:'https://ice1.somafm.com/lush-256-mp3' },
-  { id:'r48', name:'SomaFM Indie Pop',    genre:'Indie / Pop',         emoji:'🌈',  group:'int', logo:'https://somafm.com/img/indiepop-400.jpg',          url:'https://ice1.somafm.com/indiepop-256-mp3' },
-  { id:'r49', name:'Jazz24',              genre:'Jazz',                emoji:'🎷',  group:'int', logo:'https://www.jazz24.org/favicon.ico',               url:'https://live.wostreaming.net/direct/ppm-jazz24aac-ibc1' },
-  { id:'r50', name:'Absolute 80s',        genre:'Anni 80',             emoji:'📼',  group:'int', logo:'https://www.absoluteradio.co.uk/favicon.ico',     url:'https://stream-mz.planetradio.co.uk/absolute80s.mp3' },
-  { id:'r51', name:'Chillhop Radio',      genre:'Lo-Fi / Chill',       emoji:'☕',  group:'int', logo:'https://chillhop.com/favicon.ico',                url:'https://streams.ilovemusic.de/iloveradio17.mp3' },
-  { id:'r52', name:'Radio Swiss Pop',     genre:'Pop / Svizzera',      emoji:'🇨🇭',  group:'int', logo:'https://www.srgssr.ch/favicon.ico',               url:'https://stream.srg-ssr.ch/m/rsp/mp3_128' },
-  { id:'r53', name:'RFI Français',        genre:'News / FR',           emoji:'🇫🇷',  group:'int', logo:'https://www.rfi.fr/favicon.ico',                  url:'https://rfifr-lh.akamaihd.net/i/rfifr_fr@2944/index_48_a-p.m3u8' },
-  { id:'r54', name:'Deutschlandfunk',     genre:'News / DE',           emoji:'🇩🇪',  group:'int', logo:'https://www.deutschlandfunk.de/favicon.ico',      url:'https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3' },
-  { id:'r55', name:'Radio Paradise',      genre:'Rock / Alternative',  emoji:'🌍',  group:'int', logo:'https://radioparadise.com/favicon.ico',           url:'https://stream.radioparadise.com/rock-128' },
-  { id:'r56', name:'WNYC NYC',            genre:'News / Talk / USA',   emoji:'🇺🇸',  group:'int', logo:'https://www.wnyc.org/favicon.ico',               url:'https://fm939.wnyc.org/wnycfm' },
-  { id:'r57', name:'KEXP Seattle',        genre:'Indie / Alternative', emoji:'🌿',  group:'int', logo:'https://www.kexp.org/favicon.ico',               url:'https://live-aacplus-64.kexp.org/kexp64.aac' },
+  { id:'r40', name:'BBC Radio 1',         genre:'Pop / UK',            emoji:'🇬🇧',  group:'int', logo:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',               url:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one' },
+  { id:'r41', name:'BBC Radio 2',         genre:'Pop / UK Classici',   emoji:'🇬🇧',  group:'int', logo:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',               url:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_two' },
+  { id:'r42', name:'BBC Radio 6 Music',   genre:'Alternative / Indie', emoji:'🇬🇧',  group:'int', logo:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',               url:'https://stream.live.vc.bbcmedia.co.uk/bbc_6music' },
+  { id:'r43', name:'NRJ France',          genre:'Dance / Pop FR',      emoji:'🇫🇷',  group:'int', logo:'https://www.google.com/s2/favicons?domain=nrj.fr&sz=64',                  url:'https://scdn.nrjaudio.fm/adwz2/fr/30001/mp3_128.mp3' },
+  { id:'r44', name:'Radio Swiss Jazz',    genre:'Jazz / Blues',        emoji:'🇨🇭',  group:'int', logo:'https://www.google.com/s2/favicons?domain=srgssr.ch&sz=64',               url:'https://stream.srg-ssr.ch/m/rsj/mp3_128' },
+  { id:'r45', name:'Radio Swiss Classic', genre:'Classica',            emoji:'🇨🇭',  group:'int', logo:'https://www.google.com/s2/favicons?domain=srgssr.ch&sz=64',               url:'https://stream.srg-ssr.ch/m/rsc_de/mp3_128' },
+  { id:'r46', name:'SomaFM Groove Salad', genre:'Soul / Ambient',      emoji:'🎺',  group:'int', logo:'https://www.google.com/s2/favicons?domain=somafm.com&sz=64',              url:'https://ice1.somafm.com/groovesalad-256-mp3' },
+  { id:'r47', name:'SomaFM Lush',         genre:'Ambient / Electronic',emoji:'🌙',  group:'int', logo:'https://www.google.com/s2/favicons?domain=somafm.com&sz=64',              url:'https://ice1.somafm.com/lush-256-mp3' },
+  { id:'r48', name:'SomaFM Indie Pop',    genre:'Indie / Pop',         emoji:'🌈',  group:'int', logo:'https://www.google.com/s2/favicons?domain=somafm.com&sz=64',              url:'https://ice1.somafm.com/indiepop-256-mp3' },
+  { id:'r49', name:'Jazz24',              genre:'Jazz',                emoji:'🎷',  group:'int', logo:'https://www.google.com/s2/favicons?domain=jazz24.org&sz=64',               url:'https://live.wostreaming.net/direct/ppm-jazz24aac-ibc1' },
+  { id:'r50', name:'Absolute 80s',        genre:'Anni 80',             emoji:'📼',  group:'int', logo:'https://www.google.com/s2/favicons?domain=absoluteradio.co.uk&sz=64',     url:'https://stream-mz.planetradio.co.uk/absolute80s.mp3' },
+  { id:'r51', name:'Chillhop Radio',      genre:'Lo-Fi / Chill',       emoji:'☕',  group:'int', logo:'https://www.google.com/s2/favicons?domain=chillhop.com&sz=64',            url:'https://streams.ilovemusic.de/iloveradio17.mp3' },
+  { id:'r52', name:'Radio Swiss Pop',     genre:'Pop / Svizzera',      emoji:'🇨🇭',  group:'int', logo:'https://www.google.com/s2/favicons?domain=srgssr.ch&sz=64',               url:'https://stream.srg-ssr.ch/m/rsp/mp3_128' },
+  { id:'r53', name:'RFI Français',        genre:'News / FR',           emoji:'🇫🇷',  group:'int', logo:'https://www.google.com/s2/favicons?domain=rfi.fr&sz=64',                  url:'https://rfifr-lh.akamaihd.net/i/rfifr_fr@2944/index_48_a-p.m3u8' },
+  { id:'r54', name:'Deutschlandfunk',     genre:'News / DE',           emoji:'🇩🇪',  group:'int', logo:'https://www.google.com/s2/favicons?domain=deutschlandfunk.de&sz=64',      url:'https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3' },
+  { id:'r55', name:'Radio Paradise',      genre:'Rock / Alternative',  emoji:'🌍',  group:'int', logo:'https://www.google.com/s2/favicons?domain=radioparadise.com&sz=64',       url:'https://stream.radioparadise.com/rock-128' },
+  { id:'r56', name:'WNYC NYC',            genre:'News / Talk / USA',   emoji:'🇺🇸',  group:'int', logo:'https://www.google.com/s2/favicons?domain=wnyc.org&sz=64',               url:'https://fm939.wnyc.org/wnycfm' },
+  { id:'r57', name:'KEXP Seattle',        genre:'Indie / Alternative', emoji:'🌿',  group:'int', logo:'https://www.google.com/s2/favicons?domain=kexp.org&sz=64',               url:'https://live-aacplus-64.kexp.org/kexp64.aac' },
 ];
 
 let customRadios = JSON.parse(localStorage.getItem('customRadios') || '[]');
@@ -1316,7 +1316,7 @@ function getLogoUrl(r) {
 function renderRadioLogo(r) {
   const logo = r.logo || null;
   if (logo) {
-    return `<img class="radio-logo" src="${logo}" alt="${r.name}"
+    return `<img class="radio-logo" src="${logo}" alt="${r.name}" loading="lazy"
               onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
             <span class="radio-logo-emoji" style="display:none">${r.emoji || '📻'}</span>`;
   }
