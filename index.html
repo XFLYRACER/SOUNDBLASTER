@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean 2000</title>
+<title>Radio - Jean</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -2328,8 +2328,12 @@ function renderCharts(filter = '') {
   }
 
   el.innerHTML = data.map((c, i) => `
-    <div class="chart-item" style="cursor:pointer;" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background=''">
-      <div class="chart-pos ${c.pos <= 3 ? 'top3' : ''}">${c.pos}</div>
+    <div class="chart-item" style="cursor:pointer;padding:10px 16px;" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background=''">
+      <button onclick="addChartToPlaylist(${i})" title="Aggiungi alla playlist"
+        style="width:36px;height:36px;background:var(--accent);border:none;border-radius:50%;color:white;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform 0.15s,background 0.15s;line-height:1;"
+        onmouseover="this.style.transform='scale(1.15)';this.style.background='#ff2a4d'" 
+        onmouseout="this.style.transform='scale(1)';this.style.background='var(--accent)'">+</button>
+      <div class="chart-pos ${c.pos <= 3 ? 'top3' : ''}" style="margin-left:4px;">${c.pos}</div>
       <div class="chart-art" style="background:none;padding:0;overflow:hidden;">
         ${c.art ? `<img src="${c.art}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none'">` : '🎵'}
       </div>
@@ -2337,10 +2341,7 @@ function renderCharts(filter = '') {
         <div class="chart-song">${filter ? c.song.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.song)}</div>
         <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
       </div>
-      <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-right:8px;">${c.label}</div>
-      <button onclick="addChartToPlaylist(${i})" title="Cerca su YouTube e aggiungi alla playlist"
-        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--accent2);cursor:pointer;padding:6px 10px;font-size:14px;flex-shrink:0;transition:all 0.2s;"
-        onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">＋</button>
+      <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${c.label}</div>
     </div>
   `).join('');
 }
