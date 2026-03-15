@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean</title>
+<title>Radio - Jean*</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -941,15 +941,15 @@ body::before {
     <div id="addRadioForm" class="add-form">
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Nome Radio</label>
+          <label class="form-label" for="addName">Nome Radio</label>
           <input class="form-input" type="text" id="addName" placeholder="Es. Radio Rockout">
         </div>
         <div class="form-group">
-          <label class="form-label">URL Stream</label>
+          <label class="form-label" for="addUrl">URL Stream</label>
           <input class="form-input" type="url" id="addUrl" placeholder="https://stream.esempio.it/live.mp3">
         </div>
         <div class="form-group">
-          <label class="form-label">Genere</label>
+          <label class="form-label" for="addGenre">Genere</label>
           <input class="form-input" type="text" id="addGenre" placeholder="Pop, Rock, Jazz...">
         </div>
         <button class="btn btn-primary" onclick="addCustomRadio()">Salva</button>
@@ -1059,15 +1059,15 @@ body::before {
     <div class="modal-form">
       <input type="hidden" id="editRadioId">
       <div class="form-group">
-        <label class="form-label">Nome stazione</label>
+        <label class="form-label" for="editRadioName">Nome stazione</label>
         <input class="form-input" type="text" id="editRadioName" placeholder="Es. Radio Italia">
       </div>
       <div class="form-group">
-        <label class="form-label">URL Stream</label>
+        <label class="form-label" for="editRadioUrl">URL Stream</label>
         <input class="form-input" type="url" id="editRadioUrl" placeholder="https://stream.esempio.it/live.mp3">
       </div>
       <div class="form-group">
-        <label class="form-label">Genere / Descrizione</label>
+        <label class="form-label" for="editRadioGenre">Genere / Descrizione</label>
         <input class="form-input" type="text" id="editRadioGenre" placeholder="Pop, Rock, News...">
       </div>
       <div id="editLogoPreview" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;">
@@ -1126,7 +1126,7 @@ body::before {
 
       <!-- AGGIUNGI A PLAYLIST -->
       <div class="form-group" id="ytPlaylistGroup" style="display:none;">
-        <label class="form-label">Aggiungi anche alla playlist (opzionale)</label>
+        <label class="form-label" for="ytPlaylistSelect">Aggiungi anche alla playlist (opzionale)</label>
         <select class="form-input" id="ytPlaylistSelect">
           <option value="">Solo coda di riproduzione</option>
         </select>
@@ -1146,11 +1146,11 @@ body::before {
     <div class="modal-title">Nuova Playlist</div>
     <div class="modal-form">
       <div class="form-group">
-        <label class="form-label">Nome Playlist</label>
+        <label class="form-label" for="plName">Nome Playlist</label>
         <input class="form-input" type="text" id="plName" placeholder="Es. Road Trip Mix">
       </div>
       <div class="form-group">
-        <label class="form-label">Emoji (opzionale)</label>
+        <label class="form-label" for="plEmoji">Emoji (opzionale)</label>
         <input class="form-input" type="text" id="plEmoji" placeholder="🎸" maxlength="2">
       </div>
     </div>
