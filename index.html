@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v11</title>
+<title>Radio - Jean v12</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1278,16 +1278,20 @@ async function rbFetch(path) {
 
 function stationToRadio(s, group) {
   const originalUrl = s.url_resolved || s.url || '';
-  // Passa lo stream attraverso il Worker per evitare CORS, Mixed Content e SSL
-  const streamUrl = WORKER_URL + '/stream?url=' + encodeURIComponent(originalUrl);
+  // Chiedi al Worker di risolvere l'URL finale (segue redirect HTTP→HTTPS)
+  // Se l'URL è già HTTPS lo usiamo direttamente
+  const streamUrl = originalUrl.startsWith('https://')
+    ? originalUrl
+    : WORKER_URL + '/resolve?url=' + encodeURIComponent(originalUrl);
   return {
     id:    'rb_' + s.stationuuid,
     name:   s.name.trim(),
     genre:  s.tags ? s.tags.split(',').slice(0,2).map(t => t.trim()).filter(Boolean).join(' / ') || s.country : s.country,
     emoji:  '📻',
     group:  group,
-    logo:   s.favicon || null,
+    logo:   s.favicon ? (s.favicon.startsWith('https://') ? s.favicon : null) : null,
     url:    streamUrl,
+    originalUrl: originalUrl,
   };
 }
 
