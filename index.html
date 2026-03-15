@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v6</title>
+<title>Radio - Jean v8</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1257,50 +1257,21 @@ let queue = JSON.parse(localStorage.getItem('queue') || '[]');
 // RADIO BROWSER API
 // ===========================
 // Lista server Radio Browser (round-robin per affidabilità)
-// Server di fallback hardcoded — usati se il DNS lookup fallisce
-const RB_FALLBACK = [
-  'https://de1.api.radio-browser.info',
-  'https://de2.api.radio-browser.info',
-];
-
-let rbServers = null; // popolato dinamicamente
-
-async function getRbServers() {
-  if (rbServers) return rbServers;
-  try {
-    // Metodo ufficiale: DNS lookup di all.api.radio-browser.info
-    const res = await fetch('https://all.api.radio-browser.info/json/servers', {
-      signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined
-    });
-    if (res.ok) {
-      const list = await res.json();
-      if (list && list.length) {
-        rbServers = list.map(s => 'https://' + s.name);
-        return rbServers;
-      }
-    }
-  } catch(e) {
-    console.warn('DNS lookup Radio Browser fallito, uso fallback');
-  }
-  rbServers = RB_FALLBACK;
-  return rbServers;
-}
+// Radio Browser API via Cloudflare Worker (nessun problema CORS)
+const WORKER_URL = 'https://radioweb.jm-belley.workers.dev';
 
 async function rbFetch(path) {
-  const servers = await getRbServers();
-  for (const base of servers) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 8000);
-      const res = await fetch(base + path, { signal: controller.signal });
-      clearTimeout(timer);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.length) return data;
-      }
-    } catch(e) {
-      console.warn('RB server fallito:', base, e.message);
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(WORKER_URL + '/radio' + path, { signal: controller.signal });
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.length) return data;
     }
+  } catch(e) {
+    console.warn('Radio Browser via Worker fallito:', e.message);
   }
   return [];
 }
@@ -1866,8 +1837,6 @@ async function searchYT() {
   resultsDiv.style.flexDirection = 'column';
   resultsDiv.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">🔎 Ricerca in corso...</div>';
 
-  const WORKER_URL = 'https://radioweb.jm-belley.workers.dev';
-
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
@@ -1920,47 +1889,6 @@ async function searchYT() {
   btn.disabled = false;
 }
 
-function selectYTItemFromItunes(item, ytQuery) {
-  // Cerca il video YouTube corrispondente e apre il link
-  // Salva i metadati iTunes per la playlist
-  const title   = item.trackName || '';
-  const channel = item.artistName || '';
-  const thumb   = (item.artworkUrl100 || '').replace('100x100', '200x200');
-  const dur     = item.trackTimeMillis ? fmtSec(Math.floor(item.trackTimeMillis / 1000)) : '';
-
-  // Mostra dialog per incollare URL YouTube
-  document.getElementById('ytSearchResults').style.display = 'none';
-
-  // Pre-popola il campo URL con un messaggio guida
-  const urlInput = document.getElementById('ytUrlInput');
-  urlInput.value = '';
-  urlInput.placeholder = 'Cerca "' + title + ' ' + channel + '" su YouTube e incolla il link qui';
-  urlInput.focus();
-
-  // Aggiorna anteprima con dati iTunes
-  document.getElementById('ytSelThumb').src = thumb;
-  document.getElementById('ytSelTitle').textContent = title;
-  document.getElementById('ytSelChannel').textContent = channel;
-  document.getElementById('ytSelDuration').textContent = dur ? '⏱ ' + dur : '';
-  document.getElementById('ytSelectedPreview').style.display = 'block';
-  document.getElementById('ytPlaylistGroup').style.display = '';
-  document.getElementById('btnAddYT').style.display = '';
-
-  // Salva item selezionato — useremo i dati iTunes ma l'URL YouTube dall'input
-  selectedYTItem = {
-    ytId: '',  // verrà estratto dall'URL che incollerà l'utente
-    title,
-    channel,
-    duration: dur,
-    _itunesThumb: thumb,
-    _needsUrl: true
-  };
-
-  // Apri YouTube search in nuova scheda
-  window.open('https://www.youtube.com/results?search_query=' + ytQuery, '_blank');
-
-  showToast('🔗 YouTube aperto — copia il link e incollalo qui sotto', 'success');
-}
 
 function fmtSec(s) {
   s = parseInt(s);
@@ -2028,14 +1956,7 @@ function addYTToQueue() {
     if (!id) return showToast('Seleziona un brano o incolla un URL valido', 'error');
     selectedYTItem = { ytId: id, title: 'Video YouTube', channel: 'YouTube', duration: '' };
   }
-  // Se viene da iTunes e manca ancora l'URL YouTube, cercalo nell'input
-  if (selectedYTItem._needsUrl) {
-    const url = document.getElementById('ytUrlInput').value;
-    const id = getYTId(url);
-    if (!id) return showToast('Incolla il link YouTube del brano', 'error');
-    selectedYTItem.ytId = id;
-    delete selectedYTItem._needsUrl;
-  }
+
   const item = {
     id: 'yt' + Date.now(),
     ytId: selectedYTItem.ytId,
@@ -2402,16 +2323,18 @@ function renderCharts(filter = '') {
     <div class="chart-item" style="padding:10px 16px;" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background=''">
       <button onclick="event.stopPropagation();addChartToPlaylist(${i})" title="Aggiungi alla playlist"
         style="width:36px;height:36px;background:var(--accent);border:none;border-radius:50%;color:white;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform 0.15s,background 0.15s;line-height:1;"
-        onmouseover="this.style.transform='scale(1.15)';this.style.background='#ff2a4d'" 
+        onmouseover="this.style.transform='scale(1.15)';this.style.background='#ff2a4d'"
         onmouseout="this.style.transform='scale(1)';this.style.background='var(--accent)'">+</button>
       <div class="chart-pos ${c.pos <= 3 ? 'top3' : ''}" style="margin-left:4px;">${c.pos}</div>
       <div class="chart-art" style="background:none;padding:0;overflow:hidden;">
         ${c.art ? `<img src="${c.art}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none'">` : '🎵'}
       </div>
-      <div class="chart-info" style="flex:1;cursor:pointer;" onclick="event.stopPropagation();window.open('${c.link}','_blank')">
-        <div class="chart-song">${filter ? c.song.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.song)}</div>
-        <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
-      </div>
+      <a href="${c.link}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="flex:1;text-decoration:none;">
+        <div class="chart-info" style="cursor:pointer;">
+          <div class="chart-song">${filter ? c.song.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.song)}</div>
+          <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
+        </div>
+      </a>
       <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${c.label}</div>
     </div>
   `).join('');
