@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - RADIOWEB v15</title>
+<title>Radio - RADIOWEB v16</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1304,14 +1304,14 @@ async function fetchRadios() {
 
   // Radio italiane fisse con CORS aperto e stream verificati
   const fixedItalian = [
-    { stationuuid:'fixed-rds',      name:'RDS',            tags:'pop,dance',      country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=rds.it&sz=64',          url_resolved:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
-    { stationuuid:'fixed-r101',     name:'R101',           tags:'pop,romantico',  country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=r101.it&sz=64',         url_resolved:'https://icecast.unitedradio.it/r101.mp3' },
-    { stationuuid:'fixed-105',      name:'Radio 105',      tags:'pop,dance,hits', country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=105.net&sz=64',          url_resolved:'https://icecast.unitedradio.it/Radio105.mp3' },
-    { stationuuid:'fixed-virgin',   name:'Virgin Radio',   tags:'rock,pop',       country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=virginradio.it&sz=64',  url_resolved:'https://icecast.unitedradio.it/Virgin.mp3' },
-    { stationuuid:'fixed-m2o',      name:'Radio m2o',      tags:'dance,electronic',country:'Italy',countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=m2o.it&sz=64',          url_resolved:'https://icecast.unitedradio.it/m2o.mp3' },
-    { stationuuid:'fixed-rmc',      name:'Radio Monte Carlo', tags:'jazz,classico',country:'Italy',countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=radiomontecarlo.net&sz=64', url_resolved:'https://edge.radiomontecarlo.net/RMC.mp3' },
-    { stationuuid:'fixed-sportiva', name:'Radio Sportiva', tags:'sport,news',     country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=radiosportiva.it&sz=64', url_resolved:'https://stream.radiosportiva.it/radiosportiva' },
-    { stationuuid:'fixed-kisskiss', name:'Radio Kiss Kiss',tags:'pop,hit',        country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=kisskiss.it&sz=64',     url_resolved:'https://icecast.fluidstream.net/KissKiss.mp3' },
+ //   { stationuuid:'fixed-rds',      name:'RDS',            tags:'pop,dance',      country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=rds.it&sz=64',          url_resolved:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
+ //   { stationuuid:'fixed-r101',     name:'R101',           tags:'pop,romantico',  country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=r101.it&sz=64',         url_resolved:'https://icecast.unitedradio.it/r101.mp3' },
+ //   { stationuuid:'fixed-105',      name:'Radio 105',      tags:'pop,dance,hits', country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=105.net&sz=64',          url_resolved:'https://icecast.unitedradio.it/Radio105.mp3' },
+ //   { stationuuid:'fixed-virgin',   name:'Virgin Radio',   tags:'rock,pop',       country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=virginradio.it&sz=64',  url_resolved:'https://icecast.unitedradio.it/Virgin.mp3' },
+ //   { stationuuid:'fixed-m2o',      name:'Radio m2o',      tags:'dance,electronic',country:'Italy',countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=m2o.it&sz=64',          url_resolved:'https://icecast.unitedradio.it/m2o.mp3' },
+ //   { stationuuid:'fixed-rmc',      name:'Radio Monte Carlo', tags:'jazz,classico',country:'Italy',countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=radiomontecarlo.net&sz=64', url_resolved:'https://edge.radiomontecarlo.net/RMC.mp3' },
+ //   { stationuuid:'fixed-sportiva', name:'Radio Sportiva', tags:'sport,news',     country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=radiosportiva.it&sz=64', url_resolved:'https://stream.radiosportiva.it/radiosportiva' },
+ //   { stationuuid:'fixed-kisskiss', name:'Radio Kiss Kiss',tags:'pop,hit',        country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=kisskiss.it&sz=64',     url_resolved:'https://icecast.fluidstream.net/KissKiss.mp3' },
   ];
 
   if (!itStations.length && !intStations.length) {
