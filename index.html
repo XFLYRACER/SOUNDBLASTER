@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean</title>
+<title>Radio - Jean**</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1866,54 +1866,100 @@ async function searchYT() {
   resultsDiv.style.flexDirection = 'column';
   resultsDiv.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">🔎 Ricerca in corso...</div>';
 
-  // Rilevamento automatico: locale o Render
-  // Cambia RENDER_URL con il tuo URL dopo il deploy su Render
-  const RENDER_URL = 'https://radio-jean-search.onrender.com';
-  const LOCAL_URL  = 'http://localhost:5000';
-  const isLocal    = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  const baseUrl    = isLocal ? LOCAL_URL : RENDER_URL;
+  const PIPED = [
+    'https://pipedapi.kavin.rocks',
+    'https://pipedapi.adminforge.de',
+    'https://piped-api.tokhmi.xyz',
+  ];
+  const INVIDIOUS = [
+    'https://invidious.fdn.fr',
+    'https://inv.nadeko.net',
+    'https://invidious.privacyredirect.com',
+    'https://iv.datura.network',
+    'https://invidious.protokolla.fi',
+  ];
 
-  try {
-    const res = await fetch(baseUrl + '/search?q=' + encodeURIComponent(q), {
-      signal: AbortSignal.timeout(15000)
-    });
+  async function tryPiped(base) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch(base + '/search?q=' + encodeURIComponent(q) + '&filter=videos', { signal: controller.signal });
+    clearTimeout(timer);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const videos = await res.json();
-    if (!videos.length) throw new Error('Nessun risultato');
-
-    resultsDiv.innerHTML = '';
-    videos.forEach(function(v) {
-      const div = document.createElement('div');
-      div.style.cssText = 'display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:4px;background:var(--card);transition:border-color 0.2s;';
-      div.onmouseover = function(){ this.style.borderColor = 'var(--accent2)'; };
-      div.onmouseout  = function(){ this.style.borderColor = 'var(--border)'; };
-      div.onclick = function() { selectYTItem(v.ytId, v.title, v.channel, v.dur); };
-      const img = document.createElement('img');
-      img.src = 'https://img.youtube.com/vi/' + v.ytId + '/mqdefault.jpg';
-      img.style.cssText = 'width:80px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg3);';
-      const info = document.createElement('div');
-      info.style.cssText = 'flex:1;overflow:hidden;';
-      info.innerHTML =
-        '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(v.title) + '</div>' +
-        '<div style="font-size:11px;color:var(--text3);margin-top:3px;">' + esc(v.channel) + '</div>' +
-        '<div style="font-size:10px;color:var(--accent3);margin-top:2px;font-family:monospace;">' + esc(v.dur) + '</div>';
-      div.appendChild(img);
-      div.appendChild(info);
-      resultsDiv.appendChild(div);
-    });
-
-  } catch(e) {
-    const isServerDown = e.message.includes('Failed to fetch') || e.message.includes('Load failed') || e.message.includes('NetworkError');
-    resultsDiv.innerHTML =
-      '<div style="color:var(--accent);font-size:13px;padding:12px;text-align:center;">' +
-        (isServerDown
-          ? '⚠️ Server di ricerca non raggiungibile.<br><small style="color:var(--text3)">In locale: avvia <b>server.py</b> prima di cercare.<br>Online: verifica che il servizio Render sia attivo.</small>'
-          : '❌ ' + esc(e.message)) +
-        '<br><br><a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '" target="_blank" ' +
-        'style="color:var(--accent2);text-decoration:none;padding:6px 14px;border:1px solid var(--accent2);border-radius:6px;font-size:12px;">' +
-        '🔗 Cerca su YouTube →</a>' +
-      '</div>';
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('json')) throw new Error('not JSON');
+    const data = await res.json();
+    const items = (data.items || []).filter(i => i.url && i.url.startsWith('/watch'));
+    if (!items.length) throw new Error('empty');
+    return items.slice(0, 6).map(v => ({
+      ytId:    (v.url || '').replace('/watch?v=', ''),
+      title:   v.title || '',
+      channel: v.uploaderName || '',
+      dur:     v.duration ? fmtSec(v.duration) : '',
+    }));
   }
+
+  async function tryInvidious(base) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch(base + '/api/v1/search?q=' + encodeURIComponent(q) + '&type=video', { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('json')) throw new Error('not JSON');
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) throw new Error('empty');
+    return data.slice(0, 6).map(v => ({
+      ytId:    v.videoId || '',
+      title:   v.title || '',
+      channel: v.author || '',
+      dur:     v.lengthSeconds ? fmtSec(v.lengthSeconds) : '',
+    }));
+  }
+
+  let videos = null;
+  try {
+    videos = await Promise.any([
+      ...PIPED.map(b => tryPiped(b)),
+      ...INVIDIOUS.map(b => tryInvidious(b)),
+    ]);
+  } catch(e) {
+    videos = null;
+  }
+
+  resultsDiv.innerHTML = '';
+
+  if (!videos || !videos.length) {
+    resultsDiv.innerHTML =
+      '<div style="color:var(--text3);font-size:13px;padding:12px;text-align:center;">' +
+      'Le API di ricerca non sono raggiungibili.<br>' +
+      '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '" target="_blank" ' +
+      'style="color:var(--accent2);text-decoration:none;display:inline-block;margin-top:10px;padding:8px 16px;border:1px solid var(--accent2);border-radius:8px;">' +
+      '🔗 Cerca su YouTube →</a><br>' +
+      '<small style="color:var(--text3);margin-top:8px;display:block;">Copia il link e incollalo nel campo URL qui sotto</small>' +
+      '</div>';
+    btn.textContent = 'Cerca'; btn.disabled = false;
+    return;
+  }
+
+  videos.forEach(function(v) {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:4px;background:var(--card);transition:border-color 0.2s;';
+    div.onmouseover = function(){ this.style.borderColor = 'var(--accent2)'; };
+    div.onmouseout  = function(){ this.style.borderColor = 'var(--border)'; };
+    div.onclick = function() { selectYTItem(v.ytId, v.title, v.channel, v.dur); };
+    const img = document.createElement('img');
+    img.src = 'https://img.youtube.com/vi/' + v.ytId + '/mqdefault.jpg';
+    img.style.cssText = 'width:80px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg3);';
+    const info = document.createElement('div');
+    info.style.cssText = 'flex:1;overflow:hidden;';
+    info.innerHTML =
+      '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(v.title) + '</div>' +
+      '<div style="font-size:11px;color:var(--text3);margin-top:3px;">' + esc(v.channel) + '</div>' +
+      '<div style="font-size:10px;color:var(--accent3);margin-top:2px;font-family:monospace;">' + esc(v.dur) + '</div>';
+    div.appendChild(img);
+    div.appendChild(info);
+    resultsDiv.appendChild(div);
+  });
 
   btn.textContent = 'Cerca';
   btn.disabled = false;
