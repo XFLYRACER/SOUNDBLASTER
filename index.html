@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean**</title>
+<title>Radio - Jean v3</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1870,6 +1870,8 @@ async function searchYT() {
     'https://pipedapi.kavin.rocks',
     'https://pipedapi.adminforge.de',
     'https://piped-api.tokhmi.xyz',
+    'https://pipedapi.yt.artemislena.eu',
+    'https://pipedapi.moomoo.me',
   ];
   const INVIDIOUS = [
     'https://invidious.fdn.fr',
@@ -1877,43 +1879,62 @@ async function searchYT() {
     'https://invidious.privacyredirect.com',
     'https://iv.datura.network',
     'https://invidious.protokolla.fi',
+    'https://invidious.nerdvpn.de',
+    'https://yt.drgnz.club',
+    'https://invidious.io',
   ];
+
+  const log = [];
 
   async function tryPiped(base) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
-    const res = await fetch(base + '/search?q=' + encodeURIComponent(q) + '&filter=videos', { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const ct = res.headers.get('content-type') || '';
-    if (!ct.includes('json')) throw new Error('not JSON');
-    const data = await res.json();
-    const items = (data.items || []).filter(i => i.url && i.url.startsWith('/watch'));
-    if (!items.length) throw new Error('empty');
-    return items.slice(0, 6).map(v => ({
-      ytId:    (v.url || '').replace('/watch?v=', ''),
-      title:   v.title || '',
-      channel: v.uploaderName || '',
-      dur:     v.duration ? fmtSec(v.duration) : '',
-    }));
+    const timer = setTimeout(() => controller.abort(), 7000);
+    try {
+      const res = await fetch(base + '/search?q=' + encodeURIComponent(q) + '&filter=videos', { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) { log.push('❌ Piped ' + base + ' → HTTP ' + res.status); throw new Error('HTTP ' + res.status); }
+      const ct = res.headers.get('content-type') || '';
+      if (!ct.includes('json')) { log.push('❌ Piped ' + base + ' → not JSON'); throw new Error('not JSON'); }
+      const data = await res.json();
+      const items = (data.items || []).filter(i => i.url && i.url.startsWith('/watch'));
+      if (!items.length) { log.push('⚠️ Piped ' + base + ' → empty'); throw new Error('empty'); }
+      log.push('✅ Piped ' + base + ' → OK (' + items.length + ' risultati)');
+      return items.slice(0, 6).map(v => ({
+        ytId:    (v.url || '').replace('/watch?v=', ''),
+        title:   v.title || '',
+        channel: v.uploaderName || '',
+        dur:     v.duration ? fmtSec(v.duration) : '',
+      }));
+    } catch(e) {
+      clearTimeout(timer);
+      if (!log.find(l => l.includes(base))) log.push('❌ Piped ' + base + ' → ' + e.message);
+      throw e;
+    }
   }
 
   async function tryInvidious(base) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
-    const res = await fetch(base + '/api/v1/search?q=' + encodeURIComponent(q) + '&type=video', { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const ct = res.headers.get('content-type') || '';
-    if (!ct.includes('json')) throw new Error('not JSON');
-    const data = await res.json();
-    if (!Array.isArray(data) || !data.length) throw new Error('empty');
-    return data.slice(0, 6).map(v => ({
-      ytId:    v.videoId || '',
-      title:   v.title || '',
-      channel: v.author || '',
-      dur:     v.lengthSeconds ? fmtSec(v.lengthSeconds) : '',
-    }));
+    const timer = setTimeout(() => controller.abort(), 7000);
+    try {
+      const res = await fetch(base + '/api/v1/search?q=' + encodeURIComponent(q) + '&type=video', { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) { log.push('❌ Inv ' + base + ' → HTTP ' + res.status); throw new Error('HTTP ' + res.status); }
+      const ct = res.headers.get('content-type') || '';
+      if (!ct.includes('json')) { log.push('❌ Inv ' + base + ' → not JSON'); throw new Error('not JSON'); }
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) { log.push('⚠️ Inv ' + base + ' → empty'); throw new Error('empty'); }
+      log.push('✅ Inv ' + base + ' → OK (' + data.length + ' risultati)');
+      return data.slice(0, 6).map(v => ({
+        ytId:    v.videoId || '',
+        title:   v.title || '',
+        channel: v.author || '',
+        dur:     v.lengthSeconds ? fmtSec(v.lengthSeconds) : '',
+      }));
+    } catch(e) {
+      clearTimeout(timer);
+      if (!log.find(l => l.includes(base))) log.push('❌ Inv ' + base + ' → ' + e.message);
+      throw e;
+    }
   }
 
   let videos = null;
@@ -1926,16 +1947,23 @@ async function searchYT() {
     videos = null;
   }
 
+  // Mostra sempre il log in console per debug
+  console.group('YouTube Search Debug');
+  log.forEach(l => console.log(l));
+  console.groupEnd();
+
   resultsDiv.innerHTML = '';
 
   if (!videos || !videos.length) {
     resultsDiv.innerHTML =
-      '<div style="color:var(--text3);font-size:13px;padding:12px;text-align:center;">' +
-      'Le API di ricerca non sono raggiungibili.<br>' +
+      '<div style="color:var(--text3);font-size:13px;padding:12px;">' +
+      '<b style="color:var(--accent)">❌ Nessuna API raggiungibile.</b><br><br>' +
+      '<div style="font-family:monospace;font-size:11px;background:var(--bg3);padding:8px;border-radius:6px;max-height:150px;overflow-y:auto;">' +
+      log.map(l => '<div>' + esc(l) + '</div>').join('') +
+      '</div><br>' +
       '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '" target="_blank" ' +
-      'style="color:var(--accent2);text-decoration:none;display:inline-block;margin-top:10px;padding:8px 16px;border:1px solid var(--accent2);border-radius:8px;">' +
-      '🔗 Cerca su YouTube →</a><br>' +
-      '<small style="color:var(--text3);margin-top:8px;display:block;">Copia il link e incollalo nel campo URL qui sotto</small>' +
+      'style="color:var(--accent2);text-decoration:none;display:inline-block;margin-top:4px;padding:8px 16px;border:1px solid var(--accent2);border-radius:8px;">' +
+      '🔗 Cerca su YouTube →</a>' +
       '</div>';
     btn.textContent = 'Cerca'; btn.disabled = false;
     return;
