@@ -1438,87 +1438,110 @@ const CORS_PROXIES = [
   'https://api.allorigins.win/raw?url=',
   'https://thingproxy.freeboard.io/fetch/',
 ];
-function playRadio(id, fallbackIndex, useProxy) {
-  const all = [...builtinRadios, ...customRadios];
-  const radio = all.find(r => r.id === id);
-  if (!radio) return;
+function playRadio(id, fallbackIndex, forceProxy) {
+    const all = [...builtinRadios, ...customRadios];
+    const radio = all.find(r => r.id === id);
+    if (!radio) return;
 
-  // Se la radio ha cors:true e non stiamo già provando proxy, proviamo direttamente
-  // e in caso di errore riproveremo col proxy
-  const urls = [radio.url, ...(radio.fallbacks || [])];
-  const urlIndex = fallbackIndex || 0;
+    // Lista URL da provare: Originale -> Fallbacks -> Proxy (se attivato)
+    let urls = [radio.url, ...(radio.fallbacks || [])];
+    
+    // Se siamo al secondo tentativo o forziamo il proxy, aggiungiamo un proxy CORS/HTTPS
+    if (fallbackIndex > 0 || forceProxy) {
+        // Usiamo un proxy pubblico affidabile come ultima spiaggia
+        // Nota: I proxy gratuiti possono essere lenti, usali solo se necessario
+        const proxyUrl = 'https://api.allorigins.win/raw?url='; 
+        urls = urls.map(u => proxyUrl + encodeURIComponent(u));
+    }
 
-  if (urlIndex >= urls.length) {
-    showToast('\u26a0\ufe0f ' + radio.name + ': stream non raggiungibile', 'error');
+    const urlIndex = fallbackIndex || 0;
+
+    // Se abbiamo esaurito tutti gli URL
+    if (urlIndex >= urls.length) {
+        showToast(`⚠️ ${radio.name}: Nessuno stream disponibile`, 'error');
+        resetPlayerState();
+        return;
+    }
+
+    currentMode = 'radio';
+    currentRadio = radio;
+    
+    // UI Update
     const card = document.getElementById('rc-' + id);
-    if (card) {
-      card.style.borderColor = 'var(--accent)';
-      if (!card.querySelector('.stream-err')) {
-        const tag = document.createElement('div');
-        tag.className = 'stream-err';
-        tag.style.cssText = 'font-size:10px;color:var(--accent);margin-top:4px;font-family:JetBrains Mono,monospace;';
-        tag.textContent = '\u2715 non disponibile';
-        card.appendChild(tag);
-      }
+    if (card) { 
+        card.style.borderColor = ''; 
+        const errTag = card.querySelector('.stream-err'); 
+        if (errTag) errTag.remove(); 
     }
-    currentMode = 'idle'; isPlaying = false;
-    document.getElementById('playBtn').textContent = '\u25b6';
-    return;
-  }
 
-  currentMode = 'radio';
-  currentRadio = radio;
-
-  const card = document.getElementById('rc-' + id);
-  if (card) { card.style.borderColor = ''; const e = card.querySelector('.stream-err'); if (e) e.remove(); }
-
-  // Costruisci URL: diretto (niente proxy per ora — rimuoviamo il loop)
-  const streamUrl = urls[urlIndex];
-
-  audio.onerror = null;
-  let started = false;
-  let errorFired = false;
-
-  const onPlaying = () => { started = true; clearTimeout(safetyTimer); };
-  audio.addEventListener('playing', onPlaying, { once: true });
-
-  const tryNext = () => {
-    if (errorFired) return;
-    errorFired = true;
+    const streamUrl = urls[urlIndex];
+    
+    // Reset eventi audio
     audio.onerror = null;
-    destroyHls();
-    if (!started && currentRadio && currentRadio.id === id) {
-      audio.removeEventListener('playing', onPlaying);
-      playRadio(id, urlIndex + 1);
+    audio.onplaying = null;
+    let hasStarted = false;
+    let errorHandled = false;
+
+    const handleSuccess = () => {
+        hasStarted = true;
+        clearTimeout(safetyTimer);
+        if (urlIndex === 0 && !forceProxy) {
+            showToast(`▶️ ${radio.name} in riproduzione`, 'success');
+        }
+    };
+
+    const handleError = () => {
+        if (errorHandled) return;
+        errorHandled = true;
+        destroyHls();
+        
+        if (!hasStarted && currentRadio && currentRadio.id === id) {
+            console.warn(`Stream fallito per ${radio.name}, provo il successivo...`);
+            // Ritardo minimo prima del prossimo tentativo
+            setTimeout(() => playRadio(id, urlIndex + 1), 500);
+        }
+    };
+
+    // Timer di sicurezza: se dopo 8 secondi non parte, prova il prossimo
+    const safetyTimer = setTimeout(() => {
+        if (!hasStarted && currentRadio && currentRadio.id === id) {
+            handleError();
+        }
+    }, 8000);
+
+    audio.addEventListener('playing', handleSuccess, { once: true });
+    audio.onerror = handleError;
+
+    // Avvio riproduzione
+    playStream(streamUrl, handleError);
+    
+    isPlaying = true;
+    updatePlayerUI(radio, true);
+    renderRadio(); // Aggiorna icone play/pause
+}
+
+function resetPlayerState() {
+    currentMode = 'idle'; 
+    isPlaying = false;
+    document.getElementById('playBtn').textContent = '▶';
+    document.getElementById('liveBadge').style.display = 'none';
+}
+
+function updatePlayerUI(radio, playing) {
+    const artEl = document.getElementById('playerArt');
+    const logoUrl = getLogoUrl(radio);
+    if (logoUrl) {
+        artEl.innerHTML = `<img src="${logoUrl}" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.textContent='${radio.emoji||'📻'}'">`;
+    } else {
+        artEl.textContent = radio.emoji || '📻';
     }
-  };
-
-  const safetyTimer = setTimeout(() => {
-    if (!started && currentRadio && currentRadio.id === id) tryNext();
-  }, 10000);
-
-  audio.onerror = tryNext;
-  playStream(streamUrl, tryNext);
-
-  isPlaying = true;
-  document.getElementById('playBtn').textContent = '\u23f8';
-  const artEl = document.getElementById('playerArt');
-  const logoUrl = getLogoUrl(radio);
-  if (logoUrl) {
-    artEl.innerHTML = '<img src="' + logoUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.textContent=\'' + (radio.emoji||'\ud83d\udcfb') + '\'">';
-  } else {
-    artEl.textContent = radio.emoji || '\ud83d\udcfb';
-  }
-  document.getElementById('playerTrack').textContent = radio.name;
-  document.getElementById('playerStation').textContent = radio.genre;
-  document.getElementById('liveBadge').style.display = 'inline-flex';
-  document.getElementById('npTitle').textContent = radio.name;
-  document.getElementById('npSub').textContent = radio.genre;
-  document.getElementById('timeDuration').textContent = 'LIVE';
-
-  renderRadio();
-  if (urlIndex === 0) showToast('\u25b6 ' + radio.name + ' in riproduzione', 'success');
-  // Silently try fallbacks - no toast spam during retries
+    document.getElementById('playerTrack').textContent = radio.name;
+    document.getElementById('playerStation').textContent = radio.genre;
+    document.getElementById('liveBadge').style.display = playing ? 'inline-flex' : 'none';
+    document.getElementById('npTitle').textContent = radio.name;
+    document.getElementById('npSub').textContent = radio.genre;
+    document.getElementById('timeDuration').textContent = 'LIVE';
+    document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
 }
 
 function cardClick(id) {
