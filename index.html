@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v3.2</title>
+<title>Radio - Jean</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1257,18 +1257,39 @@ let queue = JSON.parse(localStorage.getItem('queue') || '[]');
 // RADIO BROWSER API
 // ===========================
 // Lista server Radio Browser (round-robin per affidabilità)
-const RB_SERVERS = [
+// Server di fallback hardcoded — usati se il DNS lookup fallisce
+const RB_FALLBACK = [
   'https://de1.api.radio-browser.info',
-  'https://fr1.api.radio-browser.info',
-  'https://at1.api.radio-browser.info',
-  'https://nl1.api.radio-browser.info',
-  'https://fi1.api.radio-browser.info',
+  'https://de2.api.radio-browser.info',
 ];
 
+let rbServers = null; // popolato dinamicamente
+
+async function getRbServers() {
+  if (rbServers) return rbServers;
+  try {
+    // Metodo ufficiale: DNS lookup di all.api.radio-browser.info
+    const res = await fetch('https://all.api.radio-browser.info/json/servers', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined
+    });
+    if (res.ok) {
+      const list = await res.json();
+      if (list && list.length) {
+        rbServers = list.map(s => 'https://' + s.name);
+        return rbServers;
+      }
+    }
+  } catch(e) {
+    console.warn('DNS lookup Radio Browser fallito, uso fallback');
+  }
+  rbServers = RB_FALLBACK;
+  return rbServers;
+}
+
 async function rbFetch(path) {
-  for (const base of RB_SERVERS) {
+  const servers = await getRbServers();
+  for (const base of servers) {
     try {
-      // Timeout manuale compatibile con tutti i browser
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(base + path, { signal: controller.signal });
@@ -2164,6 +2185,72 @@ function deletePlaylist(i) {
   localStorage.setItem('playlists', JSON.stringify(playlists));
   renderPlaylist();
   showToast('Playlist eliminata', 'success');
+}
+
+
+// ===========================
+// PLAYLIST SUGGERITE
+// ===========================
+const suggestedPlaylists = [
+  { emoji: '🇮🇹', name: 'Hits Italiane', desc: 'Il meglio della musica italiana', tags: ['pop italiano','italian pop'] },
+  { emoji: '🎸', name: 'Rock Classics', desc: 'I classici del rock internazionale', tags: ['rock','classic rock'] },
+  { emoji: '🎷', name: 'Jazz & Soul', desc: 'Jazz, Blues e Soul', tags: ['jazz','soul','blues'] },
+  { emoji: '🎉', name: 'Dance & Electronic', desc: 'Musica da ballare', tags: ['dance','electronic','house'] },
+  { emoji: '🌙', name: 'Chill & Ambient', desc: 'Musica rilassante', tags: ['ambient','chill','lo-fi'] },
+  { emoji: '📰', name: 'News & Talk', desc: 'Radio informazione', tags: ['news','talk','information'] },
+  { emoji: '🏆', name: 'Top Hits', desc: 'Le più ascoltate del momento', tags: ['pop','top 40','hits'] },
+  { emoji: '🎼', name: 'Classica', desc: 'Musica classica e opera', tags: ['classical','opera','classical music'] },
+];
+
+function renderSuggestedPlaylists() {
+  const grid = document.getElementById('suggesteGrid');
+  if (!grid) return;
+  grid.innerHTML = suggestedPlaylists.map(sp => `
+    <div class="playlist-card" onclick="filterBySuggested(${JSON.stringify(sp.tags)}, '${sp.name}')" style="cursor:pointer;">
+      <div class="playlist-thumb" style="font-size:28px;">${sp.emoji}</div>
+      <div class="playlist-info">
+        <div class="playlist-name">${sp.name}</div>
+        <div class="playlist-count">${sp.desc}</div>
+      </div>
+      <div class="playlist-actions">
+        <button class="btn btn-primary btn-sm">📻 Ascolta</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterBySuggested(tags, name) {
+  // Vai alla sezione radio e filtra per tag
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-radio').classList.add('active');
+  document.querySelector('.nav-item').classList.add('active');
+  document.getElementById('pageTitle').textContent = 'Radio Live';
+  document.getElementById('radioSectionTitle').textContent = '🎁 ' + name;
+  // Filtra le radio per tag
+  const grid = document.getElementById('radioGrid');
+  const pool = [...builtinRadios, ...customRadios];
+  const filtered = pool.filter(r => {
+    const genre = (r.genre || '').toLowerCase();
+    const rname = (r.name || '').toLowerCase();
+    return tags.some(t => genre.includes(t.toLowerCase()) || rname.includes(t.toLowerCase()));
+  });
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">Nessuna radio trovata per questa categoria.</div>';
+    return;
+  }
+  const cards = filtered.map((r, idx) => {
+    const isActive = currentRadio?.id === r.id;
+    const btnIcon = isActive && isPlaying ? '⏸' : '▶';
+    return `<div class="radio-card ${isActive ? 'playing' : ''}" data-id="${r.id}" id="rc-${r.id}" onclick="cardClick('${r.id}')">
+      ${renderRadioLogo(r)}
+      <div class="radio-name">${r.name}</div>
+      <div class="radio-genre">${r.genre}</div>
+      ${isActive && isPlaying ? `<div class="waveform">${'<div class="wave-bar"></div>'.repeat(5)}</div>` : ''}
+      <button class="radio-play-btn" onclick="event.stopPropagation(); cardClick('${r.id}')">${btnIcon}</button>
+    </div>`;
+  });
+  grid.innerHTML = cards.join('');
 }
 
 // ===========================
