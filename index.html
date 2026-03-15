@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v9</title>
+<title>Radio - Jean v10</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1293,7 +1293,7 @@ async function fetchRadios() {
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">📡 Caricamento radio...</div>';
 
   const [itStations, intStations] = await Promise.all([
-    rbFetch('/json/stations/search?country=italy&limit=80&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=IT&limit=80&hidebroken=true&order=votes&reverse=true'),
     rbFetch('/json/stations/search?limit=60&hidebroken=true&order=votes&reverse=true&countrycode=GB,FR,DE,US,CH'),
   ]);
 
