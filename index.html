@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v13</title>
+<title>Radio - Jean v14</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1258,7 +1258,7 @@ let queue = JSON.parse(localStorage.getItem('queue') || '[]');
 // ===========================
 // Lista server Radio Browser (round-robin per affidabilità)
 // Radio Browser API via Cloudflare Worker (nessun problema CORS)
-const WORKER_URL = 'https://radioweb.xflyracer.workers.dev/';
+const WORKER_URL = 'https://radioweb.xflyracer.workers.dev';
 
 async function rbFetch(path) {
   try {
@@ -2231,7 +2231,7 @@ async function filterBySuggested(idx) {
   switchTab('queue', tabs[2]);
 
   // Cerca su YouTube tramite Worker
-  const WORKER_URL = 'https://radioweb.xflyracer.workers.dev/';
+  const WORKER_URL = 'https://radioweb.xflyracer.workers.dev';
   const query = sp.ytQuery || sp.name;
 
   try {
