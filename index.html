@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v10</title>
+<title>Radio - Jean v11</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1277,6 +1277,9 @@ async function rbFetch(path) {
 }
 
 function stationToRadio(s, group) {
+  const originalUrl = s.url_resolved || s.url || '';
+  // Passa lo stream attraverso il Worker per evitare CORS, Mixed Content e SSL
+  const streamUrl = WORKER_URL + '/stream?url=' + encodeURIComponent(originalUrl);
   return {
     id:    'rb_' + s.stationuuid,
     name:   s.name.trim(),
@@ -1284,7 +1287,7 @@ function stationToRadio(s, group) {
     emoji:  '📻',
     group:  group,
     logo:   s.favicon || null,
-    url:    s.url_resolved || s.url,
+    url:    streamUrl,
   };
 }
 
