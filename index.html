@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v3</title>
+<title>Radio - Jean v4</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1866,131 +1866,117 @@ async function searchYT() {
   resultsDiv.style.flexDirection = 'column';
   resultsDiv.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">🔎 Ricerca in corso...</div>';
 
-  const PIPED = [
-    'https://pipedapi.kavin.rocks',
-    'https://pipedapi.adminforge.de',
-    'https://piped-api.tokhmi.xyz',
-    'https://pipedapi.yt.artemislena.eu',
-    'https://pipedapi.moomoo.me',
-  ];
-  const INVIDIOUS = [
-    'https://invidious.fdn.fr',
-    'https://inv.nadeko.net',
-    'https://invidious.privacyredirect.com',
-    'https://iv.datura.network',
-    'https://invidious.protokolla.fi',
-    'https://invidious.nerdvpn.de',
-    'https://yt.drgnz.club',
-    'https://invidious.io',
-  ];
-
-  const log = [];
-
-  async function tryPiped(base) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 7000);
-    try {
-      const res = await fetch(base + '/search?q=' + encodeURIComponent(q) + '&filter=videos', { signal: controller.signal });
-      clearTimeout(timer);
-      if (!res.ok) { log.push('❌ Piped ' + base + ' → HTTP ' + res.status); throw new Error('HTTP ' + res.status); }
-      const ct = res.headers.get('content-type') || '';
-      if (!ct.includes('json')) { log.push('❌ Piped ' + base + ' → not JSON'); throw new Error('not JSON'); }
-      const data = await res.json();
-      const items = (data.items || []).filter(i => i.url && i.url.startsWith('/watch'));
-      if (!items.length) { log.push('⚠️ Piped ' + base + ' → empty'); throw new Error('empty'); }
-      log.push('✅ Piped ' + base + ' → OK (' + items.length + ' risultati)');
-      return items.slice(0, 6).map(v => ({
-        ytId:    (v.url || '').replace('/watch?v=', ''),
-        title:   v.title || '',
-        channel: v.uploaderName || '',
-        dur:     v.duration ? fmtSec(v.duration) : '',
-      }));
-    } catch(e) {
-      clearTimeout(timer);
-      if (!log.find(l => l.includes(base))) log.push('❌ Piped ' + base + ' → ' + e.message);
-      throw e;
-    }
-  }
-
-  async function tryInvidious(base) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 7000);
-    try {
-      const res = await fetch(base + '/api/v1/search?q=' + encodeURIComponent(q) + '&type=video', { signal: controller.signal });
-      clearTimeout(timer);
-      if (!res.ok) { log.push('❌ Inv ' + base + ' → HTTP ' + res.status); throw new Error('HTTP ' + res.status); }
-      const ct = res.headers.get('content-type') || '';
-      if (!ct.includes('json')) { log.push('❌ Inv ' + base + ' → not JSON'); throw new Error('not JSON'); }
-      const data = await res.json();
-      if (!Array.isArray(data) || !data.length) { log.push('⚠️ Inv ' + base + ' → empty'); throw new Error('empty'); }
-      log.push('✅ Inv ' + base + ' → OK (' + data.length + ' risultati)');
-      return data.slice(0, 6).map(v => ({
-        ytId:    v.videoId || '',
-        title:   v.title || '',
-        channel: v.author || '',
-        dur:     v.lengthSeconds ? fmtSec(v.lengthSeconds) : '',
-      }));
-    } catch(e) {
-      clearTimeout(timer);
-      if (!log.find(l => l.includes(base))) log.push('❌ Inv ' + base + ' → ' + e.message);
-      throw e;
-    }
-  }
-
-  let videos = null;
   try {
-    videos = await Promise.any([
-      ...PIPED.map(b => tryPiped(b)),
-      ...INVIDIOUS.map(b => tryInvidious(b)),
-    ]);
+    // iTunes Search API — gratuita, no key, CORS aperto
+    const url = 'https://itunes.apple.com/search?term=' + encodeURIComponent(q) +
+      '&media=music&entity=song&limit=10&country=it';
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const items = data.results || [];
+    if (!items.length) throw new Error('Nessun risultato');
+
+    resultsDiv.innerHTML = '';
+    items.forEach(function(item) {
+      const title   = item.trackName || '';
+      const channel = item.artistName || '';
+      const thumb   = (item.artworkUrl100 || '').replace('100x100', '200x200');
+      const dur     = item.trackTimeMillis ? fmtSec(Math.floor(item.trackTimeMillis / 1000)) : '';
+      const ytQuery = encodeURIComponent(channel + ' ' + title);
+      // Usiamo trackId come ID univoco, con prefisso "itunes_"
+      const trackId = 'itunes_' + item.trackId;
+
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:4px;background:var(--card);transition:border-color 0.2s;';
+      div.onmouseover = function(){ this.style.borderColor = 'var(--accent2)'; };
+      div.onmouseout  = function(){ this.style.borderColor = 'var(--border)'; };
+      div.onclick = function() {
+        // Apre la ricerca YouTube nel browser per trovare il video
+        // e salva i metadati per la playlist
+        selectYTItemFromItunes(item, ytQuery);
+      };
+
+      const img = document.createElement('img');
+      img.src = thumb;
+      img.style.cssText = 'width:52px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg3);';
+
+      const info = document.createElement('div');
+      info.style.cssText = 'flex:1;overflow:hidden;';
+      info.innerHTML =
+        '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(title) + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:3px;">' + esc(channel) + '</div>' +
+        '<div style="font-size:10px;color:var(--accent3);margin-top:2px;font-family:monospace;">' + esc(dur) + '</div>';
+
+      // Badge iTunes
+      const badge = document.createElement('div');
+      badge.style.cssText = 'font-size:9px;color:var(--text3);font-family:JetBrains Mono,monospace;flex-shrink:0;';
+      badge.textContent = '🎵 iTunes';
+
+      div.appendChild(img);
+      div.appendChild(info);
+      div.appendChild(badge);
+      resultsDiv.appendChild(div);
+    });
+
   } catch(e) {
-    videos = null;
-  }
-
-  // Mostra sempre il log in console per debug
-  console.group('YouTube Search Debug');
-  log.forEach(l => console.log(l));
-  console.groupEnd();
-
-  resultsDiv.innerHTML = '';
-
-  if (!videos || !videos.length) {
     resultsDiv.innerHTML =
-      '<div style="color:var(--text3);font-size:13px;padding:12px;">' +
-      '<b style="color:var(--accent)">❌ Nessuna API raggiungibile.</b><br><br>' +
-      '<div style="font-family:monospace;font-size:11px;background:var(--bg3);padding:8px;border-radius:6px;max-height:150px;overflow-y:auto;">' +
-      log.map(l => '<div>' + esc(l) + '</div>').join('') +
-      '</div><br>' +
+      '<div style="color:var(--accent);font-size:13px;padding:12px;text-align:center;">' +
+      '❌ ' + esc(e.message) + '<br><br>' +
       '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '" target="_blank" ' +
-      'style="color:var(--accent2);text-decoration:none;display:inline-block;margin-top:4px;padding:8px 16px;border:1px solid var(--accent2);border-radius:8px;">' +
+      'style="color:var(--accent2);text-decoration:none;padding:6px 14px;border:1px solid var(--accent2);border-radius:6px;font-size:12px;">' +
       '🔗 Cerca su YouTube →</a>' +
       '</div>';
-    btn.textContent = 'Cerca'; btn.disabled = false;
-    return;
   }
-
-  videos.forEach(function(v) {
-    const div = document.createElement('div');
-    div.style.cssText = 'display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:4px;background:var(--card);transition:border-color 0.2s;';
-    div.onmouseover = function(){ this.style.borderColor = 'var(--accent2)'; };
-    div.onmouseout  = function(){ this.style.borderColor = 'var(--border)'; };
-    div.onclick = function() { selectYTItem(v.ytId, v.title, v.channel, v.dur); };
-    const img = document.createElement('img');
-    img.src = 'https://img.youtube.com/vi/' + v.ytId + '/mqdefault.jpg';
-    img.style.cssText = 'width:80px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg3);';
-    const info = document.createElement('div');
-    info.style.cssText = 'flex:1;overflow:hidden;';
-    info.innerHTML =
-      '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(v.title) + '</div>' +
-      '<div style="font-size:11px;color:var(--text3);margin-top:3px;">' + esc(v.channel) + '</div>' +
-      '<div style="font-size:10px;color:var(--accent3);margin-top:2px;font-family:monospace;">' + esc(v.dur) + '</div>';
-    div.appendChild(img);
-    div.appendChild(info);
-    resultsDiv.appendChild(div);
-  });
 
   btn.textContent = 'Cerca';
   btn.disabled = false;
+}
+
+function selectYTItemFromItunes(item, ytQuery) {
+  // Cerca il video YouTube corrispondente e apre il link
+  // Salva i metadati iTunes per la playlist
+  const title   = item.trackName || '';
+  const channel = item.artistName || '';
+  const thumb   = (item.artworkUrl100 || '').replace('100x100', '200x200');
+  const dur     = item.trackTimeMillis ? fmtSec(Math.floor(item.trackTimeMillis / 1000)) : '';
+
+  // Mostra dialog per incollare URL YouTube
+  document.getElementById('ytSearchResults').style.display = 'none';
+
+  // Pre-popola il campo URL con un messaggio guida
+  const urlInput = document.getElementById('ytUrlInput');
+  urlInput.value = '';
+  urlInput.placeholder = 'Cerca "' + title + ' ' + channel + '" su YouTube e incolla il link qui';
+  urlInput.focus();
+
+  // Aggiorna anteprima con dati iTunes
+  document.getElementById('ytSelThumb').src = thumb;
+  document.getElementById('ytSelTitle').textContent = title;
+  document.getElementById('ytSelChannel').textContent = channel;
+  document.getElementById('ytSelDuration').textContent = dur ? '⏱ ' + dur : '';
+  document.getElementById('ytSelectedPreview').style.display = 'block';
+  document.getElementById('ytPlaylistGroup').style.display = '';
+  document.getElementById('btnAddYT').style.display = '';
+
+  // Salva item selezionato — useremo i dati iTunes ma l'URL YouTube dall'input
+  selectedYTItem = {
+    ytId: '',  // verrà estratto dall'URL che incollerà l'utente
+    title,
+    channel,
+    duration: dur,
+    _itunesThumb: thumb,
+    _needsUrl: true
+  };
+
+  // Apri YouTube search in nuova scheda
+  window.open('https://www.youtube.com/results?search_query=' + ytQuery, '_blank');
+
+  showToast('🔗 YouTube aperto — copia il link e incollalo qui sotto', 'success');
 }
 
 function fmtSec(s) {
@@ -2058,6 +2044,14 @@ function addYTToQueue() {
     const id = getYTId(url);
     if (!id) return showToast('Seleziona un brano o incolla un URL valido', 'error');
     selectedYTItem = { ytId: id, title: 'Video YouTube', channel: 'YouTube', duration: '' };
+  }
+  // Se viene da iTunes e manca ancora l'URL YouTube, cercalo nell'input
+  if (selectedYTItem._needsUrl) {
+    const url = document.getElementById('ytUrlInput').value;
+    const id = getYTId(url);
+    if (!id) return showToast('Incolla il link YouTube del brano', 'error');
+    selectedYTItem.ytId = id;
+    delete selectedYTItem._needsUrl;
   }
   const item = {
     id: 'yt' + Date.now(),
