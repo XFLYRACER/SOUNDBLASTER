@@ -2192,7 +2192,7 @@ const suggestedPlaylists = [
   { emoji: '🎉', name: 'Dance & Electronic',   desc: 'Musica da ballare',                 ytQuery: 'dance electronic house mix 2024' },
   { emoji: '🌙', name: 'Chill & Lo-Fi',        desc: 'Musica rilassante',                 ytQuery: 'lofi chill beats mix relax' },
   { emoji: '🏆', name: 'Top Hits 2024',        desc: 'Le più ascoltate del momento',      ytQuery: 'top hits 2024 best songs' },
-  { emoji: '🎼', name: 'Classica',             desc: 'Musica classica e opera',            ytQuery: 'classical music best orchestra' },
+  { emoji: '🎼', name: 'Classica',             desc: 'Musica classica e opera',            ytQuery: 'classical music best orche' },
   { emoji: '🎤', name: 'Hip Hop & Rap',        desc: 'Il meglio dell hip hop',             ytQuery: 'hip hop rap best mix 2024' },
 ];
 
@@ -2493,7 +2493,7 @@ function showToast(msg, type = 'success') {
 // Applica configurazione
 document.getElementById('logoSub').textContent = CONFIG.subtitle;
 document.getElementById('logoSub').style.color  = CONFIG.subtitleColor;
-document.getElementById('logoVer').textContent  = 'v' + CONFIG.version;
+document.getElementById('logoVer').textContent  = '' + CONFIG.version;
 document.getElementById('logoVer').style.color  = CONFIG.subtitleColor;
 
 renderPlaylist();
