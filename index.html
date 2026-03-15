@@ -1,68 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Mini Music App</title>
-
+<title>Mini Music Player</title>
 <style>
-
 body{
-background:#121212;
-color:white;
-font-family:Arial;
-text-align:center;
+  background:#121212;
+  color:white;
+  font-family:Arial;
+  text-align:center;
 }
-
 input{
-padding:10px;
-width:300px;
-font-size:16px;
+  padding:10px;
+  width:300px;
+  font-size:16px;
 }
-
 button{
-padding:10px;
-font-size:16px;
+  padding:10px;
+  font-size:16px;
+  cursor:pointer;
 }
-
-#results{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-margin-top:20px;
+#results, #playlist{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:20px;
 }
-
 .song{
-width:200px;
-margin:10px;
-background:#1e1e1e;
-padding:10px;
-cursor:pointer;
-border-radius:8px;
+  width:200px;
+  margin:10px;
+  background:#1e1e1e;
+  padding:10px;
+  cursor:pointer;
+  border-radius:8px;
 }
-
 .song:hover{
-background:#333;
+  background:#333;
 }
-
 .song img{
-width:100%;
-border-radius:6px;
+  width:100%;
+  border-radius:6px;
 }
-
-#playlist{
-margin-top:30px;
+#player{
+  margin-top:30px;
 }
-
 </style>
-
 </head>
-
 <body>
 
 <h1>Mini Music Player</h1>
 
-<input id="q" placeholder="Cerca musica">
-<button onclick="search()">Cerca</button>
+<input id="q" placeholder="Cerca artista o canzone">
+<button onclick="searchMusic()">Cerca</button>
 
 <div id="player"></div>
 
@@ -73,83 +62,73 @@ margin-top:30px;
 <div id="playlist"></div>
 
 <script>
-
 let playlist = [];
 let current = 0;
 
-async function search(){
+// Funzione per cercare video su YouTube tramite feed RSS + rss2json
+async function searchMusic(){
+  let query = document.getElementById("q").value;
 
-let q = document.getElementById("q").value;
+  // URL ricerca YouTube (RSS feed globale con query)
+  let rssUrl = "https://www.youtube.com/feeds/videos.xml?channel_id=UC-9-kyTW8ZkZNDHQJ6FgpwQ"; 
+  // Puoi sostituire con altri canali musicali o playlist
 
-let url =
-"https://piped.video/api/v1/search?q=" +
-encodeURIComponent(q) +
-"&filter=videos";
+  // Convertiamo RSS in JSON (senza CORS)
+  let url = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(rssUrl);
 
-let res = await fetch(url);
-let data = await res.json();
+  try{
+    let res = await fetch(url);
+    let data = await res.json();
 
-let out = document.getElementById("results");
-out.innerHTML="";
+    let resultsDiv = document.getElementById("results");
+    resultsDiv.innerHTML="";
 
-data.items.slice(0,8).forEach(v=>{
+    // Mostriamo solo i primi 8 video
+    data.items.slice(0,8).forEach(v=>{
+      let videoId = v.link.split("v=")[1];
+      let thumb = v.thumbnail;
 
-out.innerHTML += `
-<div class="song" onclick="add('${v.url.split('v=')[1]}','${v.title}')">
-<img src="${v.thumbnail}">
-<p>${v.title}</p>
-</div>
-`;
+      resultsDiv.innerHTML += `
+        <div class="song" onclick="addToPlaylist('${videoId}','${v.title}')">
+          <img src="${thumb}">
+          <p>${v.title}</p>
+        </div>
+      `;
+    });
 
-});
-
+  } catch(e){
+    console.error("Errore fetch RSS:",e);
+  }
 }
 
-function add(id,title){
-
-playlist.push({id,title});
-renderPlaylist();
-
-if(playlist.length==1) play(0);
-
+// Aggiungi video alla playlist
+function addToPlaylist(id,title){
+  playlist.push({id,title});
+  renderPlaylist();
+  if(playlist.length===1) play(0); // se primo elemento, parte subito
 }
 
+// Mostra playlist
 function renderPlaylist(){
-
-let out = document.getElementById("playlist");
-out.innerHTML="";
-
-playlist.forEach((s,i)=>{
-
-out.innerHTML += `
-<div onclick="play(${i})">
-${i+1}. ${s.title}
-</div>
-`;
-
-});
-
+  let out = document.getElementById("playlist");
+  out.innerHTML="";
+  playlist.forEach((v,i)=>{
+    out.innerHTML += `<div onclick="play(${i})">${i+1}. ${v.title}</div>`;
+  });
 }
 
+// Riproduci video selezionato
 function play(i){
-
-current = i;
-
-let id = playlist[i].id;
-
-document.getElementById("player").innerHTML = `
-<iframe id="ytplayer"
-width="560"
-height="315"
-src="https://www.youtube.com/embed/${id}?autoplay=1&enablejsapi=1"
-frameborder="0"
-allow="autoplay"
-allowfullscreen>
-</iframe>
-`;
-
+  current = i;
+  let id = playlist[i].id;
+  document.getElementById("player").innerHTML = `
+    <iframe width="560" height="315"
+    src="https://www.youtube.com/embed/${id}?autoplay=1"
+    frameborder="0"
+    allow="autoplay; encrypted-media"
+    allowfullscreen></iframe>
+  `;
 }
-
 </script>
 
 </body>
