@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean*</title>
-  <meta name="version" content="2.0">
+<title>Radio - Jean</title>
+  <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* STILI INVARIATI - mantieni tutto il CSS precedente */
 :root {
   --bg: #0a0a0f;
   --bg2: #111118;
@@ -36,6 +35,7 @@ body {
   overflow-x: hidden;
 }
 
+/* NOISE TEXTURE */
 body::before {
   content: '';
   position: fixed;
@@ -45,6 +45,7 @@ body::before {
   z-index: 0;
 }
 
+/* SIDEBAR */
 .sidebar {
   position: fixed;
   left: 0; top: 0; bottom: 0;
@@ -154,12 +155,14 @@ body::before {
   50% { opacity: 0.5; transform: scale(0.8); }
 }
 
+/* MAIN */
 .main {
   margin-left: 220px;
   min-height: 100vh;
   padding-bottom: 100px;
 }
 
+/* TOP BAR */
 .topbar {
   padding: 20px 32px;
   display: flex;
@@ -203,6 +206,7 @@ body::before {
 
 .search-bar input::placeholder { color: var(--text3); }
 
+/* SECTIONS */
 .section {
   padding: 32px;
   display: none;
@@ -224,6 +228,7 @@ body::before {
   color: var(--text);
 }
 
+/* RADIO GRID */
 .radio-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -327,6 +332,7 @@ body::before {
 .radio-card:hover .radio-edit-btn { opacity: 1; }
 .radio-card.playing .radio-play-btn { opacity: 1; background: var(--live); }
 
+/* WAVEFORM ANIMATION */
 .waveform {
   display: flex;
   align-items: flex-end;
@@ -352,6 +358,7 @@ body::before {
   100% { height: 20px; }
 }
 
+/* ADD RADIO FORM */
 .add-form {
   background: var(--card);
   border: 1px dashed var(--border);
@@ -387,6 +394,7 @@ body::before {
 
 .form-input:focus { border-color: var(--accent2); }
 
+/* BUTTONS */
 .btn {
   padding: 10px 20px;
   border: none;
@@ -409,6 +417,7 @@ body::before {
 .btn-ghost { background: transparent; color: var(--text2); }
 .btn-ghost:hover { color: var(--accent); }
 
+/* PLAYLIST */
 .playlist-list {
   display: flex;
   flex-direction: column;
@@ -450,6 +459,7 @@ body::before {
 
 .playlist-actions { display: flex; gap: 8px; }
 
+/* QUEUE */
 .queue-list {
   display: flex;
   flex-direction: column;
@@ -505,6 +515,7 @@ body::before {
 
 .queue-remove:hover { color: var(--accent); }
 
+/* NEWS */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -551,6 +562,7 @@ body::before {
 .news-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 8px; }
 .news-date { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
 
+/* CHARTS */
 .chart-list {
   display: flex;
   flex-direction: column;
@@ -605,6 +617,7 @@ body::before {
 .trend-down { color: var(--accent); background: rgba(255,77,109,0.1); }
 .trend-same { color: var(--text3); background: var(--bg3); }
 
+/* PLAYER BAR */
 .player-bar {
   position: fixed;
   bottom: 0; left: 0; right: 0;
@@ -748,6 +761,7 @@ body::before {
   cursor: pointer;
 }
 
+/* MODAL */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -800,6 +814,7 @@ body::before {
 
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
 
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 100px;
@@ -820,6 +835,7 @@ body::before {
 .toast.success { border-left: 3px solid var(--accent3); }
 .toast.error { border-left: 3px solid var(--accent); }
 
+/* TAB BAR */
 .tab-bar {
   display: flex;
   gap: 0;
@@ -840,10 +856,12 @@ body::before {
 .tab:hover { color: var(--text2); }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
+/* scrollbar */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+/* RESPONSIVE WRAPPERS */
 .two-col {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -879,7 +897,7 @@ body::before {
       <span class="nav-icon">📻</span> Radio Live
     </div>
     <div class="nav-item" onclick="showSection('playlist')">
-      <span class="nav-icon">▶️</span> Playlist
+      <span class="nav-icon">▶️</span> Playlist YouTube
     </div>
     <div class="nav-item" onclick="showSection('charts')">
       <span class="nav-icon">🏆</span> Classifiche
@@ -909,8 +927,8 @@ body::before {
   <div class="section active" id="section-radio">
     <div class="section-header">
       <div>
-        <div class="section-title" id="radioSectionTitle">Radio Funzionanti 2026</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">35+ stazioni verificate · Streaming diretto</div>
+        <div class="section-title" id="radioSectionTitle">Radio Italiane & Internazionali</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">57 stazioni · Link verificati 2025</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('all')" id="fg-all" style="border-color:var(--accent2);color:var(--accent2)">Tutte</button>
@@ -945,6 +963,7 @@ body::before {
   <div class="section" id="section-playlist">
     <div class="tab-bar">
       <div class="tab active" onclick="switchTab('playlists', this)">Le mie Playlist</div>
+      <div class="tab" onclick="switchTab('suggerite', this)">🎁 Playlist Suggerite</div>
       <div class="tab" onclick="switchTab('queue', this)">Coda di riproduzione</div>
     </div>
 
@@ -954,6 +973,15 @@ body::before {
         <button class="btn btn-primary btn-sm" onclick="openNewPlaylistModal()">+ Nuova Playlist</button>
       </div>
       <div class="playlist-list" id="playlistList"></div>
+    </div>
+
+    <!-- PLAYLIST SUGGERITE PER GENERE -->
+    <div id="tab-suggerite" style="display:none">
+      <div class="section-header">
+        <div class="section-title">Playlist Suggerite per Genere</div>
+        <span class="badge">Pronte all'uso</span>
+      </div>
+      <div id="suggesteGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
     </div>
 
     <div id="tab-queue" style="display:none">
@@ -971,28 +999,22 @@ body::before {
     </div>
   </div>
 
-  <!-- SEZIONE CLASSIFICHE - ORA CON BRANI AGGIUNTI ALLA PLAYLIST -->
+  <!-- SEZIONE CLASSIFICHE -->
   <div class="section" id="section-charts">
     <div class="section-header">
-      <div class="section-title">🏆 Classifiche Billboard Hot 100</div>
-      <span class="badge" id="chartUpdateBadge">Aggiornamento in corso...</span>
+      <div class="section-title">🏆 Classifiche Globali</div>
+      <span class="badge" id="chartsDate">⏳ Caricamento...</span>
     </div>
     <div class="chart-list" id="chartList"></div>
-    <div style="margin-top:20px;display:flex;gap:8px;justify-content:flex-end;">
-      <button class="btn btn-secondary btn-sm" onclick="refreshCharts()">🔄 Aggiorna classifiche</button>
-    </div>
   </div>
 
-  <!-- SEZIONE NOVITÀ - ORA DA FONTI RSS -->
+  <!-- SEZIONE NOVITÀ -->
   <div class="section" id="section-news">
     <div class="section-header">
       <div class="section-title">📰 Novità Musicali</div>
-      <span class="badge" id="newsUpdateBadge">Aggiornamento in corso...</span>
+      <span class="badge" id="newsDate">⏳ Caricamento...</span>
     </div>
     <div class="news-grid" id="newsGrid"></div>
-    <div style="margin-top:20px;display:flex;gap:8px;justify-content:flex-end;">
-      <button class="btn btn-secondary btn-sm" onclick="refreshNews()">🔄 Aggiorna notizie</button>
-    </div>
   </div>
 </main>
 
@@ -1029,6 +1051,7 @@ body::before {
   </div>
 </div>
 
+
 <!-- MODAL EDIT RADIO -->
 <div class="modal-overlay" id="editRadioModal">
   <div class="modal" style="width:500px;">
@@ -1047,6 +1070,13 @@ body::before {
         <label class="form-label" for="editRadioGenre">Genere / Descrizione</label>
         <input class="form-input" type="text" id="editRadioGenre" placeholder="Pop, Rock, News...">
       </div>
+      <div id="editLogoPreview" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;">
+        <img id="editLogoImg" src="" alt="" style="width:48px;height:48px;border-radius:8px;object-fit:contain;background:var(--bg3);">
+        <div>
+          <div style="font-size:13px;color:var(--text);font-weight:600;" id="editLogoSource">Logo automatico</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Trovato dal sito ufficiale</div>
+        </div>
+      </div>
     </div>
     <div class="modal-actions" style="justify-content:space-between;">
       <button class="btn btn-secondary" id="editDeleteBtn" onclick="deleteRadio()" style="color:var(--accent);border-color:var(--accent);">🗑 Elimina</button>
@@ -1058,16 +1088,19 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL ADD YT -->
+<!-- MODAL ADD YT - con ricerca e metadati -->
 <div class="modal-overlay" id="ytModal">
   <div class="modal" style="width:620px;">
     <div class="modal-title">🔍 Cerca su YouTube</div>
     <div class="modal-form">
+
+      <!-- RICERCA -->
       <div style="display:flex;gap:8px;">
         <input class="form-input" type="text" id="ytSearchInput" placeholder="Cerca artista, canzone, album..." style="flex:1;" onkeydown="if(event.key==='Enter') searchYT()">
         <button class="btn btn-primary" onclick="searchYT()" id="btnSearch">Cerca</button>
       </div>
 
+      <!-- OPPURE INCOLLA URL -->
       <div style="display:flex;align-items:center;gap:10px;color:var(--text3);font-size:12px;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
         oppure incolla un URL diretto
@@ -1075,8 +1108,10 @@ body::before {
       </div>
       <input class="form-input" type="url" id="ytUrlInput" placeholder="https://www.youtube.com/watch?v=..." oninput="previewYTUrl()">
 
+      <!-- RISULTATI RICERCA -->
       <div id="ytSearchResults" style="display:none;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
 
+      <!-- ANTEPRIMA VIDEO SELEZIONATO -->
       <div id="ytSelectedPreview" style="display:none;background:var(--bg3);border:1px solid var(--accent3);border-radius:10px;padding:14px;gap:14px;align-items:center;">
         <div style="display:flex;gap:14px;align-items:center;">
           <img id="ytSelThumb" src="" alt="" style="width:100px;height:64px;border-radius:8px;object-fit:cover;flex-shrink:0;">
@@ -1089,12 +1124,14 @@ body::before {
         </div>
       </div>
 
+      <!-- AGGIUNGI A PLAYLIST -->
       <div class="form-group" id="ytPlaylistGroup" style="display:none;">
         <label class="form-label" for="ytPlaylistSelect">Aggiungi anche alla playlist (opzionale)</label>
         <select class="form-input" id="ytPlaylistSelect">
           <option value="">Solo coda di riproduzione</option>
         </select>
       </div>
+
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('ytModal')">Annulla</button>
@@ -1128,8 +1165,7 @@ body::before {
 
 <!-- AUDIO -->
 <audio id="audioPlayer" crossorigin="anonymous" controlslist="nodownload"></audio>
-
-<!-- YT CARD -->
+<!-- YT AUDIO CARD -->
 <div id="ytCard" style="display:none;position:fixed;bottom:88px;right:20px;z-index:300;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;width:300px;box-shadow:0 8px 40px rgba(0,0,0,0.6);flex-direction:column;gap:10px;">
   <div style="display:flex;align-items:center;gap:10px;">
     <img id="ytCardThumb" src="" alt="" style="width:64px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;">
@@ -1140,72 +1176,25 @@ body::before {
     <button onclick="closeYT()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:2px;line-height:1;">×</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <span style="font-size:11px;color:var(--accent3);font-family:JetBrains Mono,monospace;">▶ Audio in riproduzione</span>
-    <a id="ytCardLink" href="#" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none;margin-left:auto;">🔗 Apri su YT</a>
+    <span style="font-size:11px;color:var(--accent3);font-family:JetBrains Mono,monospace;">&#127925; Audio in riproduzione</span>
+    <a id="ytCardLink" href="#" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none;margin-left:auto;">&#9654; Guarda su YT</a>
   </div>
 </div>
 
 <script>
 // ===========================
-// CONFIGURAZIONE
+// CONFIGURAZIONE — modifica qui
 // ===========================
 const CONFIG = {
-  version:  '2.0',
-  subtitle: 'Radio Funzionanti 2026',
-  subtitleColor: '#c8c8e0',
+  version:  '1.3',
+  subtitle: 'Music & Streaming',
+  subtitleColor: '#c8c8e0',   // colore sottotitolo e versione — più bianco = più vicino a #ffffff
 };
 
 // ===========================
-// RADIO VERIFICATE FUNZIONANTI (MARZO 2026)
+// STATE
 // ===========================
-const verifiedRadios = [
-  // RADIO ITALIANE (Funzionanti)
-  { id: 'it_rai1', name: 'Rai Radio 1', url: 'https://icestreaming.rai.it/1.mp3', genre: 'News, Talk', emoji: '🇮🇹', group: 'it', logo: 'https://www.rai.it/dl/img/2022/12/1671632252792_RADIO1.png' },
-  { id: 'it_rai2', name: 'Rai Radio 2', url: 'https://icestreaming.rai.it/2.mp3', genre: 'Hit, Intrattenimento', emoji: '🎤', group: 'it', logo: 'https://www.rai.it/dl/img/2022/12/1671632270539_RADIO2.png' },
-  { id: 'it_rai3', name: 'Rai Radio 3', url: 'https://icestreaming.rai.it/3.mp3', genre: 'Classica, Cultura', emoji: '🎻', group: 'it', logo: 'https://www.rai.it/dl/img/2022/12/1671632285556_RADIO3.png' },
-  { id: 'it_rtl', name: 'RTL 102.5', url: 'https://streamingv2.shoutcast.com/rtl-1025', genre: 'Hit Italiane', emoji: '📻', group: 'it', logo: 'https://www.rtl.it/upload/rtl-logo.png' },
-  { id: 'it_radio105', name: 'Radio 105', url: 'https://icecast.unitedradio.it/Radio105.mp3', genre: 'Pop, Rock', emoji: '🎸', group: 'it', logo: 'https://www.105.net/img/logo_105.png' },
-  { id: 'it_m2o', name: 'm2o', url: 'https://icecast.unitedradio.it/m2o.mp3', genre: 'Dance, EDM', emoji: '🎧', group: 'it', logo: 'https://www.m2o.it/img/logo_m2o.png' },
-  { id: 'it_virgin', name: 'Virgin Radio', url: 'https://icecast.unitedradio.it/Virgin.mp3', genre: 'Rock, Alternative', emoji: '🤘', group: 'it', logo: 'https://www.virginradio.it/img/logo_virgin.png' },
-  { id: 'it_radio24', name: 'Radio 24', url: 'https://shoutcast.radio24.it:8000/stream', genre: 'News, Economia', emoji: '📡', group: 'it' },
-  { id: 'it_kisskiss', name: 'Radio Kiss Kiss', url: 'https://icecast.kisskiss.it/kisskiss', genre: 'Hit Italiane', emoji: '💋', group: 'it' },
-  { id: 'it_radioitalia', name: 'Radio Italia', url: 'https://radioitaliasmi.akamaized.net/hls/live/2093120/RADIOITALIA/master.m3u8', genre: 'Solo Musica Italiana', emoji: '🇮🇹', group: 'it', logo: 'https://www.radioitalia.it/img/logo-radio-italia.png' },
-  { id: 'it_radiozeta', name: 'Radio Zeta', url: 'https://streamingv2.shoutcast.com/radio-zeta', genre: 'Hit, Pop', emoji: '⭐', group: 'it' },
-  { id: 'it_dimensione', name: 'Dimensione Suono', url: 'https://stream1.dimensionesuonoroma.radio/stream/1/', genre: 'Soft Rock', emoji: '🎵', group: 'it' },
-  { id: 'it_radiofreccia', name: 'Radio Freccia', url: 'https://icecast.unitedradio.it/RadioFreccia.mp3', genre: 'Rock Classics', emoji: '⚡', group: 'it' },
-  { id: 'it_radiomontecarlo', name: 'Radio Monte Carlo', url: 'https://edge.singsingmusic.net/singsingweb.mp3', genre: 'Easy Listening', emoji: '✨', group: 'it' },
-
-  // RADIO INTERNAZIONALI (Funzionanti)
-  { id: 'uk_bbc1', name: 'BBC Radio 1', url: 'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one', genre: 'Top 40, UK', emoji: '🇬🇧', group: 'int' },
-  { id: 'uk_bbc2', name: 'BBC Radio 2', url: 'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_two', genre: 'Adult Contemporary', emoji: '🇬🇧', group: 'int' },
-  { id: 'uk_bbc3', name: 'BBC Radio 3', url: 'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_three', genre: 'Classical, Jazz', emoji: '🎼', group: 'int' },
-  { id: 'uk_bbc4', name: 'BBC Radio 4', url: 'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourfm', genre: 'News, Talk', emoji: '📰', group: 'int' },
-  { id: 'uk_bbc6', name: 'BBC Radio 6 Music', url: 'https://stream.live.vc.bbcmedia.co.uk/bbc_6music', genre: 'Alternative, Indie', emoji: '🎸', group: 'int' },
-  { id: 'us_npr', name: 'NPR News', url: 'https://npr-ice.streamguys1.com/npr.mp3', genre: 'News, Public Radio', emoji: '🗽', group: 'int' },
-  { id: 'us_kexp', name: 'KEXP Seattle', url: 'https://kexp.streamguys1.com/kexp64.aac', genre: 'Indie, Alternative', emoji: '🌲', group: 'int' },
-  { id: 'fr_fip', name: 'FIP Radio', url: 'https://icecast.radiofrance.fr/fip-hifi.aac', genre: 'Eclectic, Jazz', emoji: '🇫🇷', group: 'int' },
-  { id: 'de_dlf', name: 'Deutschlandfunk', url: 'https://st01.sslstream.dlf.de/dlf/01/high/aac/stream.aac', genre: 'News, Cultura', emoji: '🇩🇪', group: 'int' },
-  { id: 'nl_3fm', name: 'NPO 3FM', url: 'https://icecast.omroep.nl/3fm-sb-aac', genre: 'Alternative, Dutch', emoji: '🇳🇱', group: 'int' },
-  { id: 'se_sr', name: 'Sveriges Radio P3', url: 'https://http-live.sr.se/p3-aac-192', genre: 'Top 40, Svezia', emoji: '🇸🇪', group: 'int' },
-  { id: 'no_nrk', name: 'NRK P3', url: 'https://lyd.nrk.no/nrk_radio_p3_aac_h', genre: 'Pop, Norvegia', emoji: '🇳🇴', group: 'int' },
-  { id: 'dk_dr', name: 'DR P3', url: 'https://drliveradio.akamaized.net/hls/live/2022417/p3/masterab.m3u8', genre: 'Hit, Danimarca', emoji: '🇩🇰', group: 'int' },
-  { id: 'ch_srf3', name: 'SRF 3', url: 'https://lsaplus.swisstxt.ch/audio/srf-3_96.stream', genre: 'Pop, Svizzera', emoji: '🇨🇭', group: 'int' },
-  { id: 'at_fm4', name: 'FM4', url: 'https://orf-live.ors-shoutcast.at/fm4-q2a', genre: 'Alternative, Austria', emoji: '🇦🇹', group: 'int' },
-  { id: 'es_rtve3', name: 'RTVE Radio 3', url: 'https://addrad.io/444z7f8', genre: 'Indie, Spagna', emoji: '🇪🇸', group: 'int' },
-  { id: 'pt_antena3', name: 'Antena 3', url: 'https://antena3.stream.pt/antena3.mp3', genre: 'Hit, Portogallo', emoji: '🇵🇹', group: 'int' },
-  { id: 'gr_era', name: 'ERA Sport', url: 'https://radiostreaming.ert.gr/ert-erasport', genre: 'Sport, Grecia', emoji: '🇬🇷', group: 'int' },
-  { id: 'jp_jwave', name: 'J-Wave', url: 'https://j-wave.stream.radio.co.jp/j-wave', genre: 'J-Pop, Tokyo', emoji: '🇯🇵', group: 'int' },
-  { id: 'au_triplej', name: 'Triple J', url: 'https://live-radio01.mediahubaustralia.com/2TJW/aac/', genre: 'Alternative, Australia', emoji: '🇦🇺', group: 'int' },
-];
-
-let customRadios = JSON.parse(localStorage.getItem('customRadios') || '[]');
-let playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
-let queue = JSON.parse(localStorage.getItem('queue') || '[]');
-
-// ===========================
-// STATO PLAYER
-// ===========================
-let currentMode = 'idle';
+let currentMode = 'idle'; // 'radio' | 'youtube'
 let isPlaying = false;
 let currentRadio = null;
 let currentYTIndex = -1;
@@ -1214,7 +1203,7 @@ let isMuted = false;
 const audio = document.getElementById('audioPlayer');
 audio.preload = "none";
 audio.volume = 0.8;
-let hlsInstance = null;
+let hlsInstance = null; // istanza HLS.js attiva
 
 function destroyHls() {
   if (hlsInstance) {
@@ -1226,7 +1215,6 @@ function destroyHls() {
 function playStream(streamUrl, onError) {
   destroyHls();
   const isHLS = streamUrl.includes('.m3u8');
-  
   if (isHLS && Hls.isSupported()) {
     hlsInstance = new Hls({ enableWorker: false });
     hlsInstance.loadSource(streamUrl);
@@ -1238,10 +1226,13 @@ function playStream(streamUrl, onError) {
       if (data.fatal) onError();
     });
   } else if (isHLS && audio.canPlayType('application/vnd.apple.mpegurl')) {
+    // Safari supporta HLS nativo
     audio.src = streamUrl;
     audio.load();
     audio.play().catch(onError);
   } else if (!isHLS) {
+    audio.src = '';
+    audio.load();
     audio.src = streamUrl;
     audio.load();
     audio.play().catch(onError);
@@ -1251,51 +1242,154 @@ function playStream(streamUrl, onError) {
 }
 
 // ===========================
-// NAVIGAZIONE
+// RADIO DATA
+// ===========================
+// builtinRadios viene popolato dinamicamente da Radio Browser API
+// Le radio hardcodate sono solo un fallback minimo se l'API non risponde
+let builtinRadios = [];
+
+let customRadios = JSON.parse(localStorage.getItem('customRadios') || '[]');
+let playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
+let queue = JSON.parse(localStorage.getItem('queue') || '[]');
+
+
+// ===========================
+// RADIO BROWSER API
+// ===========================
+// Lista server Radio Browser (round-robin per affidabilità)
+// Server di fallback hardcoded — usati se il DNS lookup fallisce
+const RB_FALLBACK = [
+  'https://de1.api.radio-browser.info',
+  'https://de2.api.radio-browser.info',
+];
+
+let rbServers = null; // popolato dinamicamente
+
+async function getRbServers() {
+  if (rbServers) return rbServers;
+  try {
+    // Metodo ufficiale: DNS lookup di all.api.radio-browser.info
+    const res = await fetch('https://all.api.radio-browser.info/json/servers', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined
+    });
+    if (res.ok) {
+      const list = await res.json();
+      if (list && list.length) {
+        rbServers = list.map(s => 'https://' + s.name);
+        return rbServers;
+      }
+    }
+  } catch(e) {
+    console.warn('DNS lookup Radio Browser fallito, uso fallback');
+  }
+  rbServers = RB_FALLBACK;
+  return rbServers;
+}
+
+async function rbFetch(path) {
+  const servers = await getRbServers();
+  for (const base of servers) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(base + path, { signal: controller.signal });
+      clearTimeout(timer);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length) return data;
+      }
+    } catch(e) {
+      console.warn('RB server fallito:', base, e.message);
+    }
+  }
+  return [];
+}
+
+function stationToRadio(s, group) {
+  return {
+    id:    'rb_' + s.stationuuid,
+    name:   s.name.trim(),
+    genre:  s.tags ? s.tags.split(',').slice(0,2).map(t => t.trim()).filter(Boolean).join(' / ') || s.country : s.country,
+    emoji:  '📻',
+    group:  group,
+    logo:   s.favicon || null,
+    url:    s.url_resolved || s.url,
+  };
+}
+
+async function fetchRadios() {
+  const grid = document.getElementById('radioGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">📡 Caricamento radio...</div>';
+
+  const [itStations, intStations] = await Promise.all([
+    rbFetch('/json/stations/search?country=italy&limit=80&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?limit=60&hidebroken=true&order=votes&reverse=true&countrycode=GB,FR,DE,US,CH'),
+  ]);
+
+  if (!itStations.length && !intStations.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--accent);">
+      ⚠️ Impossibile caricare le radio. Controlla la connessione.<br>
+      <button onclick="fetchRadios()" style="margin-top:16px;padding:8px 20px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;">🔄 Riprova</button>
+    </div>`;
+    return;
+  }
+
+  // Converti in formato interno e salva
+  builtinRadios = [
+    ...itStations.map(s => stationToRadio(s, 'it')),
+    ...intStations.map(s => stationToRadio(s, 'int')),
+  ];
+
+  applyStoredOverrides();
+  renderRadio();
+}
+
+// ===========================
+// NAVIGATION
 // ===========================
 function showSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('section-' + name).classList.add('active');
   event.currentTarget.classList.add('active');
-  
-  const titles = { radio: 'Radio Live', playlist: 'Playlist', charts: 'Classifiche', news: 'Novità' };
+  const titles = { radio: 'Radio Live', playlist: 'Playlist & YouTube', charts: 'Classifiche', news: 'Novità' };
   document.getElementById('pageTitle').textContent = titles[name] || name;
-  
-  document.getElementById('searchInput').value = '';
-  
-  if (name === 'radio') renderRadio();
+  // Reset search box on section change
+  const si = document.getElementById('searchInput');
+  if (si) si.value = '';
   if (name === 'playlist') renderPlaylist();
-  if (name === 'charts') refreshCharts();
-  if (name === 'news') refreshNews();
+  if (name === 'charts') { if (!chartsLoaded) fetchCharts(); else renderCharts(); }
+  if (name === 'news')   { if (!newsLoaded)   fetchNews();   else renderNews();   }
 }
 
 function switchTab(tabName, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('tab-playlists').style.display = tabName === 'playlists' ? '' : 'none';
+  document.getElementById('tab-suggerite').style.display = tabName === 'suggerite' ? '' : 'none';
   document.getElementById('tab-queue').style.display = tabName === 'queue' ? '' : 'none';
   if (tabName === 'queue') renderQueue();
+  if (tabName === 'suggerite') renderSuggestedPlaylists();
 }
 
 // ===========================
 // RADIO
 // ===========================
 let radioGroupFilter = 'all';
-
 function filterRadioGroup(g) {
   radioGroupFilter = g;
   document.querySelectorAll('[id^="fg-"]').forEach(b => { b.style.borderColor=''; b.style.color=''; });
   document.getElementById('fg-' + g).style.borderColor = 'var(--accent2)';
   document.getElementById('fg-' + g).style.color = 'var(--accent2)';
-  
-  const titles = { all: 'Radio Funzionanti 2026', it: '🇮🇹 Radio Italiane', int: '🌍 Radio Internazionali' };
+  const titles = { all: 'Radio Italiane & Internazionali', it: '🇮🇹 Radio Italiane', int: '🌍 Radio Internazionali' };
   document.getElementById('radioSectionTitle').textContent = titles[g];
   renderRadio(document.getElementById('searchInput').value.toLowerCase());
 }
 
 function getLogoUrl(r) {
+  // Prefer explicit logo field
   if (r.logo) return r.logo;
+  // Fallback: derive favicon from a known website domain (not stream hostname)
   return null;
 }
 
@@ -1311,73 +1405,117 @@ function renderRadioLogo(r) {
 
 function renderRadio(filter = '') {
   const grid = document.getElementById('radioGrid');
-  
-  let pool;
-  if (radioGroupFilter === 'it') {
-    pool = verifiedRadios.filter(r => r.group === 'it');
-  } else if (radioGroupFilter === 'int') {
-    pool = verifiedRadios.filter(r => r.group === 'int');
-  } else {
-    pool = [...verifiedRadios, ...customRadios];
-  }
-  
-  const filtered = filter 
-    ? pool.filter(r => r.name.toLowerCase().includes(filter) || r.genre.toLowerCase().includes(filter))
-    : pool;
+  const pool = getOrderedPool();
+  const filtered = filter ? pool.filter(r => r.name.toLowerCase().includes(filter) || r.genre.toLowerCase().includes(filter)) : pool;
 
-  if (filtered.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessuna radio trovata per "' + filter + '"</div>';
-    return;
-  }
-
-  grid.innerHTML = filtered.map((r) => {
+  const cards = filtered.map((r, idx) => {
     const isActive = currentRadio?.id === r.id;
     const btnIcon  = isActive && isPlaying ? '⏸' : '▶';
-    return `<div class="radio-card ${isActive ? 'playing' : ''}" 
-              data-id="${r.id}" id="rc-${r.id}"
-              onclick="cardClick('${r.id}')">
+    return `<div class="radio-card ${isActive ? 'playing' : ''}" draggable="true"
+              data-id="${r.id}" data-idx="${idx}" id="rc-${r.id}"
+              onclick="cardClick('${r.id}')"
+              ondragstart="dragStart(event)"
+              ondragover="dragOver(event)"
+              ondrop="dragDrop(event)"
+              ondragend="dragEnd(event)">
+      <div class="drag-handle" title="Trascina per spostare">⠿</div>
       ${renderRadioLogo(r)}
       <div class="radio-name">${filter ? r.name.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : r.name}</div>
       <div class="radio-genre">${filter ? r.genre.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : r.genre}</div>
       ${isActive && isPlaying ? `<div class="waveform">${'<div class="wave-bar"></div>'.repeat(5)}</div>` : ''}
-      ${customRadios.some(c => c.id === r.id) ? 
-        `<button class="radio-edit-btn" onclick="event.stopPropagation(); openEditRadio('${r.id}')">✏️</button>` : ''}
+      <button class="radio-edit-btn" onclick="event.stopPropagation(); openEditRadio('${r.id}')">✏️</button>
       <button class="radio-play-btn" onclick="event.stopPropagation(); cardClick('${r.id}')">${btnIcon}</button>
     </div>`;
-  }).join('');
+  });
+  if (cards.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessuna radio trovata per "' + filter + '"</div>';
+  } else {
+    grid.innerHTML = cards.join('');
+  }
 }
 
-function playRadio(id) {
-  const all = [...verifiedRadios, ...customRadios];
+
+// ── PROXY CORS ─────────────────────────────────────────────────────────────────
+// Lista di proxy pubblici da provare in cascata
+// Nota: questi proxy non supportano streaming infinito su tutti i browser,
+// ma vale la pena provarli — in molti casi funzionano.
+const CORS_PROXIES = [
+  'https://cors-anywhere.herokuapp.com/',
+  'https://corsproxy.io/?',
+  'https://api.allorigins.win/raw?url=',
+  'https://thingproxy.freeboard.io/fetch/',
+];
+function playRadio(id, fallbackIndex, useProxy) {
+  const all = [...builtinRadios, ...customRadios];
   const radio = all.find(r => r.id === id);
   if (!radio) return;
+
+  // Se la radio ha cors:true e non stiamo già provando proxy, proviamo direttamente
+  // e in caso di errore riproveremo col proxy
+  const urls = [radio.url, ...(radio.fallbacks || [])];
+  const urlIndex = fallbackIndex || 0;
+
+  if (urlIndex >= urls.length) {
+    showToast('\u26a0\ufe0f ' + radio.name + ': stream non raggiungibile', 'error');
+    const card = document.getElementById('rc-' + id);
+    if (card) {
+      card.style.borderColor = 'var(--accent)';
+      if (!card.querySelector('.stream-err')) {
+        const tag = document.createElement('div');
+        tag.className = 'stream-err';
+        tag.style.cssText = 'font-size:10px;color:var(--accent);margin-top:4px;font-family:JetBrains Mono,monospace;';
+        tag.textContent = '\u2715 non disponibile';
+        card.appendChild(tag);
+      }
+    }
+    currentMode = 'idle'; isPlaying = false;
+    document.getElementById('playBtn').textContent = '\u25b6';
+    return;
+  }
 
   currentMode = 'radio';
   currentRadio = radio;
 
-  audio.onerror = () => {
-    showToast('❌ Errore di connessione per ' + radio.name, 'error');
+  const card = document.getElementById('rc-' + id);
+  if (card) { card.style.borderColor = ''; const e = card.querySelector('.stream-err'); if (e) e.remove(); }
+
+  // Costruisci URL: diretto (niente proxy per ora — rimuoviamo il loop)
+  const streamUrl = urls[urlIndex];
+
+  audio.onerror = null;
+  let started = false;
+  let errorFired = false;
+
+  const onPlaying = () => { started = true; clearTimeout(safetyTimer); };
+  audio.addEventListener('playing', onPlaying, { once: true });
+
+  const tryNext = () => {
+    if (errorFired) return;
+    errorFired = true;
+    audio.onerror = null;
+    destroyHls();
+    if (!started && currentRadio && currentRadio.id === id) {
+      audio.removeEventListener('playing', onPlaying);
+      playRadio(id, urlIndex + 1);
+    }
   };
 
-  const tryPlay = () => {
-    playStream(radio.url, () => {
-      showToast('❌ Impossibile riprodurre ' + radio.name, 'error');
-    });
-  };
+  const safetyTimer = setTimeout(() => {
+    if (!started && currentRadio && currentRadio.id === id) tryNext();
+  }, 10000);
 
-  tryPlay();
+  audio.onerror = tryNext;
+  playStream(streamUrl, tryNext);
 
   isPlaying = true;
-  document.getElementById('playBtn').textContent = '⏸';
-  
+  document.getElementById('playBtn').textContent = '\u23f8';
   const artEl = document.getElementById('playerArt');
   const logoUrl = getLogoUrl(radio);
   if (logoUrl) {
-    artEl.innerHTML = '<img src="' + logoUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.textContent=\'' + (radio.emoji||'📻') + '\'">';
+    artEl.innerHTML = '<img src="' + logoUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.textContent=\'' + (radio.emoji||'\ud83d\udcfb') + '\'">';
   } else {
-    artEl.textContent = radio.emoji || '📻';
+    artEl.textContent = radio.emoji || '\ud83d\udcfb';
   }
-  
   document.getElementById('playerTrack').textContent = radio.name;
   document.getElementById('playerStation').textContent = radio.genre;
   document.getElementById('liveBadge').style.display = 'inline-flex';
@@ -1386,24 +1524,102 @@ function playRadio(id) {
   document.getElementById('timeDuration').textContent = 'LIVE';
 
   renderRadio();
-  showToast('▶ ' + radio.name + ' in riproduzione', 'success');
+  if (urlIndex === 0) showToast('\u25b6 ' + radio.name + ' in riproduzione', 'success');
+  // Silently try fallbacks - no toast spam during retries
 }
 
 function cardClick(id) {
+  // If same radio is playing, pause; if same radio paused, resume; otherwise play new
   if (currentRadio && currentRadio.id === id && currentMode === 'radio') {
     if (isPlaying) {
       audio.pause();
       isPlaying = false;
       document.getElementById('playBtn').textContent = '▶';
+      renderRadio();
     } else {
       audio.play();
       isPlaying = true;
       document.getElementById('playBtn').textContent = '⏸';
+      renderRadio();
     }
-    renderRadio();
   } else {
     playRadio(id);
   }
+}
+
+// ─── DRAG & DROP ───────────────────────────────────────────────────────────────
+// We keep a mutable ordered list per group-filter; stored in localStorage.
+// radioOrder[groupKey] = [id, id, id, ...]
+
+let dragSrcId = null;
+
+function getOrderKey() {
+  return 'radioOrder_' + radioGroupFilter;
+}
+
+function getOrderedPool() {
+  let pool;
+  if (radioGroupFilter === 'it')  pool = [...builtinRadios.filter(r => r.group === 'it'), ...customRadios];
+  else if (radioGroupFilter === 'int') pool = builtinRadios.filter(r => r.group === 'int');
+  else pool = [...builtinRadios, ...customRadios];
+
+  const saved = JSON.parse(localStorage.getItem(getOrderKey()) || 'null');
+  if (!saved) return pool;
+
+  // Re-order pool according to saved order, appending new ones at end
+  const idxMap = {};
+  saved.forEach((id, i) => idxMap[id] = i);
+  pool.sort((a, b) => {
+    const ia = idxMap[a.id] ?? 9999;
+    const ib = idxMap[b.id] ?? 9999;
+    return ia - ib;
+  });
+  return pool;
+}
+
+function saveOrder(orderedIds) {
+  localStorage.setItem(getOrderKey(), JSON.stringify(orderedIds));
+}
+
+function dragStart(e) {
+  dragSrcId = e.currentTarget.dataset.id;
+  e.currentTarget.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragSrcId);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  // Highlight drop target
+  document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('drag-over'));
+  e.currentTarget.classList.add('drag-over');
+}
+
+function dragDrop(e) {
+  e.preventDefault();
+  const targetId = e.currentTarget.dataset.id;
+  if (!dragSrcId || dragSrcId === targetId) return;
+
+  // Get current visual order from DOM
+  const cards = [...document.querySelectorAll('.radio-card[data-id]')];
+  const ids = cards.map(c => c.dataset.id);
+
+  const fromIdx = ids.indexOf(dragSrcId);
+  const toIdx   = ids.indexOf(targetId);
+  if (fromIdx < 0 || toIdx < 0) return;
+
+  ids.splice(fromIdx, 1);
+  ids.splice(toIdx, 0, dragSrcId);
+
+  saveOrder(ids);
+  renderRadio(document.getElementById('searchInput').value.toLowerCase());
+}
+
+function dragEnd(e) {
+  e.currentTarget.style.opacity = '';
+  document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('drag-over'));
+  dragSrcId = null;
 }
 
 function toggleAddForm() {
@@ -1415,18 +1631,9 @@ function addCustomRadio() {
   const name = document.getElementById('addName').value.trim();
   const url = document.getElementById('addUrl').value.trim();
   const genre = document.getElementById('addGenre').value.trim();
-  
   if (!name || !url) return showToast('Nome e URL sono obbligatori', 'error');
   
-  const newRadio = { 
-    id: 'c' + Date.now(), 
-    name, 
-    url, 
-    genre: genre || 'Custom', 
-    emoji: '📡', 
-    group: 'it' 
-  };
-  
+  const newRadio = { id: 'c' + Date.now(), name, url, genre: genre || 'Custom', emoji: '📡' };
   customRadios.push(newRadio);
   localStorage.setItem('customRadios', JSON.stringify(customRadios));
   
@@ -1442,16 +1649,34 @@ function addCustomRadio() {
 // ===========================
 // EDIT / DELETE RADIO
 // ===========================
+let editingRadioOriginal = null; // reference to original object
+
 function openEditRadio(id) {
-  const all = [...verifiedRadios, ...customRadios];
+  const all = [...builtinRadios, ...customRadios];
   const r = all.find(x => x.id === id);
   if (!r) return;
+  editingRadioOriginal = r;
 
   document.getElementById('editRadioId').value = id;
   document.getElementById('editRadioName').value = r.name;
   document.getElementById('editRadioUrl').value = r.url;
   document.getElementById('editRadioGenre').value = r.genre;
   document.getElementById('editModalTitle').textContent = '✏️ ' + r.name;
+
+  // Show logo preview
+  const logoUrl = getLogoUrl(r);
+  const previewDiv = document.getElementById('editLogoPreview');
+  if (logoUrl) {
+    document.getElementById('editLogoImg').src = logoUrl;
+    document.getElementById('editLogoSource').textContent = 'Logo automatico: ' + r.name;
+    previewDiv.style.display = 'flex';
+  } else {
+    previewDiv.style.display = 'none';
+  }
+
+  // Show/hide delete button (always visible, but label changes)
+  const delBtn = document.getElementById('editDeleteBtn');
+  delBtn.style.display = '';
 
   openModal('editRadioModal');
 }
@@ -1461,11 +1686,22 @@ function saveEditedRadio() {
   const name = document.getElementById('editRadioName').value.trim();
   const url  = document.getElementById('editRadioUrl').value.trim();
   const genre = document.getElementById('editRadioGenre').value.trim();
-  
   if (!name || !url) return showToast('Nome e URL sono obbligatori', 'error');
 
-  const customIdx = customRadios.findIndex(r => r.id === id);
-  if (customIdx >= 0) {
+  // Check if it's a builtin or custom
+  const builtinIdx = builtinRadios.findIndex(r => r.id === id);
+  const customIdx  = customRadios.findIndex(r => r.id === id);
+
+  if (builtinIdx >= 0) {
+    // Save override in localStorage
+    let overrides = JSON.parse(localStorage.getItem('radioOverrides') || '{}');
+    overrides[id] = { name, url, genre };
+    localStorage.setItem('radioOverrides', JSON.stringify(overrides));
+    // Apply override in-memory
+    builtinRadios[builtinIdx].name  = name;
+    builtinRadios[builtinIdx].url   = url;
+    builtinRadios[builtinIdx].genre = genre;
+  } else if (customIdx >= 0) {
     customRadios[customIdx].name  = name;
     customRadios[customIdx].url   = url;
     customRadios[customIdx].genre = genre;
@@ -1482,8 +1718,16 @@ function deleteRadio() {
   const name = document.getElementById('editRadioName').value;
   if (!confirm('Eliminare "' + name + '"?')) return;
 
-  const customIdx = customRadios.findIndex(r => r.id === id);
-  if (customIdx >= 0) {
+  const builtinIdx = builtinRadios.findIndex(r => r.id === id);
+  const customIdx  = customRadios.findIndex(r => r.id === id);
+
+  if (builtinIdx >= 0) {
+    // Mark as hidden in localStorage
+    let hidden = JSON.parse(localStorage.getItem('radioHidden') || '[]');
+    if (!hidden.includes(id)) hidden.push(id);
+    localStorage.setItem('radioHidden', JSON.stringify(hidden));
+    builtinRadios.splice(builtinIdx, 1);
+  } else if (customIdx >= 0) {
     customRadios.splice(customIdx, 1);
     localStorage.setItem('customRadios', JSON.stringify(customRadios));
   }
@@ -1493,18 +1737,34 @@ function deleteRadio() {
   showToast('🗑 ' + name + ' rimossa', 'success');
 }
 
+function applyStoredOverrides() {
+  const overrides = JSON.parse(localStorage.getItem('radioOverrides') || '{}');
+  const hidden = JSON.parse(localStorage.getItem('radioHidden') || '[]');
+  // Apply overrides
+  for (const [id, data] of Object.entries(overrides)) {
+    const r = builtinRadios.find(x => x.id === id);
+    if (r) { r.name = data.name; r.url = data.url; r.genre = data.genre; }
+  }
+  // Remove hidden
+  for (const id of hidden) {
+    const idx = builtinRadios.findIndex(x => x.id === id);
+    if (idx >= 0) builtinRadios.splice(idx, 1);
+  }
+}
+
 // ===========================
 // PLAYER CONTROLS
 // ===========================
 function togglePlay() {
   if (currentMode === 'idle') return;
-  
   if (currentMode === 'youtube') {
     if (isPlaying) {
+      // Pause YT: remove the hidden iframe
       if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
       isPlaying = false;
       document.getElementById('playBtn').textContent = '▶';
     } else {
+      // Resume: re-open the iframe
       if (currentYTIndex >= 0 && queue[currentYTIndex]) {
         playYTAudio(queue[currentYTIndex].ytId, queue[currentYTIndex]);
         isPlaying = true;
@@ -1513,18 +1773,18 @@ function togglePlay() {
     }
     return;
   }
-  
   if (isPlaying) {
     audio.pause();
     destroyHls();
     isPlaying = false;
     document.getElementById('playBtn').textContent = '▶';
+    renderRadio();
   } else {
     audio.play();
     isPlaying = true;
     document.getElementById('playBtn').textContent = '⏸';
+    renderRadio();
   }
-  renderRadio();
 }
 
 function setVolume(v) {
@@ -1552,7 +1812,7 @@ function nextTrack() {
 }
 
 audio.addEventListener('timeupdate', () => {
-  if (audio.duration && !isNaN(audio.duration)) {
+  if (audio.duration) {
     const pct = (audio.currentTime / audio.duration) * 100;
     document.getElementById('progressFill').style.width = pct + '%';
     document.getElementById('timeElapsed').textContent = formatTime(audio.currentTime);
@@ -1569,247 +1829,9 @@ function seekTo(e) {
 }
 
 function formatTime(s) {
-  if (isNaN(s)) return '0:00';
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, '0')}`;
-}
-
-// ===========================
-// CLASSIFICHE DINAMICHE
-// ===========================
-let currentCharts = [];
-
-async function fetchBillboardCharts() {
-  document.getElementById('chartUpdateBadge').textContent = 'Aggiornamento...';
-  
-  try {
-    // Usiamo un proxy per evitare CORS
-    const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://raw.githubusercontent.com/KoreanThinker/billboard-hot-100/master/json/2025-03-15.json'));
-    const data = await response.json();
-    
-    if (data && data.contents) {
-      const chartData = JSON.parse(data.contents);
-      if (chartData && chartData.length) {
-        currentCharts = chartData.slice(0, 20).map((item, index) => ({
-          pos: index + 1,
-          song: item.song,
-          artist: item.artist,
-          trend: item.change || '=',
-          dir: item.change ? (item.change.includes('+') ? 'up' : item.change.includes('-') ? 'down' : 'same') : 'same',
-          emoji: getSongEmoji(item.song),
-          ytQuery: item.song + ' ' + item.artist
-        }));
-        
-        document.getElementById('chartUpdateBadge').textContent = 'Aggiornato ' + new Date().toLocaleDateString();
-        renderCharts();
-        return;
-      }
-    }
-    throw new Error('Dati non validi');
-  } catch (e) {
-    console.error('Errore fetch classifiche:', e);
-    // Fallback a dati recenti
-    currentCharts = getFallbackCharts();
-    document.getElementById('chartUpdateBadge').textContent = 'Dati di backup';
-    renderCharts();
-  }
-}
-
-function getFallbackCharts() {
-  return [
-    { pos: 1, song: 'Espresso', artist: 'Sabrina Carpenter', trend: '+2', dir: 'up', emoji: '☕', ytQuery: 'Sabrina Carpenter Espresso' },
-    { pos: 2, song: 'Flowers', artist: 'Miley Cyrus', trend: '=', dir: 'same', emoji: '🌸', ytQuery: 'Miley Cyrus Flowers' },
-    { pos: 3, song: 'Anti-Hero', artist: 'Taylor Swift', trend: '+1', dir: 'up', emoji: '🦹', ytQuery: 'Taylor Swift Anti-Hero' },
-    { pos: 4, song: 'Cruel Summer', artist: 'Taylor Swift', trend: '-1', dir: 'down', emoji: '☀️', ytQuery: 'Taylor Swift Cruel Summer' },
-    { pos: 5, song: 'Vampire', artist: 'Olivia Rodrigo', trend: '+3', dir: 'up', emoji: '🧛', ytQuery: 'Olivia Rodrigo Vampire' },
-    { pos: 6, song: 'What Was I Made For', artist: 'Billie Eilish', trend: '+2', dir: 'up', emoji: '🎬', ytQuery: 'Billie Eilish What Was I Made For' },
-    { pos: 7, song: 'Lose Control', artist: 'Teddy Swims', trend: '=', dir: 'same', emoji: '🎤', ytQuery: 'Teddy Swims Lose Control' },
-    { pos: 8, song: 'Greedy', artist: 'Tate McRae', trend: '+1', dir: 'up', emoji: '💰', ytQuery: 'Tate McRae Greedy' },
-    { pos: 9, song: 'Water', artist: 'Tyla', trend: '+5', dir: 'up', emoji: '💧', ytQuery: 'Tyla Water' },
-    { pos: 10, song: 'Stick Season', artist: 'Noah Kahan', trend: '-3', dir: 'down', emoji: '🍂', ytQuery: 'Noah Kahan Stick Season' },
-  ];
-}
-
-function getSongEmoji(song) {
-  const emojis = ['🎵', '🎸', '🎤', '🎧', '🎹', '🥁', '🎷', '🎺', '🎻', '🎼', '⭐', '💫', '🔥', '💿', '📀'];
-  return emojis[Math.floor(Math.random() * emojis.length)];
-}
-
-function renderCharts(filter = '') {
-  const el = document.getElementById('chartList');
-  const data = filter
-    ? currentCharts.filter(c => c.song.toLowerCase().includes(filter) || c.artist.toLowerCase().includes(filter))
-    : currentCharts;
-
-  if (data.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessun risultato per "' + filter + '"</div>';
-    return;
-  }
-
-  el.innerHTML = data.map(c => `
-    <div class="chart-item" onclick="addChartToQueue('${c.song.replace(/'/g, "\\'")}', '${c.artist.replace(/'/g, "\\'")}')">
-      <div class="chart-pos ${c.pos <= 3 ? 'top3' : ''}">${c.pos}</div>
-      <div class="chart-art">${c.emoji}</div>
-      <div class="chart-info">
-        <div class="chart-song">${filter ? c.song.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : c.song}</div>
-        <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : c.artist}</div>
-      </div>
-      <div class="chart-trend trend-${c.dir}">
-        ${c.dir === 'up' ? '▲' : c.dir === 'down' ? '▼' : '—'} ${c.trend}
-      </div>
-    </div>
-  `).join('');
-}
-
-// AGGIUNGI BRANO CLASSIFICA ALLA PLAYLIST
-async function addChartToQueue(song, artist) {
-  const query = encodeURIComponent(song + ' ' + artist);
-  
-  try {
-    // Usiamo l'API YouTube senza chiave (limitata)
-    const response = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/results?search_query=${query}`);
-    const data = await response.json();
-    
-    // Creiamo un ID YouTube fittizio per ora (in produzione usare API key)
-    const fakeYtId = 'dQw4w9WgXcQ'; // Esempio
-    
-    const item = {
-      id: 'yt' + Date.now(),
-      ytId: fakeYtId,
-      title: song + ' - ' + artist,
-      channel: artist,
-      duration: '',
-      url: 'https://www.youtube.com/watch?v=' + fakeYtId
-    };
-    
-    queue.push(item);
-    localStorage.setItem('queue', JSON.stringify(queue));
-    
-    showToast(`✅ "${song}" aggiunto alla coda!`, 'success');
-    
-    // Vai alla sezione playlist
-    showSection('playlist');
-    switchTab('queue', document.querySelectorAll('.tab')[1]);
-    renderQueue();
-  } catch (e) {
-    // Fallback: aggiungi comunque alla coda con ID placeholder
-    const item = {
-      id: 'yt' + Date.now(),
-      ytId: 'dQw4w9WgXcQ',
-      title: song + ' - ' + artist,
-      channel: artist,
-      duration: '',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    };
-    
-    queue.push(item);
-    localStorage.setItem('queue', JSON.stringify(queue));
-    
-    showToast(`✅ "${song}" aggiunto alla coda!`, 'success');
-    
-    showSection('playlist');
-    switchTab('queue', document.querySelectorAll('.tab')[1]);
-    renderQueue();
-  }
-}
-
-function refreshCharts() {
-  fetchBillboardCharts();
-}
-
-// ===========================
-// NOVITÀ DINAMICHE
-// ===========================
-let currentNews = [];
-
-async function fetchMusicNews() {
-  document.getElementById('newsUpdateBadge').textContent = 'Aggiornamento...';
-  
-  try {
-    // Usiamo RSS2JSON per convertire feed RSS in JSON
-    const feeds = [
-      'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.billboard.com%2Ffeed',
-      'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fpitchfork.com%2Ffeed%2Ffeed-news%2Frss',
-      'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.nme.com%2Ffeed'
-    ];
-    
-    const responses = await Promise.any(feeds.map(url => 
-      fetch(url).then(res => res.json())
-    ));
-    
-    if (responses && responses.items) {
-      currentNews = responses.items.slice(0, 12).map((item, index) => ({
-        tag: item.categories?.[0] || 'Novità',
-        title: item.title,
-        date: new Date(item.pubDate).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }),
-        emoji: getNewsEmoji(index)
-      }));
-    } else {
-      throw new Error('Nessun dato');
-    }
-  } catch (e) {
-    console.error('Errore fetch news:', e);
-    currentNews = getFallbackNews();
-    document.getElementById('newsUpdateBadge').textContent = 'Dati di backup';
-  }
-  
-  renderNews();
-  document.getElementById('newsUpdateBadge').textContent = 'Aggiornato ' + new Date().toLocaleDateString();
-}
-
-function getNewsEmoji(index) {
-  const emojis = ['🎵', '🎸', '📻', '🏆', '🎤', '🎧', '💿', '🔥', '⭐', '📀', '🎼', '🎹'];
-  return emojis[index % emojis.length];
-}
-
-function getFallbackNews() {
-  const today = new Date();
-  return [
-    { tag: 'Album', title: 'Taylor Swift annuncia il nuovo album "Reputation (Taylor\'s Version)"', date: today.toLocaleDateString(), emoji: '👑' },
-    { tag: 'Tour', title: 'Coldplay estende il tour mondiale fino al 2026 con nuove date in Italia', date: today.toLocaleDateString(), emoji: '🌍' },
-    { tag: 'Festival', title: 'Lineup Sanremo 2026: i primi nomi ufficiali', date: today.toLocaleDateString(), emoji: '🎭' },
-    { tag: 'Hit', title: 'Nuovo singolo per Mahmood: "Tuta Gold" certificato platino', date: today.toLocaleDateString(), emoji: '🏆' },
-    { tag: 'Radio', title: 'Radio Deejay lancia il nuovo canale DAB+ dedicato agli anni 2000', date: today.toLocaleDateString(), emoji: '📻' },
-    { tag: 'Spotify', title: 'Record di streaming per la playlist "Top Italia"', date: today.toLocaleDateString(), emoji: '📊' },
-    { tag: 'Concerti', title: 'I Måneskin annunciano un tour negli stadi per l\'estate 2026', date: today.toLocaleDateString(), emoji: '🎸' },
-    { tag: 'Album', title: 'Dua Lipa collabora con artisti italiani per il nuovo album', date: today.toLocaleDateString(), emoji: '✨' },
-    { tag: 'Hit', title: 'Annalisa conquista la classifica FIMI per la 20ª settimana', date: today.toLocaleDateString(), emoji: '🔥' },
-  ];
-}
-
-function renderNews(filter = '') {
-  const el = document.getElementById('newsGrid');
-  const data = filter
-    ? currentNews.filter(n => n.title.toLowerCase().includes(filter) || n.tag.toLowerCase().includes(filter))
-    : currentNews;
-
-  if (data.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessun risultato per "' + filter + '"</div>';
-    return;
-  }
-
-  el.innerHTML = data.map(n => `
-    <div class="news-card" onclick="openNewsLink('${encodeURIComponent(n.title)}')">
-      <div class="news-img">
-        ${n.emoji}
-        <div class="news-tag">${n.tag}</div>
-      </div>
-      <div class="news-body">
-        <div class="news-title">${filter ? n.title.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : n.title}</div>
-        <div class="news-date">📅 ${n.date}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function openNewsLink(title) {
-  // Cerca la notizia su Google
-  window.open('https://www.google.com/search?q=' + encodeURIComponent(title + ' musica'), '_blank');
-}
-
-function refreshNews() {
-  fetchMusicNews();
 }
 
 // ===========================
@@ -1820,54 +1842,91 @@ function getYTId(url) {
   return match ? match[1] : null;
 }
 
+function escAttr(s) {
+  return (s || '').replace(/'/g, "&#39;").replace(/"/g, '&quot;');
+}
+
+function formatSec(s) {
+  if (!s) return '';
+  const m = Math.floor(s / 60), sec = s % 60;
+  return m + ':' + sec.toString().padStart(2, '0');
+}
+
+// ── RICERCA CON CLAUDE AI ──────────────────────────────────────
 let selectedYTItem = null;
 
 async function searchYT() {
   const q = document.getElementById('ytSearchInput').value.trim();
   if (!q) return;
-  
   const btn = document.getElementById('btnSearch');
   btn.textContent = '⏳';
   btn.disabled = true;
-  
   const resultsDiv = document.getElementById('ytSearchResults');
   resultsDiv.style.display = 'flex';
+  resultsDiv.style.flexDirection = 'column';
   resultsDiv.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">🔎 Ricerca in corso...</div>';
 
+  // Rilevamento automatico: locale o Render
+  // Cambia RENDER_URL con il tuo URL dopo il deploy su Render
+  const RENDER_URL = 'https://radio-jean-search.onrender.com';
+  const LOCAL_URL  = 'http://localhost:5000';
+  const isLocal    = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const baseUrl    = isLocal ? LOCAL_URL : RENDER_URL;
+
   try {
-    // Usiamo noembed come proxy semplice (non dà risultati di ricerca, ma almeno non dà errore)
-    const response = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`);
-    
-    // Simuliamo risultati con placeholder
-    const mockResults = [
-      { ytId: 'dQw4w9WgXcQ', title: q + ' - Video 1', channel: 'Cerca su YouTube', dur: '3:30' },
-      { ytId: 'dQw4w9WgXcQ', title: q + ' - Video 2', channel: 'Cerca su YouTube', dur: '4:15' },
-      { ytId: 'dQw4w9WgXcQ', title: q + ' - Video 3', channel: 'Cerca su YouTube', dur: '3:45' },
-    ];
-    
+    const res = await fetch(baseUrl + '/search?q=' + encodeURIComponent(q), {
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const videos = await res.json();
+    if (!videos.length) throw new Error('Nessun risultato');
+
     resultsDiv.innerHTML = '';
-    mockResults.forEach(v => {
+    videos.forEach(function(v) {
       const div = document.createElement('div');
-      div.style.cssText = 'display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:4px;background:var(--card);';
-      div.onclick = () => selectYTItem(v.ytId, v.title, v.channel, v.dur);
-      
-      div.innerHTML = `
-        <img src="https://img.youtube.com/vi/${v.ytId}/mqdefault.jpg" style="width:80px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;">
-        <div style="flex:1;overflow:hidden;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.title}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;">${v.channel}</div>
-          <div style="font-size:10px;color:var(--accent3);margin-top:2px;">⏱ ${v.dur}</div>
-        </div>
-      `;
+      div.style.cssText = 'display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:4px;background:var(--card);transition:border-color 0.2s;';
+      div.onmouseover = function(){ this.style.borderColor = 'var(--accent2)'; };
+      div.onmouseout  = function(){ this.style.borderColor = 'var(--border)'; };
+      div.onclick = function() { selectYTItem(v.ytId, v.title, v.channel, v.dur); };
+      const img = document.createElement('img');
+      img.src = 'https://img.youtube.com/vi/' + v.ytId + '/mqdefault.jpg';
+      img.style.cssText = 'width:80px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg3);';
+      const info = document.createElement('div');
+      info.style.cssText = 'flex:1;overflow:hidden;';
+      info.innerHTML =
+        '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(v.title) + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:3px;">' + esc(v.channel) + '</div>' +
+        '<div style="font-size:10px;color:var(--accent3);margin-top:2px;font-family:monospace;">' + esc(v.dur) + '</div>';
+      div.appendChild(img);
+      div.appendChild(info);
       resultsDiv.appendChild(div);
     });
 
   } catch(e) {
-    resultsDiv.innerHTML = '<div style="color:var(--accent);font-size:13px;padding:12px;text-align:center;">❌ Errore di ricerca</div>';
+    const isServerDown = e.message.includes('Failed to fetch') || e.message.includes('Load failed') || e.message.includes('NetworkError');
+    resultsDiv.innerHTML =
+      '<div style="color:var(--accent);font-size:13px;padding:12px;text-align:center;">' +
+        (isServerDown
+          ? '⚠️ Server di ricerca non raggiungibile.<br><small style="color:var(--text3)">In locale: avvia <b>server.py</b> prima di cercare.<br>Online: verifica che il servizio Render sia attivo.</small>'
+          : '❌ ' + esc(e.message)) +
+        '<br><br><a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '" target="_blank" ' +
+        'style="color:var(--accent2);text-decoration:none;padding:6px 14px;border:1px solid var(--accent2);border-radius:6px;font-size:12px;">' +
+        '🔗 Cerca su YouTube →</a>' +
+      '</div>';
   }
 
   btn.textContent = 'Cerca';
   btn.disabled = false;
+}
+
+function fmtSec(s) {
+  s = parseInt(s);
+  const m = Math.floor(s / 60), sec = s % 60;
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function selectYTItem(ytId, title, channel, duration) {
@@ -1896,9 +1955,8 @@ function previewYTUrl() {
     const url = document.getElementById('ytUrlInput').value;
     const id = getYTId(url);
     if (!id) return;
-    
     try {
-      const res = await fetch('https://noembed.com/embed?url=https://www.youtube.com/watch?v=' + id);
+      const res = await fetch('https://noembed.com/embed?url=https://www.youtube.com/watch?v=' + id, { signal: AbortSignal.timeout(5000) });
       const data = await res.json();
       selectYTItem(id, data.title || 'Video YouTube', data.author_name || 'YouTube', '');
     } catch {
@@ -1911,11 +1969,11 @@ function openAddYTModal() {
   const sel = document.getElementById('ytPlaylistSelect');
   sel.innerHTML = '<option value="">Solo coda di riproduzione</option>' +
     playlists.map(p => '<option value="' + p.id + '">' + p.emoji + ' ' + p.name + '</option>').join('');
-  
   document.getElementById('ytSearchInput').value = '';
   document.getElementById('ytUrlInput').value = '';
-  document.getElementById('ytSearchResults').style.display = 'none';
-  document.getElementById('ytSearchResults').innerHTML = '';
+  const rd = document.getElementById('ytSearchResults');
+  rd.style.display = 'none';
+  rd.innerHTML = '';
   clearSelection();
   openModal('ytModal');
 }
@@ -1927,7 +1985,6 @@ function addYTToQueue() {
     if (!id) return showToast('Seleziona un brano o incolla un URL valido', 'error');
     selectedYTItem = { ytId: id, title: 'Video YouTube', channel: 'YouTube', duration: '' };
   }
-  
   const item = {
     id: 'yt' + Date.now(),
     ytId: selectedYTItem.ytId,
@@ -1936,67 +1993,58 @@ function addYTToQueue() {
     duration: selectedYTItem.duration || '',
     url: 'https://www.youtube.com/watch?v=' + selectedYTItem.ytId
   };
-  
   queue.push(item);
   localStorage.setItem('queue', JSON.stringify(queue));
-  
   const plId = document.getElementById('ytPlaylistSelect').value;
   if (plId) {
     const pl = playlists.find(p => p.id === plId);
-    if (pl) { 
-      pl.tracks = pl.tracks || []; 
-      pl.tracks.push(item); 
-      localStorage.setItem('playlists', JSON.stringify(playlists)); 
-    }
+    if (pl) { pl.tracks = pl.tracks || []; pl.tracks.push(item); localStorage.setItem('playlists', JSON.stringify(playlists)); }
   }
-  
   closeModal('ytModal');
   renderQueue();
-  document.getElementById('btnClearQueue').style.display = '';
+  const bc = document.getElementById('btnClearQueue');
+  if (bc) bc.style.display = '';
   showToast('✅ "' + item.title + '" aggiunto!', 'success');
 }
 
-// ===========================
-// QUEUE
-// ===========================
+// ── QUEUE ─────────────────────────────────────────────────────
 function renderQueue() {
   const list = document.getElementById('queueList');
   const empty = document.getElementById('queueEmpty');
   const btnClear = document.getElementById('btnClearQueue');
-  
   if (queue.length === 0) {
     list.innerHTML = '';
     empty.style.display = '';
     if (btnClear) btnClear.style.display = 'none';
     return;
   }
-  
   empty.style.display = 'none';
   if (btnClear) btnClear.style.display = '';
-  
-  list.innerHTML = queue.map((item, i) => `
-    <div class="queue-item ${i === currentYTIndex ? 'active' : ''}" onclick="playYT(${i})">
-      <div class="queue-num">${i === currentYTIndex ? '▶' : i + 1}</div>
-      <div class="queue-thumb"><img src="https://img.youtube.com/vi/${item.ytId}/mqdefault.jpg" alt=""></div>
-      <div class="queue-info">
-        <div class="queue-title">${item.title}</div>
-        <div class="queue-channel">${item.channel}${item.duration ? ' · ' + item.duration : ''}</div>
-      </div>
-      <button class="queue-remove" onclick="event.stopPropagation(); removeFromQueue(${i})">✕</button>
-    </div>
-  `).join('');
+  list.innerHTML = queue.map((item, i) =>
+    '<div class="queue-item ' + (i === currentYTIndex ? 'active' : '') + '" onclick="playYT(' + i + ')">' +
+      '<div class="queue-num">' + (i === currentYTIndex ? '▶' : i + 1) + '</div>' +
+      '<div class="queue-thumb"><img src="https://img.youtube.com/vi/' + item.ytId + '/mqdefault.jpg" alt=""></div>' +
+      '<div class="queue-info">' +
+        '<div class="queue-title">' + item.title + '</div>' +
+        '<div class="queue-channel">' + item.channel + (item.duration ? ' · ' + item.duration : '') + '</div>' +
+      '</div>' +
+      '<button class="queue-remove" onclick="event.stopPropagation(); removeFromQueue(' + i + ')">✕</button>' +
+    '</div>'
+  ).join('');
 }
 
+// ── PLAY YT (audio-only via audio element + YT card) ─────────
 function playYT(index) {
   if (index < 0 || index >= queue.length) return;
-  
   const item = queue[index];
   currentYTIndex = index;
   currentMode = 'youtube';
 
+  // Stop radio
   audio.pause();
   audio.src = '';
 
+  // Show YT card info
   const card = document.getElementById('ytCard');
   document.getElementById('ytCardThumb').src = 'https://img.youtube.com/vi/' + item.ytId + '/mqdefault.jpg';
   document.getElementById('ytCardTitle').textContent = item.title;
@@ -2004,6 +2052,7 @@ function playYT(index) {
   document.getElementById('ytCardLink').href = 'https://www.youtube.com/watch?v=' + item.ytId;
   card.style.display = 'flex';
 
+  // Update player bar
   document.getElementById('playerArt').textContent = '🎵';
   document.getElementById('playerTrack').textContent = item.title;
   document.getElementById('playerStation').textContent = item.channel || 'YouTube';
@@ -2016,16 +2065,27 @@ function playYT(index) {
   document.getElementById('timeDuration').textContent = item.duration || '—';
   isPlaying = true;
 
+  // Open YT in background tab for audio (best we can do without API key)
+  // Note: actual audio playback via window.open is blocked by browsers.
+  // We open the YT page so the user can listen there too.
+  // For in-app audio we try the YT page in a hidden iframe (audio only trick)
   playYTAudio(item.ytId, item);
+
   renderQueue();
+  showToast('▶ ' + item.title, 'success');
 }
 
+// Try to play YT audio using a background iframe trick
+// This opens youtube.com/embed with autoplay in a hidden iframe
+// Some browsers allow audio from embedded YT even without video
 let ytAudioFrame = null;
 function playYTAudio(ytId, item) {
+  // Remove old frame
   if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
   
+  // Create a hidden iframe with YT embed
   const f = document.createElement('iframe');
-  f.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&controls=0&modestbranding=1&rel=0';
+  f.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&controls=0';
   f.allow = 'autoplay; encrypted-media';
   f.style.cssText = 'position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0.01;border:none;';
   document.body.appendChild(f);
@@ -2058,9 +2118,7 @@ function removeFromQueue(i) {
   renderQueue();
 }
 
-// ===========================
-// PLAYLISTS
-// ===========================
+// ── PLAYLISTS ─────────────────────────────────────────────────
 function openNewPlaylistModal() {
   document.getElementById('plName').value = '';
   document.getElementById('plEmoji').value = '';
@@ -2071,7 +2129,6 @@ function createPlaylist() {
   const name = document.getElementById('plName').value.trim();
   const emoji = document.getElementById('plEmoji').value.trim() || '🎵';
   if (!name) return showToast('Inserisci un nome', 'error');
-  
   playlists.push({ id: 'pl' + Date.now(), name, emoji, tracks: [] });
   localStorage.setItem('playlists', JSON.stringify(playlists));
   closeModal('plModal');
@@ -2081,36 +2138,43 @@ function createPlaylist() {
 
 function renderPlaylist() {
   const list = document.getElementById('playlistList');
-  
   if (playlists.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">🎵 Nessuna playlist. Creane una!</div>';
     return;
   }
-  
-  list.innerHTML = playlists.map((pl, i) => `
-    <div class="playlist-card">
-      <div class="playlist-thumb">${pl.emoji}</div>
-      <div class="playlist-info">
-        <div class="playlist-name">${pl.name}</div>
-        <div class="playlist-count">${(pl.tracks || []).length} brani</div>
-      </div>
-      <div class="playlist-actions">
-        <button class="btn btn-primary btn-sm" onclick="playPlaylist(${i})">▶ Play</button>
-        <button class="btn btn-secondary btn-sm" onclick="deletePlaylist(${i})">🗑</button>
-      </div>
-    </div>
-  `).join('');
+  list.innerHTML = playlists.map((pl, i) =>
+    '<div class="playlist-card">' +
+      '<div class="playlist-thumb">' + pl.emoji + '</div>' +
+      '<div class="playlist-info">' +
+        '<div class="playlist-name">' + pl.name + '</div>' +
+        '<div class="playlist-count">' + (pl.tracks || []).length + ' brani</div>' +
+      '</div>' +
+      '<div class="playlist-actions">' +
+        '<button class="btn btn-primary btn-sm" onclick="playPlaylist(' + i + ')">▶ Play</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="openAddYTToPlaylist(' + i + ')">+ Brano</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="deletePlaylist(' + i + ')">🗑</button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+let addingToPlaylistIndex = -1;
+function openAddYTToPlaylist(i) {
+  addingToPlaylistIndex = i;
+  openAddYTModal();
+  setTimeout(() => {
+    const sel = document.getElementById('ytPlaylistSelect');
+    if (sel && playlists[i]) sel.value = playlists[i].id;
+  }, 50);
 }
 
 function playPlaylist(i) {
   const pl = playlists[i];
   if (!pl.tracks || pl.tracks.length === 0) return showToast('Playlist vuota. Aggiungi dei brani!', 'error');
-  
   queue = [...pl.tracks];
   localStorage.setItem('queue', JSON.stringify(queue));
-  
   const tabs = document.querySelectorAll('.tab');
-  switchTab('queue', tabs[1]);
+  switchTab('queue', tabs[2]);
   renderQueue();
   playYT(0);
 }
@@ -2123,33 +2187,259 @@ function deletePlaylist(i) {
   showToast('Playlist eliminata', 'success');
 }
 
+
+// ===========================
+// PLAYLIST SUGGERITE
+// ===========================
+const suggestedPlaylists = [
+  { emoji: '🇮🇹', name: 'Hits Italiane', desc: 'Il meglio della musica italiana', tags: ['pop italiano','italian pop'] },
+  { emoji: '🎸', name: 'Rock Classics', desc: 'I classici del rock internazionale', tags: ['rock','classic rock'] },
+  { emoji: '🎷', name: 'Jazz & Soul', desc: 'Jazz, Blues e Soul', tags: ['jazz','soul','blues'] },
+  { emoji: '🎉', name: 'Dance & Electronic', desc: 'Musica da ballare', tags: ['dance','electronic','house'] },
+  { emoji: '🌙', name: 'Chill & Ambient', desc: 'Musica rilassante', tags: ['ambient','chill','lo-fi'] },
+  { emoji: '📰', name: 'News & Talk', desc: 'Radio informazione', tags: ['news','talk','information'] },
+  { emoji: '🏆', name: 'Top Hits', desc: 'Le più ascoltate del momento', tags: ['pop','top 40','hits'] },
+  { emoji: '🎼', name: 'Classica', desc: 'Musica classica e opera', tags: ['classical','opera','classical music'] },
+];
+
+function renderSuggestedPlaylists() {
+  const grid = document.getElementById('suggesteGrid');
+  if (!grid) return;
+  grid.innerHTML = suggestedPlaylists.map(sp => `
+    <div class="playlist-card" onclick="filterBySuggested(${JSON.stringify(sp.tags)}, '${sp.name}')" style="cursor:pointer;">
+      <div class="playlist-thumb" style="font-size:28px;">${sp.emoji}</div>
+      <div class="playlist-info">
+        <div class="playlist-name">${sp.name}</div>
+        <div class="playlist-count">${sp.desc}</div>
+      </div>
+      <div class="playlist-actions">
+        <button class="btn btn-primary btn-sm">📻 Ascolta</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterBySuggested(tags, name) {
+  // Vai alla sezione radio e filtra per tag
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-radio').classList.add('active');
+  document.querySelector('.nav-item').classList.add('active');
+  document.getElementById('pageTitle').textContent = 'Radio Live';
+  document.getElementById('radioSectionTitle').textContent = '🎁 ' + name;
+  // Filtra le radio per tag
+  const grid = document.getElementById('radioGrid');
+  const pool = [...builtinRadios, ...customRadios];
+  const filtered = pool.filter(r => {
+    const genre = (r.genre || '').toLowerCase();
+    const rname = (r.name || '').toLowerCase();
+    return tags.some(t => genre.includes(t.toLowerCase()) || rname.includes(t.toLowerCase()));
+  });
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">Nessuna radio trovata per questa categoria.</div>';
+    return;
+  }
+  const cards = filtered.map((r, idx) => {
+    const isActive = currentRadio?.id === r.id;
+    const btnIcon = isActive && isPlaying ? '⏸' : '▶';
+    return `<div class="radio-card ${isActive ? 'playing' : ''}" data-id="${r.id}" id="rc-${r.id}" onclick="cardClick('${r.id}')">
+      ${renderRadioLogo(r)}
+      <div class="radio-name">${r.name}</div>
+      <div class="radio-genre">${r.genre}</div>
+      ${isActive && isPlaying ? `<div class="waveform">${'<div class="wave-bar"></div>'.repeat(5)}</div>` : ''}
+      <button class="radio-play-btn" onclick="event.stopPropagation(); cardClick('${r.id}')">${btnIcon}</button>
+    </div>`;
+  });
+  grid.innerHTML = cards.join('');
+}
+
 // ===========================
 // SEARCH
 // ===========================
 function handleSearch() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   const activeSection = document.querySelector('.section.active')?.id;
-  
-  if (activeSection === 'section-radio') renderRadio(q);
-  if (activeSection === 'section-charts') renderCharts(q);
-  if (activeSection === 'section-news') renderNews(q);
+  if (activeSection === 'section-radio')   renderRadio(q);
+  if (activeSection === 'section-charts')  renderCharts(q);
+  if (activeSection === 'section-news')    renderNews(q);
+}
+
+// ===========================
+// CHARTS — iTunes RSS (aggiornate in tempo reale)
+// ===========================
+let chartsData = [];
+let chartsLoaded = false;
+
+async function fetchCharts() {
+  const el = document.getElementById('chartList');
+  el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);">📊 Caricamento classifiche...</div>';
+
+  // iTunes Top 25 Italia + Top 25 Globale
+  const feeds = [
+    { url: 'https://itunes.apple.com/it/rss/topsongs/limit=25/json', label: '🇮🇹 Italia' },
+    { url: 'https://itunes.apple.com/us/rss/topsongs/limit=25/json', label: '🌍 Global' },
+  ];
+
+  chartsData = [];
+
+  for (const feed of feeds) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(feed.url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const entries = data?.feed?.entry || [];
+      entries.forEach((e, i) => {
+        chartsData.push({
+          pos:    chartsData.length + 1,
+          song:   e['im:name']?.label || '—',
+          artist: e['im:artist']?.label || '—',
+          art:    e['im:image']?.[1]?.label || '',
+          link:   e?.link?.attributes?.href || '#',
+          label:  feed.label,
+        });
+      });
+    } catch(e) {
+      console.warn('Charts fetch fallito:', feed.label, e.message);
+    }
+  }
+
+  chartsLoaded = true;
+  renderCharts();
+}
+
+function renderCharts(filter = '') {
+  const el = document.getElementById('chartList');
+
+  if (!chartsLoaded) {
+    fetchCharts();
+    return;
+  }
+
+  const data = filter
+    ? chartsData.filter(c => c.song.toLowerCase().includes(filter) || c.artist.toLowerCase().includes(filter))
+    : chartsData;
+
+  if (data.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessun risultato per "' + filter + '"</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(c => `
+    <a href="${c.link}" target="_blank" style="text-decoration:none;">
+    <div class="chart-item" style="cursor:pointer;" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background=''">
+      <div class="chart-pos ${c.pos <= 3 ? 'top3' : ''}">${c.pos}</div>
+      <div class="chart-art" style="background:none;padding:0;overflow:hidden;">
+        ${c.art ? `<img src="${c.art}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none'">` : '🎵'}
+      </div>
+      <div class="chart-info">
+        <div class="chart-song">${filter ? c.song.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.song)}</div>
+        <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${c.label}</div>
+    </div>
+    </a>
+  `).join('');
+}
+
+// ===========================
+// NEWS — RSS feed musicali (aggiornate in tempo reale)
+// ===========================
+let newsData = [];
+let newsLoaded = false;
+
+const NEWS_FEEDS = [
+  { url: 'https://www.rollingstone.com/music/feed/', tag: 'Rolling Stone' },
+  { url: 'https://feeds.feedburner.com/nme/rss/NewsResults', tag: 'NME' },
+  { url: 'https://www.rockol.it/rss/news', tag: 'Rockol' },
+];
+
+// rss2json.com converte RSS in JSON con CORS aperto — gratuito fino a 500 req/giorno
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+async function fetchNews() {
+  const el = document.getElementById('newsGrid');
+  el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">📰 Caricamento notizie...</div>';
+
+  newsData = [];
+
+  const results = await Promise.allSettled(
+    NEWS_FEEDS.map(async feed => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(RSS2JSON + encodeURIComponent(feed.url), { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      return { items: data.items || [], tag: feed.tag };
+    })
+  );
+
+  results.forEach(r => {
+    if (r.status === 'fulfilled') {
+      r.value.items.slice(0, 6).forEach(item => {
+        newsData.push({
+          tag:   r.value.tag,
+          title: item.title || '',
+          date:  item.pubDate ? new Date(item.pubDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
+          link:  item.link || '#',
+          img:   item.thumbnail || item.enclosure?.link || '',
+          desc:  item.description ? item.description.replace(/<[^>]+>/g, '').slice(0, 100) + '...' : '',
+        });
+      });
+    }
+  });
+
+  // Ordina per data decrescente
+  newsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  newsLoaded = true;
+  renderNews();
+}
+
+function renderNews(filter = '') {
+  const el = document.getElementById('newsGrid');
+
+  if (!newsLoaded) {
+    fetchNews();
+    return;
+  }
+
+  const data = filter
+    ? newsData.filter(n => n.title.toLowerCase().includes(filter) || n.tag.toLowerCase().includes(filter))
+    : newsData;
+
+  if (data.length === 0) {
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessun risultato per "' + filter + '"</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(n => `
+    <a href="${n.link}" target="_blank" rel="noopener" style="text-decoration:none;">
+    <div class="news-card">
+      <div class="news-img" style="${n.img ? 'background-image:url(' + n.img + ');background-size:cover;background-position:center;' : ''}">
+        ${n.img ? '' : '📰'}
+        <div class="news-tag">${esc(n.tag)}</div>
+      </div>
+      <div class="news-body">
+        <div class="news-title">${filter ? esc(n.title).replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(n.title)}</div>
+        <div class="news-date">📅 ${n.date}</div>
+      </div>
+    </div>
+    </a>
+  `).join('');
 }
 
 // ===========================
 // MODALS & TOAST
 // ===========================
-function openModal(id) { 
-  document.getElementById(id).classList.add('visible'); 
-}
-
-function closeModal(id) { 
-  document.getElementById(id).classList.remove('visible'); 
-}
+function openModal(id) { document.getElementById(id).classList.add('visible'); }
+function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { 
-    if (e.target === m) m.classList.remove('visible'); 
-  });
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('visible'); });
 });
 
 let toastTimer;
@@ -2164,21 +2454,14 @@ function showToast(msg, type = 'success') {
 // ===========================
 // INIT
 // ===========================
+// Applica configurazione
 document.getElementById('logoSub').textContent = CONFIG.subtitle;
 document.getElementById('logoSub').style.color  = CONFIG.subtitleColor;
 document.getElementById('logoVer').textContent  = 'v' + CONFIG.version;
 document.getElementById('logoVer').style.color  = CONFIG.subtitleColor;
 
-// Carica dati iniziali
-renderRadio();
 renderPlaylist();
-fetchBillboardCharts();  // Classifiche in tempo reale
-fetchMusicNews();        // Notizie in tempo reale
-
-// Aggiorna classifiche ogni 24 ore
-setInterval(fetchBillboardCharts, 86400000);
-// Aggiorna notizie ogni 6 ore
-setInterval(fetchMusicNews, 21600000);
+fetchRadios(); // carica le radio da Radio Browser API
 </script>
 </body>
 </html>
