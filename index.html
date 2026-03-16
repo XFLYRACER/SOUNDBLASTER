@@ -946,9 +946,19 @@ body::before {
 <main class="main">
   <div class="topbar">
     <div class="page-title" id="pageTitle">Radio Live</div>
-    <div class="search-bar">
-      <span>🔍</span>
-      <input type="text" placeholder="Cerca radio, artista, canzone..." id="searchInput" oninput="handleSearch()">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <!-- Shinystat counter -->
+      <a href="https://www.shinystat.com" target="_blank" rel="noopener"
+         style="display:flex;align-items:center;gap:6px;text-decoration:none;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;transition:border-color 0.2s;"
+         onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'"
+         title="Statistiche visitatori">
+        <span style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;">👥</span>
+        <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55013717-06fb8" alt="Statistiche accessi" style="height:18px;vertical-align:middle;opacity:0.85;border:0px">
+      </a>
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="Cerca radio, artista, canzone..." id="searchInput" oninput="handleSearch()">
+      </div>
     </div>
   </div>
 
@@ -2639,5 +2649,12 @@ document.getElementById('logoVer').style.color  = CONFIG.subtitleColor;
 renderPlaylist();
 fetchRadios(); // carica le radio da Radio Browser API
 </script>
+<!-- Inizio Codice ShinyStat -->
+<script src="//codice.shinystat.com/cgi-bin/getcod.cgi?USER=SS-55013717-06fb8"></script>
+<noscript>
+<a href="https://www.shinystat.com/it/" target="_top">
+<img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55013717-06fb8" alt="Statistiche accessi" style="border:0px" /></a>
+</noscript>
+<!-- Fine Codice ShinyStat -->
 </body>
 </html>
