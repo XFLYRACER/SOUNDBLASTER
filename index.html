@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 3.0</title>
+<title>RadioWeb 2.2</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1578,7 +1578,7 @@ function showSection(name) {
   if (si) si.value = '';
   if (name === 'playlist') renderPlaylist();
   if (name === 'charts') { if (!chartsLoaded) fetchCharts(); else renderCharts(); }
-  if (name === 'news')   { newsLoaded = false; fetchNews(); }
+  if (name === 'news')   { if (!newsLoaded)   fetchNews();   else renderNews();   }
 }
 
 function switchTab(tabName, el) {
@@ -2638,7 +2638,7 @@ function renderCharts(filter = '') {
           <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
         </div>
       </div>
-
+      <a href="${c.link}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Apri su iTunes" style="font-size:16px;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--border);color:var(--text3);background:var(--card2);flex-shrink:0;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">🎵</a>
       <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${c.label}</div>
     </div>
   `).join('');
@@ -2663,71 +2663,13 @@ let newsData = [];
 let newsLoaded = false;
 
 const NEWS_FEEDS = [
-  { url: 'https://www.rockol.it/rss/news',             tag: 'Rockol' },
-  { url: 'https://www.nme.com/feed',                   tag: 'NME' },
-  { url: 'https://pitchfork.com/feed/feed-news/rss/',  tag: 'Pitchfork' },
-  { url: 'https://consequence.net/feed/',              tag: 'Consequence' },
+  { url: 'https://www.rollingstone.com/music/feed/', tag: 'Rolling Stone' },
+  { url: 'https://feeds.feedburner.com/nme/rss/NewsResults', tag: 'NME' },
+  { url: 'https://www.rockol.it/rss/news', tag: 'Rockol' },
 ];
 
-// Lista proxy CORS da provare in sequenza
-const CORS_PROXIES = [
-  'https://corsproxy.io/?url=',
-  'https://api.codetabs.com/v1/proxy?quest=',
-  'https://thingproxy.freeboard.io/fetch/',
-];
-
-async function fetchWithProxy(targetUrl) {
-  for (const proxy of CORS_PROXIES) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 6000);
-      const res = await fetch(proxy + encodeURIComponent(targetUrl), { signal: controller.signal });
-      clearTimeout(timer);
-      if (!res.ok) continue;
-      const text = await res.text();
-      if (!text) continue;
-      if (text.trim().startsWith('<')) return text;
-      try { const j = JSON.parse(text); if (j.contents) return j.contents; } catch(e) {}
-    } catch(e) { /* prossimo proxy */ }
-  }
-  throw new Error('Tutti i proxy falliti per ' + targetUrl);
-}
-
-function extractImgFromXml(item) {
-  // 1) <media:content url="...">
-  const mc = item.querySelector('content[url]');
-  if (mc) return mc.getAttribute('url');
-  // 2) <media:thumbnail url="...">
-  const mt = item.querySelector('thumbnail[url]');
-  if (mt) return mt.getAttribute('url');
-  // 3) <enclosure url="..." type="image/...">
-  const enc = item.querySelector('enclosure[type^="image"]');
-  if (enc) return enc.getAttribute('url');
-  // 4) prima <img> nel description o content:encoded
-  const cdesc = item.querySelector('description')?.textContent || '';
-  const ccont = item.querySelector('encoded')?.textContent || '';
-  const raw = cdesc + ccont;
-  const m = raw.match(/<img[^>]+src=["']([^"']+)["']/i);
-  if (m) return m[1];
-  return '';
-}
-
-async function fetchOneFeed(feed) {
-  try {
-    const text = await fetchWithProxy(feed.url);
-    const xml = new DOMParser().parseFromString(text, 'text/xml');
-    const items = [...xml.querySelectorAll('item')].slice(0, 6);
-    return items.map(item => ({
-      tag:   feed.tag,
-      title: item.querySelector('title')?.textContent?.trim() || '',
-      date:  (() => { const d = item.querySelector('pubDate')?.textContent; return d ? new Date(d).toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'numeric' }) : ''; })(),
-      link:  item.querySelector('link')?.textContent?.trim() || item.querySelector('guid')?.textContent?.trim() || '#',
-      img:   extractImgFromXml(item),
-    }));
-  } catch(e) {
-    throw e;
-  }
-}
+// rss2json.com converte RSS in JSON con CORS aperto — gratuito fino a 500 req/giorno
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
 async function fetchNews() {
   const el = document.getElementById('newsGrid');
@@ -2735,29 +2677,47 @@ async function fetchNews() {
 
   newsData = [];
 
-  const results = await Promise.allSettled(NEWS_FEEDS.map(fetchOneFeed));
+  const results = await Promise.allSettled(
+    NEWS_FEEDS.map(async feed => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(RSS2JSON + encodeURIComponent(feed.url), { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      return { items: data.items || [], tag: feed.tag };
+    })
+  );
 
   results.forEach(r => {
-    if (r.status === 'fulfilled') newsData.push(...r.value);
+    if (r.status === 'fulfilled') {
+      r.value.items.slice(0, 6).forEach(item => {
+        newsData.push({
+          tag:   r.value.tag,
+          title: item.title || '',
+          date:  item.pubDate ? new Date(item.pubDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
+          link:  item.link || '#',
+          img:   item.thumbnail || item.enclosure?.link || item.enclosure?.url || (item.content ? (item.content.match(/<img[^>]+src=["']([^"']+)["']/i)||[])[1] : '') || '',
+          desc:  item.description ? item.description.replace(/<[^>]+>/g, '').slice(0, 100) + '...' : '',
+        });
+      });
+    }
   });
 
   // Ordina per data decrescente
   newsData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   newsLoaded = true;
-
-  if (newsData.length === 0) {
-    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px;">⚠️ Impossibile caricare le notizie. Riprova tra qualche istante.</div>';
-    return;
-  }
-
   renderNews();
 }
 
 function renderNews(filter = '') {
   const el = document.getElementById('newsGrid');
 
-  if (!newsLoaded) return; // fetchNews non ancora completato, aspetta
+  if (!newsLoaded) {
+    fetchNews();
+    return;
+  }
 
   const data = filter
     ? newsData.filter(n => n.title.toLowerCase().includes(filter) || n.tag.toLowerCase().includes(filter))
@@ -2773,7 +2733,7 @@ function renderNews(filter = '') {
     <div class="news-card">
       <div class="news-img" style="background:linear-gradient(135deg,var(--bg3),var(--bg2));padding:0;overflow:hidden;">
         ${n.img
-          ? `<img src="https://wsrv.nl/?url=${encodeURIComponent(n.img)}&w=400&h=200&fit=cover" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.news-fallback').style.display='flex'">`
+          ? `<img src="${n.img}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.src='https://wsrv.nl/?url='+encodeURIComponent('${n.img}')+'&w=400&h=200&fit=cover';this.onerror=function(){this.style.display='none';this.parentElement.querySelector('.news-fallback').style.display='flex'}">`
           : ''}
         <div class="news-fallback" style="display:${n.img ? 'none' : 'flex'};align-items:center;justify-content:center;width:100%;height:100%;font-size:48px;position:absolute;inset:0;">📰</div>
         <div class="news-tag">${esc(n.tag)}</div>
