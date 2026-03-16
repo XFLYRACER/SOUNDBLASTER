@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 2.5</title>
+<title>RadioWeb 2.6</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -2669,8 +2669,29 @@ const NEWS_FEEDS = [
   { url: 'https://consequence.net/feed/',              tag: 'Consequence' },
 ];
 
-// Proxy CORS senza limiti di quota — restituisce il testo grezzo del feed
-const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+// Lista proxy CORS da provare in sequenza
+const CORS_PROXIES = [
+  'https://corsproxy.io/?url=',
+  'https://api.codetabs.com/v1/proxy?quest=',
+  'https://thingproxy.freeboard.io/fetch/',
+];
+
+async function fetchWithProxy(targetUrl) {
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(proxy + encodeURIComponent(targetUrl), { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (!text) continue;
+      if (text.trim().startsWith('<')) return text;
+      try { const j = JSON.parse(text); if (j.contents) return j.contents; } catch(e) {}
+    } catch(e) { /* prossimo proxy */ }
+  }
+  throw new Error('Tutti i proxy falliti per ' + targetUrl);
+}
 
 function extractImgFromXml(item) {
   // 1) <media:content url="...">
@@ -2692,14 +2713,9 @@ function extractImgFromXml(item) {
 }
 
 async function fetchOneFeed(feed) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 6000);
   try {
-    const res = await fetch(CORS_PROXY + encodeURIComponent(feed.url), { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    const xml = new DOMParser().parseFromString(json.contents, 'text/xml');
+    const text = await fetchWithProxy(feed.url);
+    const xml = new DOMParser().parseFromString(text, 'text/xml');
     const items = [...xml.querySelectorAll('item')].slice(0, 6);
     return items.map(item => ({
       tag:   feed.tag,
@@ -2709,7 +2725,6 @@ async function fetchOneFeed(feed) {
       img:   extractImgFromXml(item),
     }));
   } catch(e) {
-    clearTimeout(timer);
     throw e;
   }
 }
