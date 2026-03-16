@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 2.5</title>
+<title>RadioWeb 2.6</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1578,7 +1578,7 @@ function showSection(name) {
   if (si) si.value = '';
   if (name === 'playlist') renderPlaylist();
   if (name === 'charts') { if (!chartsLoaded) fetchCharts(); else renderCharts(); }
-  if (name === 'news')   { if (!newsLoaded)   fetchNews();   else renderNews();   }
+  if (name === 'news')   { newsLoaded = false; fetchNews(); }
 }
 
 function switchTab(tabName, el) {
@@ -2638,7 +2638,7 @@ function renderCharts(filter = '') {
           <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
         </div>
       </div>
-      <a href="${c.link}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Apri su iTunes" style="font-size:16px;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--border);color:var(--text3);background:var(--card2);flex-shrink:0;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">🎵</a>
+      <a href="${c.link}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Apri su iTunes" style="font-size:11px;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--border);color:var(--text3);background:var(--card2);flex-shrink:0;font-family:'JetBrains Mono',monospace;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">iTunes</a>
       <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${c.label}</div>
     </div>
   `).join('');
@@ -2669,7 +2669,7 @@ const NEWS_FEEDS = [
 ];
 
 // rss2json.com converte RSS in JSON con CORS aperto — gratuito fino a 500 req/giorno
-const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?count=10&rss_url=';
 
 async function fetchNews() {
   const el = document.getElementById('newsGrid');
@@ -2681,7 +2681,7 @@ async function fetchNews() {
     NEWS_FEEDS.map(async feed => {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 8000);
-      const res = await fetch(RSS2JSON + encodeURIComponent(feed.url), { signal: controller.signal });
+      const res = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&_cb=' + Date.now(), { signal: controller.signal });
       clearTimeout(timer);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
