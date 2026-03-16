@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio - Jean v16</title>
+<title>RadioWeb v18</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -917,7 +917,7 @@ body::before {
 <!-- SIDEBAR -->
 <nav class="sidebar">
   <div class="logo">
-    <div class="logo-text">Radio - Jean</div>
+    <div class="logo-text">RadioWeb</div>
     <div class="logo-sub" id="logoSub"></div>
     <div id="logoVer" style="font-size:9px;font-family:'JetBrains Mono',monospace;margin-top:4px;letter-spacing:1px;"></div>
   </div>
@@ -947,13 +947,8 @@ body::before {
   <div class="topbar">
     <div class="page-title" id="pageTitle">Radio Live</div>
     <div style="display:flex;align-items:center;gap:12px;">
-      <!-- Shinystat counter -->
-      <a href="https://www.shinystat.com" target="_blank" rel="noopener"
-         style="display:flex;align-items:center;gap:6px;text-decoration:none;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;transition:border-color 0.2s;"
-         onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'"
-         title="Statistiche visitatori">
-        <span style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;">👥</span>
-        <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55013717-06fb8" alt="Statistiche accessi" style="height:18px;vertical-align:middle;opacity:0.85;border:0px">
+      <a href="https://www.shinystat.com/it/" target="_top" title="Statistiche visitatori" style="display:flex;align-items:center;opacity:0.75;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.75'">
+        <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55013717-06fb8" alt="Statistiche accessi" style="height:20px;border:0px;vertical-align:middle;">
       </a>
       <div class="search-bar">
         <span>🔍</span>
@@ -973,6 +968,7 @@ body::before {
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('all')" id="fg-all" style="border-color:var(--accent2);color:var(--accent2)">Tutte</button>
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('it')" id="fg-it">🇮🇹 Italiane</button>
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('int')" id="fg-int">🌍 Int.</button>
+        <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('fav')" id="fg-fav">⭐ Preferiti</button>
         <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
         <select id="radioSortSelect" onchange="setRadioSort(this.value)"
           style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;outline:none;">
@@ -1481,8 +1477,8 @@ function filterRadioGroup(g) {
   document.querySelectorAll('[id^="fg-"]').forEach(b => { b.style.borderColor=''; b.style.color=''; });
   document.getElementById('fg-' + g).style.borderColor = 'var(--accent2)';
   document.getElementById('fg-' + g).style.color = 'var(--accent2)';
-  const titles = { all: 'Radio Italiane & Internazionali', it: '🇮🇹 Radio Italiane', int: '🌍 Radio Internazionali' };
-  document.getElementById('radioSectionTitle').textContent = titles[g];
+  const titles = { all: 'Radio Italiane & Internazionali', it: '🇮🇹 Radio Italiane', int: '🌍 Radio Internazionali', fav: '⭐ Radio Preferite' };
+  document.getElementById('radioSectionTitle').textContent = titles[g] || g;
   renderRadio(document.getElementById('searchInput').value.toLowerCase());
 }
 
@@ -1670,7 +1666,8 @@ function getOrderKey() {
 
 function getOrderedPool() {
   let pool;
-  if (radioGroupFilter === 'it')  pool = [...builtinRadios.filter(r => r.group === 'it'), ...customRadios];
+  if (radioGroupFilter === 'fav')  pool = [...builtinRadios, ...customRadios].filter(r => favorites.has(r.id));
+  else if (radioGroupFilter === 'it')  pool = [...builtinRadios.filter(r => r.group === 'it'), ...customRadios];
   else if (radioGroupFilter === 'int') pool = builtinRadios.filter(r => r.group === 'int');
   else pool = [...builtinRadios, ...customRadios];
 
@@ -2643,8 +2640,7 @@ function showToast(msg, type = 'success') {
 // Applica configurazione
 document.getElementById('logoSub').textContent = CONFIG.subtitle;
 document.getElementById('logoSub').style.color  = CONFIG.subtitleColor;
-document.getElementById('logoVer').textContent  = 'v' + CONFIG.version;
-document.getElementById('logoVer').style.color  = CONFIG.subtitleColor;
+document.getElementById('logoVer').style.display = 'none';
 
 renderPlaylist();
 fetchRadios(); // carica le radio da Radio Browser API
