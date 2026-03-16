@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 2.1</title>
+<title>RadioWeb 2.2</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1600,17 +1600,19 @@ let radioSortMode = 'default';
 
 function setRadioSort(mode) {
   radioSortMode = mode;
-  renderRadio(getCurrentFilter());
+  document.getElementById('searchInput').value = '';
+  renderRadio();
 }
 
 function filterRadioGroup(g) {
   radioGroupFilter = g;
+  document.getElementById('searchInput').value = '';
   document.querySelectorAll('[id^="fg-"]').forEach(b => { b.style.borderColor=''; b.style.color=''; });
   document.getElementById('fg-' + g).style.borderColor = 'var(--accent2)';
   document.getElementById('fg-' + g).style.color = 'var(--accent2)';
   const titles = { all: 'Radio Italiane & Internazionali', it: '🇮🇹 Radio Italiane', int: '🌍 Radio Internazionali', fav: '⭐ Radio Preferite' };
   document.getElementById('radioSectionTitle').textContent = titles[g] || g;
-  renderRadio(document.getElementById('searchInput').value.toLowerCase());
+  renderRadio();
 }
 
 function getLogoUrl(r) {
