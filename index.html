@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 3.2</title>
+<title>RadioWeb 3.3</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -345,8 +345,8 @@ body::before {
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  color: var(--text2);
-  opacity: 0;
+  color: var(--text3);
+  opacity: 1;
   transition: all 0.2s;
   z-index: 2;
   line-height: 1;
@@ -356,8 +356,8 @@ body::before {
   color: var(--gold);
   filter: drop-shadow(0 0 4px rgba(255,215,0,0.5));
 }
-.radio-card:hover .radio-fav-btn { opacity: 0.7; }
-.radio-card:hover .radio-fav-btn:hover { opacity: 1; transform: scale(1.2); }
+.radio-card:hover .radio-fav-btn { opacity: 1; color: var(--text2); }
+.radio-card:hover .radio-fav-btn:hover { opacity: 1; transform: scale(1.2); color: var(--gold); }
 
 /* WAVEFORM ANIMATION */
 .waveform {
@@ -1659,7 +1659,7 @@ function renderRadio(filter = '') {
       ${isActive && isPlaying ? `<div class="waveform">${'<div class="wave-bar"></div>'.repeat(5)}</div>` : ''}
       <button class="radio-edit-btn" onclick="event.stopPropagation(); openEditRadio('${r.id}')">✏️</button>
       <button class="radio-play-btn" onclick="event.stopPropagation(); cardClick('${r.id}')">${btnIcon}</button>
-      <button class="radio-fav-btn ${favorites.has(r.id) ? 'fav-active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${r.id}')" title="${favorites.has(r.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">★</button>
+      <button class="radio-fav-btn ${favorites.has(r.id) ? 'fav-active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${r.id}')" title="${favorites.has(r.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">${favorites.has(r.id) ? '★' : '☆'}</button>
     </div>`;
   });
   if (cards.length === 0) {
