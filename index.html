@@ -332,6 +332,33 @@ body::before {
 .radio-card:hover .radio-edit-btn { opacity: 1; }
 .radio-card.playing .radio-play-btn { opacity: 1; background: var(--live); }
 
+.radio-fav-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 26px; height: 26px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--text3);
+  opacity: 0;
+  transition: all 0.2s;
+  z-index: 2;
+  line-height: 1;
+}
+.radio-fav-btn.fav-active {
+  opacity: 1 !important;
+  color: var(--gold);
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.5));
+}
+.radio-card:hover .radio-fav-btn { opacity: 0.7; }
+.radio-card:hover .radio-fav-btn:hover { opacity: 1; transform: scale(1.2); }
+
 /* WAVEFORM ANIMATION */
 .waveform {
   display: flex;
@@ -745,6 +772,7 @@ body::before {
 
 .volume-slider {
   -webkit-appearance: none;
+  appearance: none;
   width: 80px;
   height: 3px;
   background: var(--border);
@@ -755,6 +783,7 @@ body::before {
 
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   width: 12px; height: 12px;
   background: var(--accent);
   border-radius: 50%;
@@ -928,7 +957,7 @@ body::before {
     <div class="section-header">
       <div>
         <div class="section-title" id="radioSectionTitle">Radio Italiane & Internazionali</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">57 stazioni · Link verificati 2025</div>
+        <div id="stationCount" style="font-size:12px;color:var(--text3);margin-top:4px;">Caricamento stazioni...</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('all')" id="fg-all" style="border-color:var(--accent2);color:var(--accent2)">Tutte</button>
@@ -938,6 +967,7 @@ body::before {
         <select id="radioSortSelect" onchange="setRadioSort(this.value)"
           style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;outline:none;">
           <option value="default">↕ Ordine default</option>
+          <option value="fav">⭐ Preferiti</option>
           <option value="az">🔤 A → Z</option>
           <option value="za">🔤 Z → A</option>
           <option value="genre">🎸 Per genere</option>
@@ -1261,6 +1291,27 @@ let customRadios = JSON.parse(localStorage.getItem('customRadios') || '[]');
 let playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
 let queue = JSON.parse(localStorage.getItem('queue') || '[]');
 
+// ===========================
+// FAVORITES
+// ===========================
+let favorites = new Set(JSON.parse(localStorage.getItem('radioFavorites') || '[]'));
+
+function saveFavorites() {
+  localStorage.setItem('radioFavorites', JSON.stringify([...favorites]));
+}
+
+function toggleFavorite(id) {
+  if (favorites.has(id)) {
+    favorites.delete(id);
+    showToast('★ Rimosso dai preferiti', 'success');
+  } else {
+    favorites.add(id);
+    showToast('⭐ Aggiunto ai preferiti!', 'success');
+  }
+  saveFavorites();
+  renderRadio(getCurrentFilter());
+}
+
 
 // ===========================
 // RADIO BROWSER API
@@ -1306,11 +1357,6 @@ async function fetchRadios() {
   const grid = document.getElementById('radioGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">📡 Caricamento radio...</div>';
 
-  const [itStations, intStations] = await Promise.all([
-    rbFetch('/json/stations/search?countrycode=IT&limit=100&hidebroken=true&order=votes&reverse=true&ssl=true'),
-    rbFetch('/json/stations/search?limit=80&hidebroken=true&order=votes&reverse=true&ssl=true&countrycode=GB,FR,DE,US,CH'),
-  ]);
-
   // Radio italiane fisse con CORS aperto e stream verificati
   const fixedItalian = [
     { stationuuid:'fixed-rds',      name:'RDS',            tags:'pop,dance',      country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=rds.it&sz=64',          url_resolved:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
@@ -1323,7 +1369,32 @@ async function fetchRadios() {
     { stationuuid:'fixed-kisskiss', name:'Radio Kiss Kiss',tags:'pop,hit',        country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=kisskiss.it&sz=64',     url_resolved:'https://icecast.fluidstream.net/KissKiss.mp3' },
   ];
 
-  if (!itStations.length && !intStations.length) {
+  // Radio internazionali fisse verificate (fallback garantito)
+  const fixedInt = [
+    { stationuuid:'fixed-bbc1',    name:'BBC Radio 1',      tags:'pop,hits,uk',       country:'United Kingdom', countrycode:'GB', favicon:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',        url_resolved:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one' },
+    { stationuuid:'fixed-bbc2',    name:'BBC Radio 2',      tags:'pop,classic,uk',    country:'United Kingdom', countrycode:'GB', favicon:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',        url_resolved:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_two' },
+    { stationuuid:'fixed-bbcws',   name:'BBC World Service',tags:'news,world',        country:'United Kingdom', countrycode:'GB', favicon:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',        url_resolved:'https://stream.live.vc.bbcmedia.co.uk/bbc_world_service' },
+    { stationuuid:'fixed-francei', name:'France Inter',     tags:'culture,news,fr',   country:'France',         countrycode:'FR', favicon:'https://www.google.com/s2/favicons?domain=radiofrance.fr&sz=64',   url_resolved:'https://icecast.radiofrance.fr/franceinter-midfi.mp3' },
+    { stationuuid:'fixed-nrj',     name:'NRJ France',       tags:'pop,dance,hits',    country:'France',         countrycode:'FR', favicon:'https://www.google.com/s2/favicons?domain=nrj.fr&sz=64',           url_resolved:'https://scdn.nrjaudio.fm/audio1/fr/30001/mp3_128.mp3' },
+    { stationuuid:'fixed-dtlnd',   name:'Deutschlandradio', tags:'culture,news,de',   country:'Germany',        countrycode:'DE', favicon:'https://www.google.com/s2/favicons?domain=deutschlandradio.de&sz=64', url_resolved:'https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3' },
+    { stationuuid:'fixed-1live',   name:'1LIVE',            tags:'pop,youth,de',      country:'Germany',        countrycode:'DE', favicon:'https://www.google.com/s2/favicons?domain=1live.de&sz=64',          url_resolved:'https://wdr-1live-live.icecastssl.wdr.de/wdr/1live/live/mp3/128/stream.mp3' },
+    { stationuuid:'fixed-kexp',    name:'KEXP 90.3',        tags:'indie,alternative', country:'United States',  countrycode:'US', favicon:'https://www.google.com/s2/favicons?domain=kexp.org&sz=64',          url_resolved:'https://kexp-mp3-128.streamguys1.com/kexp128.mp3' },
+    { stationuuid:'fixed-wnyc',    name:'WNYC',             tags:'news,public,us',    country:'United States',  countrycode:'US', favicon:'https://www.google.com/s2/favicons?domain=wnyc.org&sz=64',          url_resolved:'https://fm939.wnyc.org/wnycfm.aac' },
+    { stationuuid:'fixed-swr3',    name:'SWR3',             tags:'pop,rock,de',       country:'Germany',        countrycode:'DE', favicon:'https://www.google.com/s2/favicons?domain=swr3.de&sz=64',           url_resolved:'https://liveradio.swr.de/sw282p3/swr3/play.mp3' },
+  ];
+
+  // Fetch API: un paese alla volta (la Radio Browser API non supporta countrycode multipli in una singola query)
+  const [itStations, gbStations, frStations, deStations, usStations] = await Promise.all([
+    rbFetch('/json/stations/search?countrycode=IT&limit=100&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=GB&limit=25&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=FR&limit=20&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=DE&limit=20&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=US&limit=20&hidebroken=true&order=votes&reverse=true'),
+  ]);
+
+  const intStationsRaw = [...gbStations, ...frStations, ...deStations, ...usStations];
+
+  if (!itStations.length && !intStationsRaw.length) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--accent);">
       ⚠️ Impossibile caricare le radio. Controlla la connessione.<br>
       <button onclick="fetchRadios()" style="margin-top:16px;padding:8px 20px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;">🔄 Riprova</button>
@@ -1332,14 +1403,24 @@ async function fetchRadios() {
   }
 
   // Rimuovi duplicati dalle stazioni fixed già presenti nel database
-  const fixedIds = new Set(fixedItalian.map(s => s.stationuuid));
-  const itFiltered = itStations.filter(s => !fixedIds.has(s.stationuuid));
+  const fixedItIds  = new Set(fixedItalian.map(s => s.stationuuid));
+  const fixedIntIds = new Set(fixedInt.map(s => s.stationuuid));
+  const itFiltered  = itStations.filter(s => !fixedItIds.has(s.stationuuid));
+
+  // Per le internazionali API: rimuovi quelle già nelle fixed e deduplicale tra loro
+  const seenIntUuids = new Set(fixedInt.map(s => s.stationuuid));
+  const intFiltered = intStationsRaw.filter(s => {
+    if (seenIntUuids.has(s.stationuuid)) return false;
+    seenIntUuids.add(s.stationuuid);
+    return true;
+  });
 
   // Converti in formato interno e salva
   builtinRadios = [
-    ...fixedItalian.map(s => stationToRadio(s, 'it')),  // fixed in cima
+    ...fixedItalian.map(s => stationToRadio(s, 'it')),   // italiane fisse in cima
     ...itFiltered.map(s => stationToRadio(s, 'it')),
-    ...intStations.map(s => stationToRadio(s, 'int')),
+    ...fixedInt.map(s => stationToRadio(s, 'int')),       // internazionali fisse in cima
+    ...intFiltered.map(s => stationToRadio(s, 'int')),
   ];
 
   applyStoredOverrides();
@@ -1417,6 +1498,12 @@ function renderRadio(filter = '') {
   const pool = getOrderedPool();
   const filtered = filter ? pool.filter(r => r.name.toLowerCase().includes(filter) || r.genre.toLowerCase().includes(filter)) : pool;
 
+  const countEl = document.getElementById('stationCount');
+  if (countEl) {
+    const year = new Date().getFullYear();
+    countEl.textContent = `${filtered.length} stazioni · Link verificati ${year}`;
+  }
+
   const cards = filtered.map((r, idx) => {
     const isActive = currentRadio?.id === r.id;
     const btnIcon  = isActive && isPlaying ? '⏸' : '▶';
@@ -1434,6 +1521,7 @@ function renderRadio(filter = '') {
       ${isActive && isPlaying ? `<div class="waveform">${'<div class="wave-bar"></div>'.repeat(5)}</div>` : ''}
       <button class="radio-edit-btn" onclick="event.stopPropagation(); openEditRadio('${r.id}')">✏️</button>
       <button class="radio-play-btn" onclick="event.stopPropagation(); cardClick('${r.id}')">${btnIcon}</button>
+      <button class="radio-fav-btn ${favorites.has(r.id) ? 'fav-active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${r.id}')" title="${favorites.has(r.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">★</button>
     </div>`;
   });
   if (cards.length === 0) {
@@ -1577,7 +1665,15 @@ function getOrderedPool() {
   else pool = [...builtinRadios, ...customRadios];
 
   // Apply sort mode
-  if (radioSortMode === 'az') {
+  if (radioSortMode === 'fav') {
+    pool = [...pool].sort((a, b) => {
+      const af = favorites.has(a.id) ? 0 : 1;
+      const bf = favorites.has(b.id) ? 0 : 1;
+      if (af !== bf) return af - bf;
+      return a.name.localeCompare(b.name, 'it');
+    });
+    return pool;
+  } else if (radioSortMode === 'az') {
     pool = [...pool].sort((a, b) => a.name.localeCompare(b.name, 'it'));
     return pool;
   } else if (radioSortMode === 'za') {
@@ -2462,7 +2558,7 @@ async function fetchNews() {
           title: item.title || '',
           date:  item.pubDate ? new Date(item.pubDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
           link:  item.link || '#',
-          img:   item.thumbnail || item.enclosure?.link || '',
+          img:   item.thumbnail || item.enclosure?.link || item.enclosure?.url || (item.content ? (item.content.match(/<img[^>]+src=["']([^"']+)["']/i)||[])[1] : '') || '',
           desc:  item.description ? item.description.replace(/<[^>]+>/g, '').slice(0, 100) + '...' : '',
         });
       });
@@ -2496,8 +2592,11 @@ function renderNews(filter = '') {
   el.innerHTML = data.map(n => `
     <a href="${n.link}" target="_blank" rel="noopener" style="text-decoration:none;">
     <div class="news-card">
-      <div class="news-img" style="${n.img ? 'background-image:url(' + n.img + ');background-size:cover;background-position:center;' : ''}">
-        ${n.img ? '' : '📰'}
+      <div class="news-img" style="background:linear-gradient(135deg,var(--bg3),var(--bg2));padding:0;overflow:hidden;">
+        ${n.img
+          ? `<img src="${n.img}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.src='https://wsrv.nl/?url='+encodeURIComponent('${n.img}')+'&w=400&h=200&fit=cover';this.onerror=function(){this.style.display='none';this.parentElement.querySelector('.news-fallback').style.display='flex'}">`
+          : ''}
+        <div class="news-fallback" style="display:${n.img ? 'none' : 'flex'};align-items:center;justify-content:center;width:100%;height:100%;font-size:48px;position:absolute;inset:0;">📰</div>
         <div class="news-tag">${esc(n.tag)}</div>
       </div>
       <div class="news-body">
