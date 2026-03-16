@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 2.3</title>
+<title>RadioWeb 2.5</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1114,10 +1114,7 @@ body::before {
   <div class="topbar">
     <div class="page-title" id="pageTitle">Radio Live</div>
     <div style="display:flex;align-items:center;gap:12px;">
-      <div style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;" title="Visitatori">
-        <span style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;">👥</span>
-        <img src="https://www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55013717-06fb8" alt="Visitatori" style="height:32px;width:auto;border:0;vertical-align:middle;display:block;image-rendering:auto;" onerror="this.parentElement.style.display='none'">
-      </div>
+
       <div class="search-bar">
         <span>🔍</span>
         <input type="text" placeholder="Cerca radio..." id="searchInput" oninput="handleSearch()">
@@ -1550,12 +1547,14 @@ async function fetchRadios() {
     return;
   }
 
-  // Deduplicazione per stationuuid
+  // Deduplicazione per stationuuid + esclusione stazioni RAI (bloccano lo streaming esterno)
+  const RAI_BLACKLIST = /\brai\b/i;
   const seen = new Set();
   builtinRadios = [];
   for (const s of allStations) {
     if (seen.has(s.stationuuid)) continue;
     seen.add(s.stationuuid);
+    if (RAI_BLACKLIST.test(s.name)) continue; // salta tutte le RAI
     const group = s.countrycode === 'IT' ? 'it' : 'int';
     builtinRadios.push(stationToRadio(s, group));
   }
@@ -2779,6 +2778,13 @@ renderPlaylist();
 fetchRadios(); // carica le radio da Radio Browser API
 </script>
 <!-- ShinyStat tracking invisibile -->
-<img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55013717-06fb8" alt="" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;" />
+<script>
+(function(){
+  try {
+    var i = new Image();
+    i.src = 'https://www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55013717-06fb8&r=' + Math.random();
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
