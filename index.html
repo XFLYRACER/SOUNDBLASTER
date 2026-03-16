@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 2.2</title>
+<title>RadioWeb 3.2</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -2638,7 +2638,6 @@ function renderCharts(filter = '') {
           <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
         </div>
       </div>
-      <a href="${c.link}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Apri su iTunes" style="font-size:16px;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--border);color:var(--text3);background:var(--card2);flex-shrink:0;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">🎵</a>
       <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${c.label}</div>
     </div>
   `).join('');
