@@ -2663,13 +2663,56 @@ let newsData = [];
 let newsLoaded = false;
 
 const NEWS_FEEDS = [
-  { url: 'https://www.rollingstone.com/music/feed/', tag: 'Rolling Stone' },
-  { url: 'https://feeds.feedburner.com/nme/rss/NewsResults', tag: 'NME' },
-  { url: 'https://www.rockol.it/rss/news', tag: 'Rockol' },
+  { url: 'https://www.rockol.it/rss/news',             tag: 'Rockol' },
+  { url: 'https://www.nme.com/feed',                   tag: 'NME' },
+  { url: 'https://pitchfork.com/feed/feed-news/rss/',  tag: 'Pitchfork' },
+  { url: 'https://consequence.net/feed/',              tag: 'Consequence' },
 ];
 
-// rss2json.com converte RSS in JSON con CORS aperto — gratuito fino a 500 req/giorno
-const RSS2JSON = 'https://api.rss2json.com/v1/api.json?count=10&rss_url=';
+// Proxy CORS senza limiti di quota — restituisce il testo grezzo del feed
+const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+
+function extractImgFromXml(item) {
+  // 1) <media:content url="...">
+  const mc = item.querySelector('content[url]');
+  if (mc) return mc.getAttribute('url');
+  // 2) <media:thumbnail url="...">
+  const mt = item.querySelector('thumbnail[url]');
+  if (mt) return mt.getAttribute('url');
+  // 3) <enclosure url="..." type="image/...">
+  const enc = item.querySelector('enclosure[type^="image"]');
+  if (enc) return enc.getAttribute('url');
+  // 4) prima <img> nel description o content:encoded
+  const cdesc = item.querySelector('description')?.textContent || '';
+  const ccont = item.querySelector('encoded')?.textContent || '';
+  const raw = cdesc + ccont;
+  const m = raw.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (m) return m[1];
+  return '';
+}
+
+async function fetchOneFeed(feed) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
+  try {
+    const res = await fetch(CORS_PROXY + encodeURIComponent(feed.url), { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const xml = new DOMParser().parseFromString(json.contents, 'text/xml');
+    const items = [...xml.querySelectorAll('item')].slice(0, 6);
+    return items.map(item => ({
+      tag:   feed.tag,
+      title: item.querySelector('title')?.textContent?.trim() || '',
+      date:  (() => { const d = item.querySelector('pubDate')?.textContent; return d ? new Date(d).toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'numeric' }) : ''; })(),
+      link:  item.querySelector('link')?.textContent?.trim() || item.querySelector('guid')?.textContent?.trim() || '#',
+      img:   extractImgFromXml(item),
+    }));
+  } catch(e) {
+    clearTimeout(timer);
+    throw e;
+  }
+}
 
 async function fetchNews() {
   const el = document.getElementById('newsGrid');
@@ -2677,47 +2720,29 @@ async function fetchNews() {
 
   newsData = [];
 
-  const results = await Promise.allSettled(
-    NEWS_FEEDS.map(async feed => {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 8000);
-      const res = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&_cb=' + Date.now(), { signal: controller.signal });
-      clearTimeout(timer);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      return { items: data.items || [], tag: feed.tag };
-    })
-  );
+  const results = await Promise.allSettled(NEWS_FEEDS.map(fetchOneFeed));
 
   results.forEach(r => {
-    if (r.status === 'fulfilled') {
-      r.value.items.slice(0, 6).forEach(item => {
-        newsData.push({
-          tag:   r.value.tag,
-          title: item.title || '',
-          date:  item.pubDate ? new Date(item.pubDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
-          link:  item.link || '#',
-          img:   item.thumbnail || item.enclosure?.link || item.enclosure?.url || (item.content ? (item.content.match(/<img[^>]+src=["']([^"']+)["']/i)||[])[1] : '') || '',
-          desc:  item.description ? item.description.replace(/<[^>]+>/g, '').slice(0, 100) + '...' : '',
-        });
-      });
-    }
+    if (r.status === 'fulfilled') newsData.push(...r.value);
   });
 
   // Ordina per data decrescente
   newsData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   newsLoaded = true;
+
+  if (newsData.length === 0) {
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px;">⚠️ Impossibile caricare le notizie. Riprova tra qualche istante.</div>';
+    return;
+  }
+
   renderNews();
 }
 
 function renderNews(filter = '') {
   const el = document.getElementById('newsGrid');
 
-  if (!newsLoaded) {
-    fetchNews();
-    return;
-  }
+  if (!newsLoaded) return; // fetchNews non ancora completato, aspetta
 
   const data = filter
     ? newsData.filter(n => n.title.toLowerCase().includes(filter) || n.tag.toLowerCase().includes(filter))
