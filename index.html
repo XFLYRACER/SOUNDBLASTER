@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb V2.0</title>
+<title>RadioWeb 2.1</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1120,7 +1120,7 @@ body::before {
       </div>
       <div class="search-bar">
         <span>🔍</span>
-        <input type="text" placeholder="Cerca radio" id="searchInput" oninput="handleSearch()">
+        <input type="text" placeholder="Cerca radio..." id="searchInput" oninput="handleSearch()">
       </div>
     </div>
   </div>
@@ -1531,44 +1531,18 @@ async function fetchRadios() {
   const grid = document.getElementById('radioGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">📡 Caricamento radio...</div>';
 
-  // Radio italiane fisse con CORS aperto e stream verificati
-  const fixedItalian = [
-    { stationuuid:'fixed-rds',      name:'RDS',            tags:'pop,dance',      country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=rds.it&sz=64',          url_resolved:'https://stream.rds.radio/audio/rds.stream_mp3_128/stream.mp3' },
-    { stationuuid:'fixed-r101',     name:'R101',           tags:'pop,romantico',  country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=r101.it&sz=64',         url_resolved:'https://icecast.unitedradio.it/r101.mp3' },
-    { stationuuid:'fixed-105',      name:'Radio 105',      tags:'pop,dance,hits', country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=105.net&sz=64',          url_resolved:'https://icecast.unitedradio.it/Radio105.mp3' },
-    { stationuuid:'fixed-virgin',   name:'Virgin Radio',   tags:'rock,pop',       country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=virginradio.it&sz=64',  url_resolved:'https://icecast.unitedradio.it/Virgin.mp3' },
-    { stationuuid:'fixed-m2o',      name:'Radio m2o',      tags:'dance,electronic',country:'Italy',countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=m2o.it&sz=64',          url_resolved:'https://icecast.unitedradio.it/m2o.mp3' },
-    { stationuuid:'fixed-rmc',      name:'Radio Monte Carlo', tags:'jazz,classico',country:'Italy',countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=radiomontecarlo.net&sz=64', url_resolved:'https://edge.radiomontecarlo.net/RMC.mp3' },
-    { stationuuid:'fixed-sportiva', name:'Radio Sportiva', tags:'sport,news',     country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=radiosportiva.it&sz=64', url_resolved:'https://stream.radiosportiva.it/radiosportiva' },
-    { stationuuid:'fixed-kisskiss', name:'Radio Kiss Kiss',tags:'pop,hit',        country:'Italy', countrycode:'IT', favicon:'https://www.google.com/s2/favicons?domain=kisskiss.it&sz=64',     url_resolved:'https://icecast.fluidstream.net/KissKiss.mp3' },
-  ];
-
-  // Radio internazionali fisse verificate (fallback garantito)
-  const fixedInt = [
-    { stationuuid:'fixed-bbc1',    name:'BBC Radio 1',      tags:'pop,hits,uk',       country:'United Kingdom', countrycode:'GB', favicon:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',        url_resolved:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one' },
-    { stationuuid:'fixed-bbc2',    name:'BBC Radio 2',      tags:'pop,classic,uk',    country:'United Kingdom', countrycode:'GB', favicon:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',        url_resolved:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_two' },
-    { stationuuid:'fixed-bbcws',   name:'BBC World Service',tags:'news,world',        country:'United Kingdom', countrycode:'GB', favicon:'https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64',        url_resolved:'https://stream.live.vc.bbcmedia.co.uk/bbc_world_service' },
-    { stationuuid:'fixed-francei', name:'France Inter',     tags:'culture,news,fr',   country:'France',         countrycode:'FR', favicon:'https://www.google.com/s2/favicons?domain=radiofrance.fr&sz=64',   url_resolved:'https://icecast.radiofrance.fr/franceinter-midfi.mp3' },
-    { stationuuid:'fixed-nrj',     name:'NRJ France',       tags:'pop,dance,hits',    country:'France',         countrycode:'FR', favicon:'https://www.google.com/s2/favicons?domain=nrj.fr&sz=64',           url_resolved:'https://scdn.nrjaudio.fm/audio1/fr/30001/mp3_128.mp3' },
-    { stationuuid:'fixed-dtlnd',   name:'Deutschlandradio', tags:'culture,news,de',   country:'Germany',        countrycode:'DE', favicon:'https://www.google.com/s2/favicons?domain=deutschlandradio.de&sz=64', url_resolved:'https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3' },
-    { stationuuid:'fixed-1live',   name:'1LIVE',            tags:'pop,youth,de',      country:'Germany',        countrycode:'DE', favicon:'https://www.google.com/s2/favicons?domain=1live.de&sz=64',          url_resolved:'https://wdr-1live-live.icecastssl.wdr.de/wdr/1live/live/mp3/128/stream.mp3' },
-    { stationuuid:'fixed-kexp',    name:'KEXP 90.3',        tags:'indie,alternative', country:'United States',  countrycode:'US', favicon:'https://www.google.com/s2/favicons?domain=kexp.org&sz=64',          url_resolved:'https://kexp-mp3-128.streamguys1.com/kexp128.mp3' },
-    { stationuuid:'fixed-wnyc',    name:'WNYC',             tags:'news,public,us',    country:'United States',  countrycode:'US', favicon:'https://www.google.com/s2/favicons?domain=wnyc.org&sz=64',          url_resolved:'https://fm939.wnyc.org/wnycfm.aac' },
-    { stationuuid:'fixed-swr3',    name:'SWR3',             tags:'pop,rock,de',       country:'Germany',        countrycode:'DE', favicon:'https://www.google.com/s2/favicons?domain=swr3.de&sz=64',           url_resolved:'https://liveradio.swr.de/sw282p3/swr3/play.mp3' },
-  ];
-
   // Fetch API: un paese alla volta (la Radio Browser API non supporta countrycode multipli in una singola query)
   const [itStations, gbStations, frStations, deStations, usStations] = await Promise.all([
     rbFetch('/json/stations/search?countrycode=IT&limit=100&hidebroken=true&order=votes&reverse=true'),
-    rbFetch('/json/stations/search?countrycode=GB&limit=25&hidebroken=true&order=votes&reverse=true'),
-    rbFetch('/json/stations/search?countrycode=FR&limit=20&hidebroken=true&order=votes&reverse=true'),
-    rbFetch('/json/stations/search?countrycode=DE&limit=20&hidebroken=true&order=votes&reverse=true'),
-    rbFetch('/json/stations/search?countrycode=US&limit=20&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=GB&limit=30&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=FR&limit=25&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=DE&limit=25&hidebroken=true&order=votes&reverse=true'),
+    rbFetch('/json/stations/search?countrycode=US&limit=25&hidebroken=true&order=votes&reverse=true'),
   ]);
 
-  const intStationsRaw = [...gbStations, ...frStations, ...deStations, ...usStations];
+  const allStations = [...itStations, ...gbStations, ...frStations, ...deStations, ...usStations];
 
-  if (!itStations.length && !intStationsRaw.length) {
+  if (!allStations.length) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--accent);">
       ⚠️ Impossibile caricare le radio. Controlla la connessione.<br>
       <button onclick="fetchRadios()" style="margin-top:16px;padding:8px 20px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;">🔄 Riprova</button>
@@ -1576,26 +1550,15 @@ async function fetchRadios() {
     return;
   }
 
-  // Rimuovi duplicati dalle stazioni fixed già presenti nel database
-  const fixedItIds  = new Set(fixedItalian.map(s => s.stationuuid));
-  const fixedIntIds = new Set(fixedInt.map(s => s.stationuuid));
-  const itFiltered  = itStations.filter(s => !fixedItIds.has(s.stationuuid));
-
-  // Per le internazionali API: rimuovi quelle già nelle fixed e deduplicale tra loro
-  const seenIntUuids = new Set(fixedInt.map(s => s.stationuuid));
-  const intFiltered = intStationsRaw.filter(s => {
-    if (seenIntUuids.has(s.stationuuid)) return false;
-    seenIntUuids.add(s.stationuuid);
-    return true;
-  });
-
-  // Converti in formato interno e salva
-  builtinRadios = [
-    ...fixedItalian.map(s => stationToRadio(s, 'it')),   // italiane fisse in cima
-    ...itFiltered.map(s => stationToRadio(s, 'it')),
-    ...fixedInt.map(s => stationToRadio(s, 'int')),       // internazionali fisse in cima
-    ...intFiltered.map(s => stationToRadio(s, 'int')),
-  ];
+  // Deduplicazione per stationuuid
+  const seen = new Set();
+  builtinRadios = [];
+  for (const s of allStations) {
+    if (seen.has(s.stationuuid)) continue;
+    seen.add(s.stationuuid);
+    const group = s.countrycode === 'IT' ? 'it' : 'int';
+    builtinRadios.push(stationToRadio(s, group));
+  }
 
   applyStoredOverrides();
   renderRadio();
