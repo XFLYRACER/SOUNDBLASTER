@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 3.3</title>
+<title>RadioWeb 3.4</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -2351,12 +2351,28 @@ let ytAudioFrame = null;
 function playYTAudio(ytId, item) {
   // Remove old frame
   if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
-  
-  // Create a hidden iframe with YT embed
+
+  // Parametri URL iframe:
+  // autoplay=1      → avvio automatico
+  // playsinline=1   → OBBLIGATORIO su iOS Safari, senza questo Safari tenta il fullscreen e blocca l'audio
+  // mute=0          → esplicita richiesta audio (alcuni browser lo richiedono esplicitamente)
+  // controls=0      → nasconde i controlli video
+  // enablejsapi=0   → disabilita JS API non necessaria
+  const params = 'autoplay=1&playsinline=1&mute=0&controls=0&enablejsapi=0';
   const f = document.createElement('iframe');
-  f.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&controls=0';
-  f.allow = 'autoplay; encrypted-media';
-  f.style.cssText = 'position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0.01;border:none;';
+  f.src = 'https://www.youtube.com/embed/' + ytId + '?' + params;
+
+  // allow="autoplay" è il permesso minimo indispensabile.
+  // "picture-in-picture" serve su alcuni browser mobile.
+  // "fullscreen" necessario su Safari iOS per non bloccare la riproduzione.
+  f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+  f.setAttribute('allowfullscreen', '');
+
+  // L'iframe deve essere visibile al browser (anche 1x1px) altrimenti
+  // Chrome/Safari lo trattano come tentativo di autoplay non autorizzato.
+  // opacity:0.01 (non 0) + dimensioni minime = visibile ma invisibile all'utente.
+  f.style.cssText = 'position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0.01;border:none;pointer-events:none;z-index:-1;';
+
   document.body.appendChild(f);
   ytAudioFrame = f;
 }
