@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 3.4</title>
+<title>RadioWeb 3.5</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1708,6 +1708,10 @@ function playRadio(id, fallbackIndex, useProxy) {
     return;
   }
 
+  // Ferma YouTube se era in riproduzione (evita sovrapposizione audio)
+  if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
+  document.getElementById('ytCard').style.display = 'none';
+
   currentMode = 'radio';
   currentRadio = radio;
 
@@ -2309,9 +2313,10 @@ function playYT(index) {
   currentYTIndex = index;
   currentMode = 'youtube';
 
-  // Stop radio
+  // Stop radio (incluso HLS)
   audio.pause();
   audio.src = '';
+  destroyHls();
 
   // Show YT card info
   const card = document.getElementById('ytCard');
