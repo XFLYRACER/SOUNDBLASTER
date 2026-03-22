@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -732,13 +731,53 @@ body::before {
 
 /* =============================================
    SEZIONE CLASSIFICHE
-   Lista scorrevole di brani con posizione, copertina,
-   titolo e tendenza (su/giù/stabile)
+   Layout a due colonne affiancate:
+   sinistra = classifica italiana, destra = globale
    ============================================= */
+
+/* Contenitore principale: due colonne uguali */
+.charts-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Box di una singola colonna classifica */
+.chart-column {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Header della colonna con titolo e bandiera */
+.chart-column-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg3);
+}
+
+.chart-column-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+
+/* Lista brani dentro la colonna */
 .chart-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
+}
+
+/* Su mobile le due colonne si impilano verticalmente */
+@media (max-width: 900px) {
+  .charts-columns { grid-template-columns: 1fr; }
 }
 
 /* Singola riga della classifica */
@@ -1460,12 +1499,28 @@ body::before {
        ============================================= -->
   <div class="section" id="section-charts">
     <div class="section-header">
-      <div class="section-title">🏆 Classifiche Globali</div>
-      <!-- Badge con data/stato del caricamento -->
+      <div class="section-title">🏆 Classifiche</div>
       <span class="badge" id="chartsDate">⏳ Caricamento...</span>
     </div>
-    <!-- Lista brani, popolata da renderCharts() -->
-    <div class="chart-list" id="chartList"></div>
+    <!-- Due colonne affiancate: Italia a sinistra, Global a destra -->
+    <div class="charts-columns">
+      <!-- Colonna classifica italiana -->
+      <div class="chart-column">
+        <div class="chart-column-header">
+          <div class="chart-column-title">🇮🇹 Top Italia</div>
+          <span class="badge">iTunes IT</span>
+        </div>
+        <div class="chart-list" id="chartListIT"></div>
+      </div>
+      <!-- Colonna classifica globale (USA) -->
+      <div class="chart-column">
+        <div class="chart-column-header">
+          <div class="chart-column-title">🌍 Top Global</div>
+          <span class="badge">iTunes US</span>
+        </div>
+        <div class="chart-list" id="chartListGlobal"></div>
+      </div>
+    </div>
   </div>
 
   <!-- =============================================
@@ -3003,96 +3058,113 @@ function handleSearch() {
 // Carica le classifiche Top 25 Canzoni da Italia e USA.
 // Il feed è pubblico e aggiornato continuamente da Apple/iTunes.
 // ===========================
-let chartsData = [];    // array di tutti i brani caricate
-let chartsLoaded = false; // flag: true dopo il primo caricamento
+// chartsData ora è diviso per fonte: .it e .global
+// Ogni entry ha: pos, song, artist, art, link, feedKey
+let chartsData = { it: [], global: [] };
+let chartsLoaded = false;
 
 async function fetchCharts() {
-  const el = document.getElementById('chartList');
-  el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);">📊 Caricamento classifiche...</div>';
+  // Mostra loading in entrambe le colonne
+  document.getElementById('chartListIT').innerHTML     = '<div style="text-align:center;padding:48px;color:var(--text3);">⏳ Caricamento...</div>';
+  document.getElementById('chartListGlobal').innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);">⏳ Caricamento...</div>';
 
   const feeds = [
-    { url: 'https://itunes.apple.com/it/rss/topsongs/limit=25/json', label: '🇮🇹 Italia' },
-    { url: 'https://itunes.apple.com/us/rss/topsongs/limit=25/json', label: '🌍 Global' },
+    { url: 'https://itunes.apple.com/it/rss/topsongs/limit=25/json', key: 'it' },
+    { url: 'https://itunes.apple.com/us/rss/topsongs/limit=25/json', key: 'global' },
   ];
 
-  chartsData = [];
+  chartsData = { it: [], global: [] };
 
-  // Carico un feed alla volta (non in parallelo, per rispettare i limiti iTunes)
-  for (const feed of feeds) {
+  // Fetch parallelo: le due chiamate partono contemporaneamente
+  await Promise.all(feeds.map(async feed => {
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(feed.url, { signal: controller.signal });
       clearTimeout(timer);
-      if (!res.ok) continue;
+      if (!res.ok) return;
       const data = await res.json();
       const entries = data?.feed?.entry || [];
-      // Converto ogni entry nel formato interno
       entries.forEach((e, i) => {
-        chartsData.push({
-          pos:    chartsData.length + 1, // posizione globale (non per-feed)
+        chartsData[feed.key].push({
+          pos:    i + 1,                              // posizione 1-25 per ogni colonna
           song:   e['im:name']?.label || '—',
           artist: e['im:artist']?.label || '—',
-          art:    e['im:image']?.[1]?.label || '', // copertina album (60x60)
+          art:    e['im:image']?.[1]?.label || '',    // copertina 60x60
           link:   e?.link?.attributes?.href || '#',
-          label:  feed.label,
+          feedKey: feed.key,
         });
       });
     } catch(e) {
-      console.warn('Charts fetch fallito:', feed.label, e.message);
+      console.warn('Charts fetch fallito:', feed.key, e.message);
     }
-  }
+  }));
 
   chartsLoaded = true;
+  document.getElementById('chartsDate').textContent = new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
   renderCharts();
 }
 
-// Ridisegna la lista classifiche con evidenziazione ricerca opzionale
-function renderCharts(filter = '') {
-  const el = document.getElementById('chartList');
-
-  if (!chartsLoaded) { fetchCharts(); return; }
-
-  const data = filter
-    ? chartsData.filter(c => c.song.toLowerCase().includes(filter) || c.artist.toLowerCase().includes(filter))
-    : chartsData;
-
-  if (data.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessun risultato per "' + filter + '"</div>';
-    return;
-  }
-
-  el.innerHTML = data.map((c, i) => `
-    <div class="chart-item" style="padding:10px 16px;cursor:pointer;" onclick="addChartToPlaylist(${i})" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background=''">
-      <button onclick="event.stopPropagation();addChartToPlaylist(${i})" title="Cerca su YouTube"
-        style="width:36px;height:36px;background:var(--accent);border:none;border-radius:50%;color:white;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform 0.15s,background 0.15s;line-height:1;"
+// Genera l'HTML di una singola riga della classifica.
+// feedKey serve per identificare correttamente il brano quando si clicca "+"
+function renderChartItem(c, feedKey) {
+  // Creo una chiave composta per ritrovare il brano nell'array giusto
+  const key = feedKey + '_' + (c.pos - 1);
+  return `
+    <div class="chart-item" style="padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);"
+         onclick="addChartToPlaylistByKey('${key}')"
+         onmouseover="this.style.background='var(--bg3)'"
+         onmouseout="this.style.background=''">
+      <button onclick="event.stopPropagation();addChartToPlaylistByKey('${key}')" title="Cerca su YouTube"
+        style="width:32px;height:32px;background:var(--accent);border:none;border-radius:50%;color:white;cursor:pointer;font-size:16px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform 0.15s,background 0.15s;line-height:1;"
         onmouseover="this.style.transform='scale(1.15)';this.style.background='#ff2a4d'"
         onmouseout="this.style.transform='scale(1)';this.style.background='var(--accent)'">+</button>
       <div class="chart-pos ${c.pos <= 3 ? 'top3' : ''}" style="margin-left:4px;">${c.pos}</div>
-      <div class="chart-art" style="background:none;padding:0;overflow:hidden;">
-        ${c.art ? `<img src="${c.art}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none'">` : '🎵'}
+      <div class="chart-art" style="background:none;padding:0;overflow:hidden;width:40px;height:40px;flex-shrink:0;border-radius:6px;">
+        ${c.art ? `<img src="${c.art}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;" onerror="this.style.display='none'">` : '🎵'}
       </div>
-      <div style="flex:1;" onclick="event.stopPropagation();addChartToPlaylist(${i})">
-        <div class="chart-info" style="cursor:pointer;">
-          <div class="chart-song">${filter ? c.song.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.song)}</div>
-          <div class="chart-artist">${filter ? c.artist.replace(new RegExp('(' + filter + ')', 'gi'), '<mark style="background:rgba(255,77,109,0.3);border-radius:2px;padding:0 1px">$1</mark>') : esc(c.artist)}</div>
-        </div>
+      <div style="flex:1;min-width:0;">
+        <div class="chart-song" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(c.song)}</div>
+        <div class="chart-artist" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(c.artist)}</div>
       </div>
-      <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${c.label}</div>
-    </div>
-  `).join('');
+    </div>`;
 }
 
-// Quando si clicca su un brano in classifica, apre la ricerca YouTube pre-compilata
-// con "Artista NomeBrano" così l'utente trova subito il video giusto
-function addChartToPlaylist(idx) {
-  const c = chartsData[idx];
+// Ridisegna entrambe le colonne classifiche.
+// Il filtro testuale viene applicato a entrambe le liste.
+function renderCharts(filter = '') {
+  if (!chartsLoaded) { fetchCharts(); return; }
+
+  ['it', 'global'].forEach(key => {
+    const el = document.getElementById(key === 'it' ? 'chartListIT' : 'chartListGlobal');
+    const data = filter
+      ? chartsData[key].filter(c => c.song.toLowerCase().includes(filter) || c.artist.toLowerCase().includes(filter))
+      : chartsData[key];
+
+    if (data.length === 0) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px;">🔍 Nessun risultato</div>';
+    } else {
+      el.innerHTML = data.map(c => renderChartItem(c, key)).join('');
+    }
+  });
+}
+
+// Recupera il brano giusto dalla chiave composta "feedKey_indice"
+// e apre la ricerca YouTube precompilata
+function addChartToPlaylistByKey(key) {
+  const [feedKey, idxStr] = key.split('_');
+  const c = chartsData[feedKey]?.[parseInt(idxStr)];
   if (!c) return;
   openAddYTModal();
   setTimeout(() => {
     document.getElementById('ytSearchInput').value = c.artist + ' ' + c.song;
-    searchYT(); // avvia subito la ricerca
+    searchYT();
   }, 100);
+}
+
+// Manteniamo anche questa funzione per compatibilità con eventuali chiamate dirette
+function addChartToPlaylist(idx) {
+  // Non più usata direttamente, ma la lascio come fallback
 }
 
 // ===========================
