@@ -1,54 +1,33 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<!-- Impostazioni base della pagina: lingua italiana, charset UTF-8 per i caratteri speciali,
-     viewport per renderla responsive su mobile -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RadioWeb 3.6</title>
   <meta name="version" content="1.0">
-
-<!-- Carico la libreria HLS.js da CDN: serve per riprodurre stream radio in formato .m3u8 (HLS),
-     che è il formato usato da molte radio online moderne -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
-
-<!-- Carico i font da Google Fonts:
-     - Bebas Neue: font decorativo per titoli grandi
-     - DM Sans: font principale per il testo
-     - JetBrains Mono: font monospace per dati tecnici (orari, badge, ecc.) -->
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* =============================================
-   VARIABILI CSS GLOBALI (PALETTE COLORI)
-   Definisco una volta sola tutti i colori usati
-   nell'app, così se voglio cambiare il tema
-   basta modificare qui e cambia tutto
-   ============================================= */
 :root {
-  --bg: #0a0a0f;        /* sfondo principale, quasi nero */
-  --bg2: #111118;       /* sfondo secondario, sidebar */
-  --bg3: #1a1a24;       /* sfondo terziario, input e card interni */
-  --card: #16161f;      /* colore base delle card */
-  --card2: #1e1e2a;     /* card un po' più chiara (hover/attiva) */
-  --border: #2a2a3a;    /* colore dei bordi */
-  --accent: #ff4d6d;    /* colore principale: rosso/rosa acceso */
-  --accent2: #7b5ea7;   /* colore secondario: viola */
-  --accent3: #00d4aa;   /* colore terziario: verde acqua */
-  --text: #e8e8f0;      /* testo principale */
-  --text2: #9090a8;     /* testo secondario, un po' più grigio */
-  --text3: #5a5a72;     /* testo terziario, molto attenuato */
-  --live: #ff4d4d;      /* colore rosso per il badge LIVE */
-  --gold: #ffd700;      /* giallo oro per le stelle preferiti */
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a24;
+  --card: #16161f;
+  --card2: #1e1e2a;
+  --border: #2a2a3a;
+  --accent: #ff4d6d;
+  --accent2: #7b5ea7;
+  --accent3: #00d4aa;
+  --text: #e8e8f0;
+  --text2: #9090a8;
+  --text3: #5a5a72;
+  --live: #ff4d4d;
+  --gold: #ffd700;
 }
 
-/* Reset universale: tolgo margini e padding di default
-   del browser su tutti gli elementi, e uso border-box
-   per calcolare le dimensioni in modo più sano */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* Stile del body: font principale, sfondo scuro, altezza minima = tutta la finestra,
-   niente scroll orizzontale */
 body {
   font-family: 'DM Sans', sans-serif;
   background: var(--bg);
@@ -57,11 +36,6 @@ body {
   overflow-x: hidden;
 }
 
-/* TEXTURE DI RUMORE
-   Creo un pseudo-elemento fisso che copre tutta la pagina con un filtro SVG
-   che genera un effetto "grana" come la carta vecchia. opacity: 0.03 lo rende
-   quasi invisibile ma aggiunge profondità al design.
-   pointer-events: none = non interferisce con i click */
 body::before {
   content: '';
   position: fixed;
@@ -71,11 +45,6 @@ body::before {
   z-index: 0;
 }
 
-/* =============================================
-   SIDEBAR (menu laterale sinistro)
-   È fissa su desktop (position: fixed), alta
-   tutta la finestra, larga 220px
-   ============================================= */
 .sidebar {
   position: fixed;
   left: 0; top: 0; bottom: 0;
@@ -83,18 +52,16 @@ body::before {
   background: var(--bg2);
   border-right: 1px solid var(--border);
   display: flex;
-  flex-direction: column; /* elementi in colonna: logo, nav, now playing */
+  flex-direction: column;
   z-index: 100;
   padding: 0;
 }
 
-/* Logo in cima alla sidebar */
 .logo {
   padding: 28px 24px 20px;
   border-bottom: 1px solid var(--border);
 }
 
-/* Testo grande "RadioWeb" con gradiente colorato */
 .logo-text {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 28px;
@@ -106,7 +73,6 @@ body::before {
   line-height: 1;
 }
 
-/* Sottotitolo piccolo sotto il logo (es. "Music & Streaming") */
 .logo-sub {
   font-size: 10px;
   letter-spacing: 3px;
@@ -116,13 +82,11 @@ body::before {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Contenitore dei link di navigazione nella sidebar */
 .nav {
   padding: 20px 0;
-  flex: 1; /* occupa tutto lo spazio rimasto tra logo e now-playing */
+  flex: 1;
 }
 
-/* Singola voce del menu (Radio, Playlist, Classifiche, Novità) */
 .nav-item {
   display: flex;
   align-items: center;
@@ -132,33 +96,27 @@ body::before {
   color: var(--text2);
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s; /* transizione fluida su hover */
-  border-left: 3px solid transparent; /* bordo sinistro invisibile di default */
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
   position: relative;
 }
 
-/* Hover: sfondo leggermente più chiaro */
 .nav-item:hover { color: var(--text); background: var(--bg3); }
 
-/* Voce attiva: testo e bordo colorati con l'accent rosso */
 .nav-item.active {
   color: var(--accent);
   border-left-color: var(--accent);
   background: rgba(255,77,109,0.07);
 }
 
-/* Icona emoji nella voce del menu */
 .nav-icon { font-size: 18px; width: 22px; text-align: center; }
 
-/* Box "In riproduzione" in fondo alla sidebar,
-   mostra il titolo e il tipo di sorgente (radio o YouTube) */
 .now-playing-sidebar {
   padding: 16px;
   border-top: 1px solid var(--border);
   background: var(--bg3);
 }
 
-/* Etichetta piccola "IN RIPRODUZIONE" */
 .np-label {
   font-size: 9px;
   letter-spacing: 3px;
@@ -168,52 +126,41 @@ body::before {
   margin-bottom: 8px;
 }
 
-/* Titolo della stazione/canzone corrente */
 .np-title {
   font-size: 13px;
   font-weight: 500;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* taglia il testo lungo con "..." */
+  text-overflow: ellipsis;
 }
 
-/* Sottotitolo (genere o canale YouTube) */
 .np-sub {
   font-size: 11px;
   color: var(--text3);
   margin-top: 2px;
 }
 
-/* Pallino rosso pulsante vicino al badge LIVE */
 .live-dot {
   display: inline-block;
   width: 6px; height: 6px;
   background: var(--live);
   border-radius: 50%;
   margin-right: 5px;
-  animation: pulse 1.4s ease-in-out infinite; /* animazione continua */
+  animation: pulse 1.4s ease-in-out infinite;
 }
 
-/* Animazione del pallino LIVE: si illumina e si spegne */
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.8); }
 }
 
-/* =============================================
-   AREA PRINCIPALE (a destra della sidebar)
-   margin-left = larghezza della sidebar
-   ============================================= */
 .main {
   margin-left: 220px;
   min-height: 100vh;
-  padding-bottom: 100px; /* spazio per il player fisso in basso */
+  padding-bottom: 100px;
 }
 
-/* Barra in cima con titolo pagina e barra di ricerca.
-   È sticky: rimane visibile mentre scrolli.
-   backdrop-filter: blur = effetto vetro smerigliato */
 .topbar {
   padding: 20px 32px;
   display: flex;
@@ -227,7 +174,6 @@ body::before {
   z-index: 50;
 }
 
-/* Titolo grande della sezione corrente */
 .page-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 32px;
@@ -235,7 +181,6 @@ body::before {
   color: var(--text);
 }
 
-/* Barra di ricerca (icona + input) */
 .search-bar {
   display: flex;
   align-items: center;
@@ -247,7 +192,6 @@ body::before {
   min-width: 240px;
 }
 
-/* Campo di testo dentro la barra di ricerca */
 .search-bar input {
   background: none;
   border: none;
@@ -258,22 +202,15 @@ body::before {
   width: 100%;
 }
 
-/* Colore del placeholder */
 .search-bar input::placeholder { color: var(--text3); }
 
-/* =============================================
-   SEZIONI DI CONTENUTO
-   Ogni sezione (Radio, Playlist, ecc.) è un div
-   che si mostra/nasconde aggiungendo la classe .active
-   ============================================= */
 .section {
   padding: 32px;
-  display: none; /* tutte nascoste di default */
+  display: none;
 }
 
-.section.active { display: block; } /* solo quella attiva viene mostrata */
+.section.active { display: block; }
 
-/* Header interno delle sezioni: titolo + pulsanti */
 .section-header {
   display: flex;
   align-items: center;
@@ -281,7 +218,6 @@ body::before {
   margin-bottom: 24px;
 }
 
-/* Titoletto di sezione (es. "Radio Italiane & Internazionali") */
 .section-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 22px;
@@ -289,18 +225,12 @@ body::before {
   color: var(--text);
 }
 
-/* =============================================
-   GRIGLIA DELLE RADIO
-   Layout a griglia che si adatta automaticamente
-   alla larghezza disponibile (auto-fill + minmax)
-   ============================================= */
 .radio-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
 }
 
-/* Singola card di una stazione radio */
 .radio-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -308,12 +238,11 @@ body::before {
   padding: 20px;
   cursor: pointer;
   transition: all 0.25s;
-  position: relative; /* serve per posizionare i pulsanti interni in assoluto */
+  position: relative;
   overflow: hidden;
-  user-select: none; /* evita selezione del testo durante il drag */
+  user-select: none;
 }
 
-/* Stile durante il drag & drop: card di destinazione evidenziata */
 .radio-card.drag-over {
   border-color: var(--accent2);
   background: var(--card2);
@@ -321,22 +250,20 @@ body::before {
   transform: scale(1.02);
 }
 
-/* Icona "impugna per trascinare" (punti verticali ⠿), visibile solo su hover */
 .drag-handle {
   position: absolute;
   top: 8px;
   left: 8px;
   font-size: 14px;
   color: var(--text3);
-  opacity: 0;            /* invisibile di default */
+  opacity: 0;
   transition: opacity 0.2s;
   cursor: grab;
   line-height: 1;
-  pointer-events: none;  /* non blocca i click sulla card */
+  pointer-events: none;
 }
-.radio-card:hover .drag-handle { opacity: 1; } /* diventa visibile su hover */
+.radio-card:hover .drag-handle { opacity: 1; }
 
-/* Overlay luminoso angolare sulla card (visibile solo su hover) */
 .radio-card::before {
   content: '';
   position: absolute;
@@ -346,23 +273,15 @@ body::before {
   transition: opacity 0.3s;
 }
 
-/* Hover della card: solleva leggermente con ombra */
 .radio-card:hover { border-color: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
 .radio-card:hover::before { opacity: 1; }
 
-/* Card in riproduzione: bordo rosso e sfondo un po' più chiaro */
 .radio-card.playing { border-color: var(--accent); background: var(--card2); }
 
-/* Emoji della radio (quando non c'è un logo vero) */
 .radio-emoji { font-size: 32px; margin-bottom: 12px; }
-
-/* Nome della stazione */
 .radio-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-
-/* Genere musicale sotto il nome */
 .radio-genre { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1.5px; font-family: 'JetBrains Mono', monospace; }
 
-/* Logo della radio (immagine vera, se disponibile) */
 .radio-logo {
   width: 48px; height: 48px;
   border-radius: 10px;
@@ -373,11 +292,8 @@ body::before {
   display: block;
 }
 
-/* Emoji di fallback quando non c'è il logo */
 .radio-logo-emoji { font-size: 32px; margin-bottom: 12px; display:block; }
 
-/* Pulsante play sovrapposto alla card in alto a destra
-   Visibile solo su hover (opacity: 0 → opacity: 1) */
 .radio-play-btn {
   position: absolute;
   top: 10px; right: 10px;
@@ -396,7 +312,6 @@ body::before {
   z-index: 2;
 }
 
-/* Pulsante modifica (matita) sovrapposto alla card, a sinistra del play */
 .radio-edit-btn {
   position: absolute;
   top: 10px; right: 46px;
@@ -414,14 +329,11 @@ body::before {
   transition: all 0.2s;
   z-index: 2;
 }
-/* Appaiono entrambi su hover */
 .radio-card:hover .radio-play-btn { opacity: 1; }
 .radio-card:hover .radio-edit-btn { opacity: 1; }
 
-/* Quando la card è in play, il pulsante play diventa rosso vivo */
 .radio-card.playing .radio-play-btn { opacity: 1; background: var(--live); }
 
-/* Stellina preferiti in basso a destra della card */
 .radio-fav-btn {
   position: absolute;
   bottom: 10px;
@@ -442,7 +354,6 @@ body::before {
   line-height: 1;
 }
 
-/* Stellina attiva (radio nei preferiti): color oro con glow */
 .radio-fav-btn.fav-active {
   opacity: 1 !important;
   color: var(--gold);
@@ -451,10 +362,6 @@ body::before {
 .radio-card:hover .radio-fav-btn { opacity: 1; color: var(--text2); }
 .radio-card:hover .radio-fav-btn:hover { opacity: 1; transform: scale(1.2); color: var(--gold); }
 
-/* =============================================
-   ANIMAZIONE WAVEFORM (le barrette che ballano
-   quando una radio è in riproduzione)
-   ============================================= */
 .waveform {
   display: flex;
   align-items: flex-end;
@@ -463,7 +370,6 @@ body::before {
   margin-top: 8px;
 }
 
-/* Singola barretta della waveform */
 .wave-bar {
   width: 3px;
   background: var(--accent);
@@ -471,34 +377,27 @@ body::before {
   animation: wave 0.8s ease-in-out infinite alternate;
 }
 
-/* Ritardi diversi per ogni barretta: effetto onda naturale */
 .wave-bar:nth-child(2) { animation-delay: 0.1s; }
 .wave-bar:nth-child(3) { animation-delay: 0.2s; }
 .wave-bar:nth-child(4) { animation-delay: 0.3s; }
 .wave-bar:nth-child(5) { animation-delay: 0.15s; }
 
-/* La barretta oscilla tra 4px e 20px di altezza */
 @keyframes wave {
   0% { height: 4px; }
   100% { height: 20px; }
 }
 
-/* =============================================
-   FORM AGGIUNGI RADIO PERSONALIZZATA
-   Di default nascosto, appare premendo "+ Aggiungi"
-   ============================================= */
 .add-form {
   background: var(--card);
-  border: 1px dashed var(--border); /* bordo tratteggiato per stile "draft" */
+  border: 1px dashed var(--border);
   border-radius: 12px;
   padding: 24px;
   margin-top: 24px;
   display: none;
 }
 
-.add-form.visible { display: block; } /* diventa visibile aggiungendo questa classe */
+.add-form.visible { display: block; }
 
-/* Griglia a 4 colonne per i campi del form */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
@@ -506,13 +405,10 @@ body::before {
   align-items: end;
 }
 
-/* Gruppo label + input */
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 
-/* Etichetta del campo */
 .form-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1.5px; font-family: 'JetBrains Mono', monospace; }
 
-/* Campo di input generico (usato in tutti i form) */
 .form-input {
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -525,17 +421,8 @@ body::before {
   transition: border-color 0.2s;
 }
 
-/* Input con focus: bordo viola */
 .form-input:focus { border-color: var(--accent2); }
 
-/* =============================================
-   BOTTONI (sistema di varianti)
-   .btn = stile base
-   .btn-primary = rosso (azione principale)
-   .btn-secondary = grigio (azione secondaria)
-   .btn-sm = versione piccola
-   .btn-ghost = trasparente
-   ============================================= */
 .btn {
   padding: 10px 20px;
   border: none;
@@ -558,11 +445,173 @@ body::before {
 .btn-ghost { background: transparent; color: var(--text2); }
 .btn-ghost:hover { color: var(--accent); }
 
-/* =============================================
-   CARD E LISTA DELLE PLAYLIST
-   ============================================= */
+/* ========= BOTTONI SIDEBAR AZIONI ========= */
+.sidebar-actions {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+}
 
-/* Lista di playlist in colonna */
+.sidebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+  letter-spacing: 0.2px;
+}
+
+.sidebar-btn-suggest {
+  background: rgba(123,94,167,0.15);
+  color: #a07fd4;
+  border: 1px solid rgba(123,94,167,0.3);
+}
+.sidebar-btn-suggest:hover {
+  background: rgba(123,94,167,0.28);
+  color: #c4a0f0;
+  border-color: rgba(123,94,167,0.55);
+  transform: translateY(-1px);
+}
+
+.sidebar-btn-coffee {
+  background: rgba(255,180,30,0.12);
+  color: #f0a830;
+  border: 1px solid rgba(255,180,30,0.25);
+}
+.sidebar-btn-coffee:hover {
+  background: rgba(255,180,30,0.24);
+  color: #ffc84a;
+  border-color: rgba(255,180,30,0.5);
+  transform: translateY(-1px);
+}
+
+/* ========= BOTTONE SCRIVIMI (legacy, tenuto per il popup) ========= */
+.btn-mail {
+  background: linear-gradient(135deg, var(--accent2), #5a3d8a);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(123,94,167,0.3);
+}
+.btn-mail:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(123,94,167,0.5);
+}
+
+/* ========= POPUP SCRIVIMI ========= */
+.contact-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 600;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.contact-popup-overlay.visible { display: flex; }
+
+.contact-popup {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px;
+  width: 480px;
+  max-width: 95vw;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+
+.contact-popup-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 32px; height: 32px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.contact-popup-close:hover { color: var(--accent); border-color: var(--accent); }
+
+.contact-popup-icon {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.contact-popup-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.contact-popup-body {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.contact-popup-body strong { color: var(--text); }
+
+.contact-mail-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--accent2), #5a3d8a);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(123,94,167,0.4);
+  margin-bottom: 16px;
+}
+.contact-mail-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(123,94,167,0.6);
+}
+
+.contact-popup-footer {
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* ========= LISTA BRANI PLAYLIST ========= */
 .playlist-list {
   display: flex;
   flex-direction: column;
@@ -570,22 +619,25 @@ body::before {
   margin-bottom: 24px;
 }
 
-/* Singola card playlist: layout orizzontale con thumbnail + info + azioni */
 .playlist-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.playlist-card-header {
   padding: 16px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
-.playlist-card:hover { border-color: var(--accent2); }
+.playlist-card-header:hover { background: rgba(255,255,255,0.02); }
+.playlist-card.open { border-color: var(--accent2); }
 
-/* Quadratino emoji/thumbnail della playlist */
 .playlist-thumb {
   width: 56px; height: 56px;
   background: var(--bg3);
@@ -594,31 +646,131 @@ body::before {
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  flex-shrink: 0; /* non si restringe mai */
+  flex-shrink: 0;
   overflow: hidden;
 }
 
 .playlist-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
 
-/* Info testuale della playlist */
-.playlist-info { flex: 1; } /* occupa tutto lo spazio rimasto */
+.playlist-info { flex: 1; }
 .playlist-name { font-size: 15px; font-weight: 600; color: var(--text); }
 .playlist-count { font-size: 12px; color: var(--text3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
 
-/* Pulsanti azioni (Play, + Brano, Elimina) */
 .playlist-actions { display: flex; gap: 8px; }
 
-/* =============================================
-   CODA DI RIPRODUZIONE (Queue)
-   Lista dei video YouTube da riprodurre in sequenza
-   ============================================= */
+.playlist-chevron {
+  font-size: 14px;
+  color: var(--text3);
+  transition: transform 0.25s;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.playlist-card.open .playlist-chevron { transform: rotate(90deg); }
+
+/* Tracks list dentro la playlist */
+.playlist-tracks {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 0;
+  background: var(--bg3);
+}
+.playlist-card.open .playlist-tracks { display: block; }
+
+.playlist-track-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.playlist-track-item:last-child { border-bottom: none; }
+.playlist-track-item:hover { background: rgba(255,255,255,0.04); }
+
+.playlist-track-num {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.playlist-track-thumb {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--card2);
+}
+.playlist-track-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.playlist-track-info { flex: 1; min-width: 0; }
+.playlist-track-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.playlist-track-channel {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.playlist-track-dur {
+  font-size: 10px;
+  color: var(--accent3);
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+
+.playlist-track-remove {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+  opacity: 0;
+}
+.playlist-track-item:hover .playlist-track-remove { opacity: 1; }
+.playlist-track-remove:hover { color: var(--accent); }
+
+.playlist-tracks-empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--text3);
+  font-size: 13px;
+}
+
+.playlist-tracks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.playlist-tracks-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
 .queue-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-/* Singolo elemento della coda */
 .queue-item {
   display: flex;
   align-items: center;
@@ -631,11 +783,8 @@ body::before {
 }
 
 .queue-item:hover { border-color: var(--border); background: var(--card2); }
-
-/* Elemento attualmente in riproduzione: bordo verde acqua */
 .queue-item.active { border-color: var(--accent3); }
 
-/* Numero posizione (o ▶ se è quello attivo) */
 .queue-num {
   font-size: 12px;
   color: var(--text3);
@@ -644,7 +793,6 @@ body::before {
   text-align: center;
 }
 
-/* Thumbnail del video YouTube */
 .queue-thumb {
   width: 42px; height: 42px;
   background: var(--bg3);
@@ -655,12 +803,10 @@ body::before {
 
 .queue-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Info testo del brano in coda */
 .queue-info { flex: 1; }
 .queue-title { font-size: 13px; font-weight: 500; color: var(--text); }
 .queue-channel { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-/* Pulsante X per rimuovere dalla coda */
 .queue-remove {
   background: none;
   border: none;
@@ -674,30 +820,23 @@ body::before {
 
 .queue-remove:hover { color: var(--accent); }
 
-/* =============================================
-   SEZIONE NOTIZIE MUSICALI
-   Griglia di card notizie con immagine e testo
-   ============================================= */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
-/* Singola card notizia */
 .news-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  overflow: hidden; /* taglia l'immagine ai bordi arrotondati */
+  overflow: hidden;
   transition: all 0.25s;
   cursor: pointer;
 }
 
-/* Hover: si solleva con ombra più profonda */
 .news-card:hover { border-color: var(--accent2); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
 
-/* Area immagine della notizia */
 .news-img {
   height: 160px;
   background: linear-gradient(135deg, var(--bg3), var(--bg2));
@@ -709,7 +848,6 @@ body::before {
   overflow: hidden;
 }
 
-/* Badge colorato con la fonte (es. "Billboard", "NME") */
 .news-tag {
   position: absolute;
   top: 12px; left: 12px;
@@ -724,18 +862,10 @@ body::before {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Corpo testuale della card notizia */
 .news-body { padding: 16px; }
 .news-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 8px; }
 .news-date { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
 
-/* =============================================
-   SEZIONE CLASSIFICHE
-   Layout a due colonne affiancate:
-   sinistra = classifica italiana, destra = globale
-   ============================================= */
-
-/* Contenitore principale: due colonne uguali */
 .charts-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -743,7 +873,6 @@ body::before {
   align-items: start;
 }
 
-/* Box di una singola colonna classifica */
 .chart-column {
   background: var(--card);
   border: 1px solid var(--border);
@@ -751,7 +880,6 @@ body::before {
   overflow: hidden;
 }
 
-/* Header della colonna con titolo e bandiera */
 .chart-column-header {
   padding: 16px 20px;
   border-bottom: 1px solid var(--border);
@@ -768,19 +896,16 @@ body::before {
   color: var(--text);
 }
 
-/* Lista brani dentro la colonna */
 .chart-list {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-/* Su mobile le due colonne si impilano verticalmente */
 @media (max-width: 900px) {
   .charts-columns { grid-template-columns: 1fr; }
 }
 
-/* Singola riga della classifica */
 .chart-item {
   display: flex;
   align-items: center;
@@ -793,7 +918,6 @@ body::before {
 
 .chart-item:hover { background: var(--card); }
 
-/* Numero di posizione */
 .chart-pos {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 20px;
@@ -802,10 +926,8 @@ body::before {
   text-align: center;
 }
 
-/* Top 3: numero dorato */
 .chart-pos.top3 { color: var(--gold); }
 
-/* Copertina album (piccolo quadrato) */
 .chart-art {
   width: 48px; height: 48px;
   border-radius: 8px;
@@ -817,12 +939,10 @@ body::before {
   flex-shrink: 0;
 }
 
-/* Info testo del brano */
 .chart-info { flex: 1; }
 .chart-song { font-size: 14px; font-weight: 600; color: var(--text); }
 .chart-artist { font-size: 12px; color: var(--text3); margin-top: 2px; }
 
-/* Badge tendenza: verde = sale, rosso = scende, grigio = stabile */
 .chart-trend {
   font-size: 12px;
   font-family: 'JetBrains Mono', monospace;
@@ -834,25 +954,20 @@ body::before {
 .trend-down { color: var(--accent); background: rgba(255,77,109,0.1); }
 .trend-same { color: var(--text3); background: var(--bg3); }
 
-/* =============================================
-   PLAYER BAR (barra in basso sempre visibile)
-   Contiene: info brano, controlli, barra progresso, volume
-   ============================================= */
 .player-bar {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   background: rgba(17, 17, 24, 0.97);
-  backdrop-filter: blur(30px); /* effetto vetro smerigliato */
+  backdrop-filter: blur(30px);
   border-top: 1px solid var(--border);
   padding: 0 32px;
   height: 80px;
   display: flex;
   align-items: center;
   gap: 24px;
-  z-index: 200; /* sopra tutto il resto */
+  z-index: 200;
 }
 
-/* Sezione sinistra: art + nome + badge LIVE */
 .player-info {
   display: flex;
   align-items: center;
@@ -861,7 +976,6 @@ body::before {
   flex: 1;
 }
 
-/* Quadratino artwork del player (emoji o logo) */
 .player-art {
   width: 48px; height: 48px;
   border-radius: 8px;
@@ -875,7 +989,6 @@ body::before {
   overflow: hidden;
 }
 
-/* Bordo animato intorno all'artwork quando si sta riproducendo */
 .player-art::after {
   content: '';
   position: absolute;
@@ -893,7 +1006,6 @@ body::before {
 .player-track { font-size: 14px; font-weight: 600; color: var(--text); }
 .player-station { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
 
-/* Sezione centrale: pulsanti di controllo (precedente, play/pausa, successivo) */
 .player-controls {
   display: flex;
   align-items: center;
@@ -902,7 +1014,6 @@ body::before {
   justify-content: center;
 }
 
-/* Pulsante di controllo generico */
 .ctrl-btn {
   background: none;
   border: none;
@@ -919,7 +1030,6 @@ body::before {
 
 .ctrl-btn:hover { color: var(--text); }
 
-/* Pulsante play/pausa principale: cerchio rosso più grande */
 .ctrl-btn.main-btn {
   width: 44px; height: 44px;
   background: var(--accent);
@@ -930,7 +1040,6 @@ body::before {
 
 .ctrl-btn.main-btn:hover { background: #ff2a4d; transform: scale(1.05); }
 
-/* Sezione centrale-destra: barra progresso (usata per YouTube, per radio è LIVE) */
 .player-progress {
   flex: 1;
   max-width: 300px;
@@ -939,7 +1048,6 @@ body::before {
   gap: 6px;
 }
 
-/* Barra progresso cliccabile */
 .progress-bar {
   height: 3px;
   background: var(--border);
@@ -948,7 +1056,6 @@ body::before {
   position: relative;
 }
 
-/* Riempimento della barra progresso con gradiente */
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
@@ -957,7 +1064,6 @@ body::before {
   transition: width 0.5s linear;
 }
 
-/* Tempi sotto la barra: elapsed e durata totale */
 .progress-times {
   display: flex;
   justify-content: space-between;
@@ -966,7 +1072,6 @@ body::before {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Sezione volume: icona + slider */
 .volume-ctrl {
   display: flex;
   align-items: center;
@@ -974,7 +1079,6 @@ body::before {
   min-width: 130px;
 }
 
-/* Slider del volume (personalizzato con webkit) */
 .volume-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -986,7 +1090,6 @@ body::before {
   cursor: pointer;
 }
 
-/* Pallino del cursore dello slider */
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -996,15 +1099,10 @@ body::before {
   cursor: pointer;
 }
 
-/* =============================================
-   MODAL (finestre di dialogo a tutto schermo)
-   L'overlay è fisso e copre tutto.
-   Il modal è centrato dentro l'overlay.
-   ============================================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8); /* sfondo scuro semi-trasparente */
+  background: rgba(0,0,0,0.8);
   z-index: 500;
   display: none;
   align-items: center;
@@ -1012,17 +1110,15 @@ body::before {
   backdrop-filter: blur(4px);
 }
 
-/* Aggiungere .visible all'overlay lo rende visibile */
 .modal-overlay.visible { display: flex; }
 
-/* Il box vero e proprio del modal */
 .modal {
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 28px;
   width: 500px;
-  max-width: 95vw; /* su schermi piccoli non esce dai bordi */
+  max-width: 95vw;
 }
 
 .modal-title {
@@ -1032,21 +1128,18 @@ body::before {
   margin-bottom: 20px;
 }
 
-/* Contenuto del form dentro il modal */
 .modal-form { display: flex; flex-direction: column; gap: 14px; }
 
-/* Anteprima del video YouTube selezionato nella ricerca */
 .yt-preview {
   background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 14px;
-  display: none; /* nascosta di default, appare quando si seleziona un video */
+  display: none;
 }
 
 .yt-preview.visible { display: flex; gap: 12px; align-items: center; }
 
-/* Thumbnail del video nell'anteprima */
 .yt-thumb-prev {
   width: 80px; height: 56px;
   border-radius: 6px;
@@ -1056,13 +1149,8 @@ body::before {
 .yt-title-prev { font-size: 13px; font-weight: 500; color: var(--text); }
 .yt-ch-prev { font-size: 11px; color: var(--text3); margin-top: 4px; }
 
-/* Azioni del modal (pulsanti in fondo: Annulla + Conferma) */
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
 
-/* =============================================
-   TOAST (notifiche temporanee in basso a destra)
-   Appare brevemente poi scompare
-   ============================================= */
 .toast {
   position: fixed;
   bottom: 100px;
@@ -1073,23 +1161,16 @@ body::before {
   padding: 12px 18px;
   font-size: 13px;
   color: var(--text);
-  z-index: 999; /* sopra tutto */
-  transform: translateX(120%); /* fuori schermo di default */
+  z-index: 999;
+  transform: translateX(120%);
   transition: transform 0.3s ease;
   max-width: 280px;
 }
 
-/* Diventa visibile traslando verso sinistra (rientra nello schermo) */
 .toast.show { transform: translateX(0); }
-
-/* Varianti colore: bordo sinistro verde = successo, rosso = errore */
 .toast.success { border-left: 3px solid var(--accent3); }
 .toast.error { border-left: 3px solid var(--accent); }
 
-/* =============================================
-   TAB BAR (schede dentro la sezione Playlist)
-   "Le mie Playlist" | "Suggerite" | "Coda"
-   ============================================= */
 .tab-bar {
   display: flex;
   gap: 0;
@@ -1097,7 +1178,6 @@ body::before {
   margin-bottom: 24px;
 }
 
-/* Singola scheda */
 .tab {
   padding: 12px 20px;
   cursor: pointer;
@@ -1109,16 +1189,12 @@ body::before {
 }
 
 .tab:hover { color: var(--text2); }
-
-/* Scheda attiva: testo e linea colorati */
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* Scrollbar personalizzata (sottile, quasi invisibile) */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-/* Layout a due colonne (es. lista + sidebar info) */
 .two-col {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -1126,7 +1202,6 @@ body::before {
   align-items: start;
 }
 
-/* Badge piccolo generico (es. "LIVE", "Pronte all'uso") */
 .badge {
   display: inline-block;
   background: var(--bg3);
@@ -1138,35 +1213,26 @@ body::before {
   border-radius: 4px;
 }
 
-/* Badge LIVE: bordo e testo rosso */
 .badge.live { background: rgba(255,77,77,0.15); border-color: var(--live); color: var(--live); }
 
-/* =============================================
-   MEDIA QUERY MOBILE (schermi <= 768px)
-   Trasformo la sidebar verticale in una
-   barra di navigazione in basso come le app mobile
-   ============================================= */
 @media (max-width: 768px) {
-
-  /* La sidebar diventa una bottom navigation bar */
   .sidebar {
     position: fixed;
     left: 0; right: 0;
-    top: auto; bottom: 0; /* incollata in fondo */
+    top: auto; bottom: 0;
     width: 100%;
     height: 60px;
-    flex-direction: row; /* voci affiancate orizzontalmente */
+    flex-direction: row;
     border-right: none;
     border-top: 1px solid var(--border);
     padding: 0;
     z-index: 300;
   }
 
-  /* Nascondo logo e now-playing: non ci stanno su mobile */
   .logo { display: none; }
   .now-playing-sidebar { display: none; }
+  .sidebar-actions { display: none; }
 
-  /* Nav orizzontale che occupa tutta la larghezza */
   .nav {
     display: flex;
     flex-direction: row;
@@ -1175,7 +1241,6 @@ body::before {
     width: 100%;
   }
 
-  /* Ogni voce occupa uguale spazio, in colonna (icona sopra, label sotto) */
   .nav-item {
     flex: 1;
     flex-direction: column;
@@ -1185,7 +1250,7 @@ body::before {
     gap: 2px;
     font-size: 10px;
     border-left: none;
-    border-top: 3px solid transparent; /* bordo in alto invece che a sinistra */
+    border-top: 3px solid transparent;
     text-align: center;
   }
 
@@ -1197,13 +1262,11 @@ body::before {
 
   .nav-icon { font-size: 20px; width: auto; }
 
-  /* Il main non ha più il margine laterale della sidebar */
   .main {
     margin-left: 0;
-    padding-bottom: 150px; /* spazio per player + bottom nav */
+    padding-bottom: 150px;
   }
 
-  /* Topbar più compatta */
   .topbar {
     padding: 12px 16px;
     flex-wrap: wrap;
@@ -1212,7 +1275,6 @@ body::before {
 
   .page-title { font-size: 22px; }
 
-  /* La seconda riga della topbar occupa tutta la larghezza */
   .topbar > div:last-child {
     width: 100%;
     justify-content: space-between;
@@ -1223,51 +1285,42 @@ body::before {
     min-width: 0;
   }
 
-  /* Sezioni: padding ridotto su mobile */
   .section { padding: 16px; }
 
-  /* Griglia radio: 2 colonne su mobile (invece di auto-fill) */
   .radio-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
-  /* Card radio più compatta */
   .radio-card { padding: 14px 12px; }
   .radio-logo { width: 36px; height: 36px; }
   .radio-logo-emoji { font-size: 24px; }
   .radio-name { font-size: 13px; }
   .radio-genre { font-size: 10px; }
 
-  /* Header sezione impilato verticalmente su mobile */
   .section-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
 
-  /* I pulsanti filtro si wrappano su più righe se necessario */
   .section-header > div:last-child {
     width: 100%;
     flex-wrap: wrap;
     gap: 6px;
   }
 
-  /* Select ordinamento a piena larghezza */
   #radioSortSelect { width: 100%; }
 
-  /* News: una colonna sola su mobile */
   .news-grid {
     grid-template-columns: 1fr;
     gap: 14px;
   }
 
-  /* Righe classifica più compatte */
   .chart-item { padding: 8px 10px; gap: 10px; }
   .chart-pos { font-size: 16px; width: 22px; }
   .chart-art { width: 38px; height: 38px; }
 
-  /* Player bar: sopra la bottom nav, più bassa */
   .player-bar {
     padding: 0 12px;
     height: 68px;
@@ -1285,58 +1338,105 @@ body::before {
   .player-track { font-size: 12px; }
   .player-station { font-size: 10px; }
 
-  /* Meno spazio tra i pulsanti di controllo */
   .player-controls { flex: 0; gap: 8px; }
   .ctrl-btn { font-size: 16px; padding: 6px; }
   .ctrl-btn.main-btn { width: 38px; height: 38px; font-size: 16px; }
 
-  /* Nascondo barra progresso e volume su mobile: non ci sarebbe spazio */
   .player-progress { display: none; }
   .volume-ctrl { display: none; }
 
-  /* Toast più in basso e allargato */
   .toast { bottom: 140px; right: 12px; left: 12px; max-width: none; }
 
-  /* Modal a piena larghezza su mobile */
   .modal { width: 95vw !important; padding: 20px; }
 
-  /* Layout a due colonne diventa singola colonna */
   .two-col { grid-template-columns: 1fr; }
 
-  /* Form: tutto in colonna invece che in griglia */
   .form-row { grid-template-columns: 1fr; }
 
-  /* Card playlist più compatte */
-  .playlist-card { padding: 12px 14px; gap: 12px; }
+  .playlist-card-header { padding: 12px 14px; gap: 12px; }
   .playlist-thumb { width: 44px; height: 44px; }
 
-  /* Card YouTube mini: si adatta alla larghezza schermo */
   #ytCard { width: calc(100vw - 40px); right: 20px; bottom: 136px; }
 }
 
-/* Su schermi molto stretti (< 400px): una sola colonna per le radio */
 @media (max-width: 400px) {
   .radio-grid { grid-template-columns: 1fr; }
+}
+
+/* ========= MOBILE DRAWER (5° tab "···") ========= */
+.mobile-drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 400;
+  backdrop-filter: blur(3px);
+}
+.mobile-drawer-overlay.visible { display: block; }
+
+.mobile-drawer {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: -200px; /* fuori schermo di default */
+  z-index: 401;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-radius: 18px 18px 0 0;
+  padding: 0 0 80px; /* 80px = spazio per la bottom nav */
+  transition: bottom 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.mobile-drawer.visible { bottom: 0; }
+
+.drawer-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 16px;
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 16px 10px;
+  padding: 14px 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.18s;
+  font-family: 'DM Sans', sans-serif;
+}
+.drawer-item:hover { border-color: var(--accent2); background: var(--card2); }
+
+.drawer-item-icon { font-size: 24px; flex-shrink: 0; }
+
+.drawer-item-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  line-height: 1.3;
+}
+.drawer-item-sub {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  display: block;
+  margin-top: 2px;
 }
 </style>
 </head>
 <body>
 
-<!-- =============================================
-     SIDEBAR / BOTTOM NAV
-     Su desktop è una barra verticale a sinistra.
-     Su mobile diventa una bottom navigation bar.
-     ============================================= -->
 <nav class="sidebar">
-  <!-- Logo con nome app, sottotitolo e badge "JEAN VERSION" -->
   <div class="logo">
     <div class="logo-text">RadioWeb</div>
     <div class="logo-sub" id="logoSub"></div>
-    <!-- Versione numerica (nascosta di default nel JS) -->
     <div id="logoVer" style="font-size:9px;font-family:'JetBrains Mono',monospace;margin-top:4px;letter-spacing:1px;"></div>
   </div>
 
-  <!-- Voci di navigazione: cliccando su una si mostra la sezione corrispondente -->
   <div class="nav">
     <div class="nav-item active" onclick="showSection('radio')">
       <span class="nav-icon">📻</span> Radio Live
@@ -1350,10 +1450,22 @@ body::before {
     <div class="nav-item" onclick="showSection('news')">
       <span class="nav-icon">📰</span> Novità
     </div>
+    <!-- 5° tab visibile solo su mobile -->
+    <div class="nav-item" id="moreTab" onclick="openDrawer()" style="display:none;">
+      <span class="nav-icon">···</span> Altro
+    </div>
   </div>
 
-  <!-- Box "In riproduzione" in fondo alla sidebar:
-       aggiornato in tempo reale dal JavaScript -->
+  <!-- Bottoni sidebar: Suggerisci + Caffè -->
+  <div class="sidebar-actions">
+    <button class="sidebar-btn sidebar-btn-suggest" onclick="openContactPopup()">
+      💡 Suggerisci una modifica
+    </button>
+    <a class="sidebar-btn sidebar-btn-coffee" href="https://www.paypal.com/paypalme/xflyracer" target="_blank" rel="noopener">
+      ☕ Offrimi un caffè
+    </a>
+  </div>
+
   <div class="now-playing-sidebar" id="npSidebar">
     <div class="np-label">In riproduzione</div>
     <div class="np-title" id="npTitle">Niente in riproduzione</div>
@@ -1361,16 +1473,11 @@ body::before {
   </div>
 </nav>
 
-<!-- =============================================
-     AREA PRINCIPALE DEL CONTENUTO
-     ============================================= -->
 <main class="main">
 
-  <!-- Topbar sticky con titolo pagina e barra di ricerca -->
   <div class="topbar">
     <div class="page-title" id="pageTitle">Radio Live</div>
     <div style="display:flex;align-items:center;gap:12px;">
-      <!-- La ricerca filtra il contenuto della sezione attiva in tempo reale -->
       <div class="search-bar">
         <span>🔍</span>
         <input type="text" placeholder="Cerca radio..." id="searchInput" oninput="handleSearch()">
@@ -1378,31 +1485,22 @@ body::before {
     </div>
   </div>
 
-  <!-- =============================================
-       SEZIONE RADIO LIVE
-       Mostrata di default (classe .active).
-       Contiene: filtri, form aggiungi, griglia card
-       ============================================= -->
+  <!-- SEZIONE RADIO LIVE -->
   <div class="section active" id="section-radio">
     <div class="section-header">
       <div>
-        <!-- Titolo dinamico che cambia in base al filtro attivo -->
         <div class="section-title" id="radioSectionTitle">Radio Italiane & Internazionali</div>
-        <!-- Contatore stazioni aggiornato dopo il caricamento dall'API -->
         <div id="stationCount" style="font-size:12px;color:var(--text3);margin-top:4px;">Caricamento stazioni...</div>
       </div>
 
-      <!-- Pulsanti di filtro per gruppo (Tutte / Italiane / Int. / Preferiti) e ordinamento -->
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('all')" id="fg-all" style="border-color:var(--accent2);color:var(--accent2)">Tutte</button>
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('it')" id="fg-it">🇮🇹 Italiane</button>
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('int')" id="fg-int">🌍 Int.</button>
         <button class="btn btn-secondary btn-sm" onclick="filterRadioGroup('fav')" id="fg-fav">⭐ Preferiti</button>
 
-        <!-- Separatore visivo verticale -->
         <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
 
-        <!-- Select per l'ordinamento delle radio nella griglia -->
         <select id="radioSortSelect" onchange="setRadioSort(this.value)"
           style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;outline:none;">
           <option value="default">↕ Ordine default</option>
@@ -1417,8 +1515,6 @@ body::before {
       </div>
     </div>
 
-    <!-- Form nascosto per aggiungere una radio personalizzata.
-         Appare/scompare con toggleAddForm() -->
     <div id="addRadioForm" class="add-form">
       <div class="form-row">
         <div class="form-group">
@@ -1437,74 +1533,55 @@ body::before {
       </div>
     </div>
 
-    <!-- Griglia delle card radio: popolata dinamicamente da renderRadio() -->
     <div class="radio-grid" id="radioGrid"></div>
   </div>
 
-  <!-- =============================================
-       SEZIONE PLAYLIST & YOUTUBE
-       Tre tab: Le mie Playlist | Suggerite | Coda
-       ============================================= -->
+  <!-- SEZIONE PLAYLIST & YOUTUBE -->
   <div class="section" id="section-playlist">
-    <!-- Tab bar per navigare tra i tre sotto-pannelli -->
     <div class="tab-bar">
       <div class="tab active" onclick="switchTab('playlists', this)">Le mie Playlist</div>
       <div class="tab" onclick="switchTab('suggerite', this)">🎁 Playlist Suggerite</div>
       <div class="tab" onclick="switchTab('queue', this)">Coda di riproduzione</div>
     </div>
 
-    <!-- TAB 1: Le mie playlist create dall'utente -->
     <div id="tab-playlists">
       <div class="section-header">
         <div class="section-title">Le mie Playlist</div>
         <button class="btn btn-primary btn-sm" onclick="openNewPlaylistModal()">+ Nuova Playlist</button>
       </div>
-      <!-- Popolata da renderPlaylist() -->
       <div class="playlist-list" id="playlistList"></div>
     </div>
 
-    <!-- TAB 2: Playlist suggerite per genere (Rock, Jazz, Dance, ecc.)
-         Nascosto di default, mostrato da switchTab() -->
     <div id="tab-suggerite" style="display:none">
       <div class="section-header">
         <div class="section-title">Playlist Suggerite per Genere</div>
         <span class="badge">Pronte all'uso</span>
       </div>
-      <!-- Popolata da renderSuggestedPlaylists() -->
       <div id="suggesteGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
     </div>
 
-    <!-- TAB 3: Coda di riproduzione YouTube -->
     <div id="tab-queue" style="display:none">
       <div class="section-header">
         <div class="section-title">Coda di riproduzione</div>
         <div style="display:flex;gap:8px;">
           <button class="btn btn-primary btn-sm" onclick="openAddYTModal()">+ Cerca su YouTube</button>
-          <!-- Pulsante svuota coda: nascosto se la coda è vuota -->
           <button class="btn btn-secondary btn-sm" onclick="clearQueue()" id="btnClearQueue" style="display:none">🗑 Svuota</button>
         </div>
       </div>
-      <!-- Lista degli elementi in coda, popolata da renderQueue() -->
       <div class="queue-list" id="queueList"></div>
-      <!-- Messaggio mostrato quando la coda è vuota -->
       <div id="queueEmpty" style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">
         🎵 Nessun brano in coda. Aggiungine uno!
       </div>
     </div>
   </div>
 
-  <!-- =============================================
-       SEZIONE CLASSIFICHE
-       Dati presi da iTunes RSS Feed in tempo reale
-       ============================================= -->
+  <!-- SEZIONE CLASSIFICHE -->
   <div class="section" id="section-charts">
     <div class="section-header">
       <div class="section-title">🏆 Classifiche</div>
       <span class="badge" id="chartsDate">⏳ Caricamento...</span>
     </div>
-    <!-- Due colonne affiancate: Italia a sinistra, Global a destra -->
     <div class="charts-columns">
-      <!-- Colonna classifica italiana -->
       <div class="chart-column">
         <div class="chart-column-header">
           <div class="chart-column-title">🇮🇹 Top Italia</div>
@@ -1512,7 +1589,6 @@ body::before {
         </div>
         <div class="chart-list" id="chartListIT"></div>
       </div>
-      <!-- Colonna classifica globale (USA) -->
       <div class="chart-column">
         <div class="chart-column-header">
           <div class="chart-column-title">🌍 Top Global</div>
@@ -1523,44 +1599,33 @@ body::before {
     </div>
   </div>
 
-  <!-- =============================================
-       SEZIONE NOVITÀ MUSICALI
-       Notizie da feed RSS di Billboard, NME, Rockol
-       ============================================= -->
+  <!-- SEZIONE NOVITÀ -->
   <div class="section" id="section-news">
     <div class="section-header">
       <div class="section-title">📰 Novità Musicali</div>
       <span class="badge" id="newsDate">⏳ Caricamento...</span>
     </div>
-    <!-- Griglia notizie, popolata da renderNews() -->
     <div class="news-grid" id="newsGrid"></div>
   </div>
 </main>
 
-<!-- =============================================
-     PLAYER BAR (sempre visibile in fondo)
-     Tre sezioni: info brano | controlli | progress + volume
-     ============================================= -->
+<!-- PLAYER BAR -->
 <div class="player-bar">
-  <!-- Info: artwork + titolo + badge LIVE -->
   <div class="player-info">
     <div class="player-art" id="playerArt">📻</div>
     <div>
       <div class="player-track" id="playerTrack">Seleziona una radio</div>
       <div class="player-station" id="playerStation">Radio </div>
     </div>
-    <!-- Badge LIVE: visibile solo quando si riproduce una radio -->
     <span class="badge live" id="liveBadge" style="display:none"><span class="live-dot"></span>LIVE</span>
   </div>
 
-  <!-- Controlli: precedente | play/pausa | successivo -->
   <div class="player-controls">
     <button class="ctrl-btn" onclick="prevTrack()" title="Precedente">⏮</button>
     <button class="ctrl-btn main-btn" id="playBtn" onclick="togglePlay()">▶</button>
     <button class="ctrl-btn" onclick="nextTrack()" title="Successivo">⏭</button>
   </div>
 
-  <!-- Barra progresso (usata solo per YouTube, per le radio mostra "LIVE") -->
   <div class="player-progress">
     <div class="progress-bar" id="progressBar" onclick="seekTo(event)">
       <div class="progress-fill" id="progressFill"></div>
@@ -1571,24 +1636,17 @@ body::before {
     </div>
   </div>
 
-  <!-- Controllo volume con slider -->
   <div class="volume-ctrl">
     <span style="font-size:18px;cursor:pointer" onclick="toggleMute()">🔊</span>
     <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80" oninput="setVolume(this.value)">
   </div>
 </div>
 
-
-<!-- =============================================
-     MODAL MODIFICA RADIO
-     Appare quando clicchi il pulsante matita su una card.
-     Permette di modificare nome, URL, genere di una radio.
-     ============================================= -->
+<!-- MODAL MODIFICA RADIO -->
 <div class="modal-overlay" id="editRadioModal">
   <div class="modal" style="width:500px;">
     <div class="modal-title" id="editModalTitle">✏️ Modifica Radio</div>
     <div class="modal-form">
-      <!-- Campo nascosto che memorizza l'ID della radio che stiamo modificando -->
       <input type="hidden" id="editRadioId">
       <div class="form-group">
         <label class="form-label" for="editRadioName">Nome stazione</label>
@@ -1602,7 +1660,6 @@ body::before {
         <label class="form-label" for="editRadioGenre">Genere / Descrizione</label>
         <input class="form-input" type="text" id="editRadioGenre" placeholder="Pop, Rock, News...">
       </div>
-      <!-- Anteprima logo automatico (visibile solo se la radio ha un logo) -->
       <div id="editLogoPreview" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;">
         <img id="editLogoImg" src="" alt="" style="width:48px;height:48px;border-radius:8px;object-fit:contain;background:var(--bg3);">
         <div>
@@ -1611,7 +1668,6 @@ body::before {
         </div>
       </div>
     </div>
-    <!-- Azioni: elimina a sinistra, annulla/salva a destra -->
     <div class="modal-actions" style="justify-content:space-between;">
       <button class="btn btn-secondary" id="editDeleteBtn" onclick="deleteRadio()" style="color:var(--accent);border-color:var(--accent);">🗑 Elimina</button>
       <div style="display:flex;gap:8px;">
@@ -1622,37 +1678,26 @@ body::before {
   </div>
 </div>
 
-<!-- =============================================
-     MODAL RICERCA YOUTUBE
-     Permette di cercare un video YouTube tramite
-     il Cloudflare Worker (che chiama l'API YouTube)
-     oppure incollare un URL diretto.
-     ============================================= -->
+<!-- MODAL RICERCA YOUTUBE -->
 <div class="modal-overlay" id="ytModal">
   <div class="modal" style="width:620px;">
     <div class="modal-title">🔍 Cerca su YouTube</div>
     <div class="modal-form">
-
-      <!-- Campo di ricerca + pulsante Cerca -->
       <div style="display:flex;gap:8px;">
         <input class="form-input" type="text" id="ytSearchInput" placeholder="Cerca artista, canzone, album..." style="flex:1;" onkeydown="if(event.key==='Enter') searchYT()">
         <button class="btn btn-primary" onclick="searchYT()" id="btnSearch">Cerca</button>
       </div>
 
-      <!-- Separatore visivo "oppure incolla un URL" -->
       <div style="display:flex;align-items:center;gap:10px;color:var(--text3);font-size:12px;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
         oppure incolla un URL diretto
         <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
 
-      <!-- Campo per URL diretto YouTube (es. https://youtube.com/watch?v=...) -->
       <input class="form-input" type="url" id="ytUrlInput" placeholder="https://www.youtube.com/watch?v=..." oninput="previewYTUrl()">
 
-      <!-- Lista risultati di ricerca: appare dopo aver cercato -->
       <div id="ytSearchResults" style="display:none;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
 
-      <!-- Anteprima del video selezionato (thumb + titolo + canale + durata) -->
       <div id="ytSelectedPreview" style="display:none;background:var(--bg3);border:1px solid var(--accent3);border-radius:10px;padding:14px;gap:14px;align-items:center;">
         <div style="display:flex;gap:14px;align-items:center;">
           <img id="ytSelThumb" src="" alt="" style="width:100px;height:64px;border-radius:8px;object-fit:cover;flex-shrink:0;">
@@ -1661,12 +1706,10 @@ body::before {
             <div id="ytSelChannel" style="font-size:12px;color:var(--text3);margin-top:4px;"></div>
             <div id="ytSelDuration" style="font-size:11px;color:var(--accent3);margin-top:2px;font-family:'JetBrains Mono',monospace;"></div>
           </div>
-          <!-- Pulsante X per deselezionare il video scelto -->
           <button class="btn btn-ghost btn-sm" onclick="clearSelection()" title="Rimuovi selezione">✕</button>
         </div>
       </div>
 
-      <!-- Select opzionale per aggiungere il video anche a una playlist esistente -->
       <div class="form-group" id="ytPlaylistGroup" style="display:none;">
         <label class="form-label" for="ytPlaylistSelect">Aggiungi anche alla playlist (opzionale)</label>
         <select class="form-input" id="ytPlaylistSelect">
@@ -1677,16 +1720,12 @@ body::before {
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('ytModal')">Annulla</button>
-      <!-- Questo pulsante appare solo dopo aver selezionato un video -->
       <button class="btn btn-primary" id="btnAddYT" onclick="addYTToQueue()" style="display:none;">+ Aggiungi alla coda</button>
     </div>
   </div>
 </div>
 
-<!-- =============================================
-     MODAL NUOVA PLAYLIST
-     Form semplice: nome + emoji opzionale
-     ============================================= -->
+<!-- MODAL NUOVA PLAYLIST -->
 <div class="modal-overlay" id="plModal">
   <div class="modal">
     <div class="modal-title">Nuova Playlist</div>
@@ -1707,15 +1746,27 @@ body::before {
   </div>
 </div>
 
-<!-- Notifica toast (sovrapposta, in basso a destra) -->
+<!-- ===== POPUP CONTATTO (NUOVO) ===== -->
+<div class="contact-popup-overlay" id="contactPopup" onclick="if(event.target===this)closeContactPopup()">
+  <div class="contact-popup">
+    <button class="contact-popup-close" onclick="closeContactPopup()">✕</button>
+    <div class="contact-popup-icon">✉️</div>
+    <div class="contact-popup-title">Scrivimi!</div>
+    <div class="contact-popup-body">
+      Hai una <strong>proposta di modifica</strong>, un bug da segnalare o vuoi che aggiunga una radio?<br>
+      Mandami pure un'email, rispondo il prima possibile.
+    </div>
+    <a class="contact-mail-link" href="mailto:xflyracer@gmail.com?subject=RadioWeb%20-%20Modifica%2FSuggerimento&body=Ciao!%0A%0AVorrei%20suggerire%3A%0A%0A">
+      📧 xflyracer@gmail.com
+    </a>
+    <div class="contact-popup-footer">RadioWeb · fatto con ❤️ da Jean</div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- Elemento audio HTML5 per lo streaming radio -->
 <audio id="audioPlayer" crossorigin="anonymous" controlslist="nodownload"></audio>
 
-<!-- Card mini YouTube: appare quando si riproduce un video YouTube.
-     Mostra thumbnail, titolo, canale e link per aprire su YouTube.
-     Posizione fissa in basso a destra, sopra il player. -->
 <div id="ytCard" style="display:none;position:fixed;bottom:88px;right:20px;z-index:300;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;width:300px;box-shadow:0 8px 40px rgba(0,0,0,0.6);flex-direction:column;gap:10px;">
   <div style="display:flex;align-items:center;gap:10px;">
     <img id="ytCardThumb" src="" alt="" style="width:64px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;">
@@ -1723,120 +1774,71 @@ body::before {
       <div id="ytCardTitle" style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div id="ytCardChannel" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
     </div>
-    <!-- Pulsante X per chiudere la card YouTube e fermare la riproduzione -->
     <button onclick="closeYT()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:2px;line-height:1;">×</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <span style="font-size:11px;color:var(--accent3);font-family:JetBrains Mono,monospace;">&#127925; Audio in riproduzione</span>
-    <!-- Link per aprire il video direttamente su YouTube -->
     <a id="ytCardLink" href="#" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none;margin-left:auto;">&#9654; Guarda su YT</a>
   </div>
 </div>
 
 <script>
-// ===========================
-// CONFIGURAZIONE GLOBALE
-// Qui si modificano versione, sottotitolo e colore del sottotitolo
-// senza toccare il resto del codice
-// ===========================
 const CONFIG = {
   version:  '1.3',
   subtitle: 'Music & Streaming',
-  subtitleColor: '#c8c8e0',   // colore testo sottotitolo
+  subtitleColor: '#c8c8e0',
 };
 
-// ===========================
-// STATO GLOBALE DELL'APP
-// Queste variabili tengono traccia di cosa sta succedendo
-// "in questo momento" nel player
-// ===========================
-let currentMode = 'idle'; // 'radio' | 'youtube' | 'idle' → cosa stiamo riproducendo
-let isPlaying = false;    // true se qualcosa sta suonando
-let currentRadio = null;  // oggetto della radio attualmente in play
-let currentYTIndex = -1;  // indice del brano YouTube nella coda (-1 = nessuno)
-let isMuted = false;      // true se il player è in mute
+let currentMode = 'idle';
+let isPlaying = false;
+let currentRadio = null;
+let currentYTIndex = -1;
+let isMuted = false;
 
-// ===========================
-// ELEMENTO AUDIO HTML5
-// È il vero "motore" del player radio.
-// preload:"none" → non scarica nulla finché non si chiede esplicitamente di suonare
-// ===========================
 const audio = document.getElementById('audioPlayer');
 audio.preload = "none";
-audio.volume = 0.8; // volume di partenza all'80%
-let hlsInstance = null; // qui memorizziamo l'istanza HLS.js quando serve
+audio.volume = 0.8;
+let hlsInstance = null;
 
-// Distrugge l'istanza HLS.js attiva (se esiste) prima di cambiare radio
-// Necessario per evitare memory leak e conflitti tra stream diversi
 function destroyHls() {
-  if (hlsInstance) {
-    hlsInstance.destroy();
-    hlsInstance = null;
-  }
+  if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
 }
 
-// Avvia la riproduzione di uno stream audio (radio live).
-// Gestisce sia stream normali (MP3/AAC) che stream HLS (.m3u8).
-// onError: funzione da chiamare se qualcosa va storto
 function playStream(streamUrl, onError) {
-  destroyHls(); // prima di tutto, pulisce eventuali istanze precedenti
-
-  const isHLS = streamUrl.includes('.m3u8'); // capisce se è uno stream HLS
-
+  destroyHls();
+  const isHLS = streamUrl.includes('.m3u8');
   if (isHLS && Hls.isSupported()) {
-    // Browser supporta HLS.js (Chrome, Firefox, ecc.)
     hlsInstance = new Hls({ enableWorker: false });
     hlsInstance.loadSource(streamUrl);
     hlsInstance.attachMedia(audio);
-    hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-      audio.play().catch(onError); // quando il manifest è pronto, fa partire la riproduzione
-    });
-    hlsInstance.on(Hls.Events.ERROR, (event, data) => {
-      if (data.fatal) onError(); // solo errori fatali (non quelli recuperabili)
-    });
+    hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => { audio.play().catch(onError); });
+    hlsInstance.on(Hls.Events.ERROR, (event, data) => { if (data.fatal) onError(); });
   } else if (isHLS && audio.canPlayType('application/vnd.apple.mpegurl')) {
-    // Safari: supporta HLS nativamente senza HLS.js
     audio.src = streamUrl;
     audio.load();
     audio.play().catch(onError);
   } else if (!isHLS) {
-    // Stream normale (MP3, AAC, OGG...): lo metto direttamente nell'audio
-    // Faccio reset di src prima di assegnare il nuovo per evitare buffer vecchi
     audio.src = '';
     audio.load();
     audio.src = streamUrl;
     audio.load();
     audio.play().catch(onError);
   } else {
-    onError(); // caso non gestibile
+    onError();
   }
 }
 
-// ===========================
-// DATI DELLE RADIO
-// builtinRadios: riempita dall'API Radio Browser al caricamento
-// customRadios: radio aggiunte manualmente dall'utente, salvate in localStorage
-// playlists: playlist YouTube dell'utente, salvate in localStorage
-// queue: coda di riproduzione YouTube, salvata in localStorage
-// ===========================
 let builtinRadios = [];
 let customRadios = JSON.parse(localStorage.getItem('customRadios') || '[]');
 let playlists = JSON.parse(localStorage.getItem('playlists') || '[]');
 let queue = JSON.parse(localStorage.getItem('queue') || '[]');
 
-// ===========================
-// GESTIONE PREFERITI (FAVORITES)
-// Uso un Set per efficienza: .has(), .add(), .delete() sono O(1)
-// I preferiti sono salvati in localStorage come array JSON
-// ===========================
 let favorites = new Set(JSON.parse(localStorage.getItem('radioFavorites') || '[]'));
 
-// Salva il Set dei preferiti in localStorage (converto in array perché JSON non supporta Set)
 function saveFavorites() {
   localStorage.setItem('radioFavorites', JSON.stringify([...favorites]));
 }
 
-// Aggiunge o rimuove una radio dai preferiti (toggle)
 function toggleFavorite(id) {
   if (favorites.has(id)) {
     favorites.delete(id);
@@ -1846,23 +1848,15 @@ function toggleFavorite(id) {
     showToast('⭐ Aggiunto ai preferiti!', 'success');
   }
   saveFavorites();
-  renderRadio(getCurrentFilter()); // aggiorna la griglia per mostrare la stellina aggiornata
+  renderRadio(getCurrentFilter());
 }
 
-// ===========================
-// RADIO BROWSER API
-// Usa un Cloudflare Worker come proxy per evitare problemi CORS
-// (il browser blocca richieste dirette da una pagina a un'API esterna)
-// ===========================
 const WORKER_URL = 'https://radioweb.xflyracer.workers.dev';
 
-// Funzione generica per chiamare il Worker (che fa da proxy verso Radio Browser API)
-// path: percorso dell'endpoint, es. "/json/stations/search?countrycode=IT..."
-// Restituisce l'array di stazioni, oppure [] in caso di errore
 async function rbFetch(path) {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 10000); // timeout 10 secondi
+    const timer = setTimeout(() => controller.abort(), 10000);
     const res = await fetch(WORKER_URL + '/radio' + path, { signal: controller.signal });
     clearTimeout(timer);
     if (res.ok) {
@@ -1875,35 +1869,26 @@ async function rbFetch(path) {
   return [];
 }
 
-// Converte un oggetto stazione dalla Radio Browser API
-// nel formato interno usato dall'app ({ id, name, genre, emoji, group, logo, url })
 function stationToRadio(s, group) {
   const originalUrl = s.url_resolved || s.url || '';
-  // Forza HTTPS: molti stream trasmettono su HTTP ma i browser moderni
-  // bloccano contenuto misto (HTTP dentro pagine HTTPS)
   const streamUrl = originalUrl.startsWith('https://')
     ? originalUrl
     : originalUrl.replace('http://', 'https://');
   return {
-    id:    'rb_' + s.stationuuid,  // prefisso 'rb_' per distinguere da radio custom
+    id:    'rb_' + s.stationuuid,
     name:   s.name.trim(),
     genre:  s.tags ? s.tags.split(',').slice(0,2).map(t => t.trim()).filter(Boolean).join(' / ') || s.country : s.country,
     emoji:  '📻',
-    group:  group,  // 'it' o 'int'
+    group:  group,
     logo:   s.favicon ? (s.favicon.startsWith('https://') ? s.favicon : s.favicon.replace('http://','https://')) : null,
     url:    streamUrl,
   };
 }
 
-// Funzione principale di caricamento radio.
-// Chiama il Worker 5 volte in parallelo (una per paese) per velocizzare il caricamento.
-// Poi deduplicano, filtrano RAI (blacklist), e costruiscono builtinRadios.
 async function fetchRadios() {
   const grid = document.getElementById('radioGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">📡 Caricamento radio...</div>';
 
-  // Fetch parallele: una per ogni paese (IT, GB, FR, DE, US)
-  // Promise.all aspetta che tutte finiscano prima di procedere
   const [itStations, gbStations, frStations, deStations, usStations] = await Promise.all([
     rbFetch('/json/stations/search?countrycode=IT&limit=100&hidebroken=true&order=votes&reverse=true'),
     rbFetch('/json/stations/search?countrycode=GB&limit=30&hidebroken=true&order=votes&reverse=true'),
@@ -1914,7 +1899,6 @@ async function fetchRadios() {
 
   const allStations = [...itStations, ...gbStations, ...frStations, ...deStations, ...usStations];
 
-  // Se non arriva nulla (API giù o offline), mostra messaggio di errore con pulsante riprova
   if (!allStations.length) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--accent);">
       ⚠️ Impossibile caricare le radio. Controlla la connessione.<br>
@@ -1923,99 +1907,70 @@ async function fetchRadios() {
     return;
   }
 
-  // Deduplicazione per stationuuid (lo stesso server può comparire in più paesi)
-  // + blacklist RAI (bloccano lo streaming esterno, meglio non mostrarle)
   const RAI_BLACKLIST = /\brai\b/i;
   const seen = new Set();
   builtinRadios = [];
   for (const s of allStations) {
-    if (seen.has(s.stationuuid)) continue;      // già vista, salto
+    if (seen.has(s.stationuuid)) continue;
     seen.add(s.stationuuid);
-    if (RAI_BLACKLIST.test(s.name)) continue;   // è RAI, salto
+    if (RAI_BLACKLIST.test(s.name)) continue;
     const group = s.countrycode === 'IT' ? 'it' : 'int';
     builtinRadios.push(stationToRadio(s, group));
   }
 
-  applyStoredOverrides(); // applica modifiche e stazioni nascoste dall'utente
-  renderRadio();          // disegna la griglia
+  applyStoredOverrides();
+  renderRadio();
 }
 
-// ===========================
-// NAVIGAZIONE TRA SEZIONI
-// Mostra una sezione e nasconde le altre.
-// Aggiorna anche il titolo nella topbar.
-// ===========================
 function showSection(name) {
-  // Rimuovo la classe active da tutte le sezioni e voci nav
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  // Attivo la sezione richiesta e la voce nav cliccata
   document.getElementById('section-' + name).classList.add('active');
   event.currentTarget.classList.add('active');
-  // Aggiorna il titolo nella topbar
   const titles = { radio: 'Radio Live', playlist: 'Playlist & YouTube', charts: 'Classifiche', news: 'Novità' };
   document.getElementById('pageTitle').textContent = titles[name] || name;
-  // Resetto la barra di ricerca quando cambio sezione
   const si = document.getElementById('searchInput');
   if (si) si.value = '';
-  // Lazy loading: carico i dati solo la prima volta che si va nella sezione
   if (name === 'playlist') renderPlaylist();
   if (name === 'charts') { if (!chartsLoaded) fetchCharts(); else renderCharts(); }
   if (name === 'news')   { if (!newsLoaded)   fetchNews();   else renderNews();   }
 }
 
-// Gestisce il cambio di tab dentro la sezione Playlist
 function switchTab(tabName, el) {
-  // Rimuove .active da tutte le tab
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  // Mostra/nasconde i tre pannelli
   document.getElementById('tab-playlists').style.display = tabName === 'playlists' ? '' : 'none';
   document.getElementById('tab-suggerite').style.display = tabName === 'suggerite' ? '' : 'none';
   document.getElementById('tab-queue').style.display = tabName === 'queue' ? '' : 'none';
-  // Popola il contenuto solo quando si va su quella tab
   if (tabName === 'queue') renderQueue();
   if (tabName === 'suggerite') renderSuggestedPlaylists();
 }
 
-// ===========================
-// LOGICA DELLE RADIO
-// Gestisce filtri, ordinamento e rendering della griglia
-// ===========================
-let radioGroupFilter = 'all'; // filtro attivo: 'all' | 'it' | 'int' | 'fav'
-let radioSortMode = 'default'; // ordinamento: 'default' | 'fav' | 'az' | 'za' | 'genre' | 'country'
+let radioGroupFilter = 'all';
+let radioSortMode = 'default';
 
-// Cambia la modalità di ordinamento e ridisegna la griglia
 function setRadioSort(mode) {
   radioSortMode = mode;
-  document.getElementById('searchInput').value = ''; // reset ricerca
+  document.getElementById('searchInput').value = '';
   renderRadio();
 }
 
-// Filtra le radio per gruppo (paese/preferiti) e ridisegna
 function filterRadioGroup(g) {
   radioGroupFilter = g;
   document.getElementById('searchInput').value = '';
-  // Resetta il colore di tutti i pulsanti filtro
   document.querySelectorAll('[id^="fg-"]').forEach(b => { b.style.borderColor=''; b.style.color=''; });
-  // Evidenzia il pulsante attivo
   document.getElementById('fg-' + g).style.borderColor = 'var(--accent2)';
   document.getElementById('fg-' + g).style.color = 'var(--accent2)';
-  // Aggiorna il titolo della sezione
   const titles = { all: 'Radio Italiane & Internazionali', it: '🇮🇹 Radio Italiane', int: '🌍 Radio Internazionali', fav: '⭐ Radio Preferite' };
   document.getElementById('radioSectionTitle').textContent = titles[g] || g;
   renderRadio();
 }
 
-// Restituisce l'URL del logo per una radio (se disponibile)
 function getLogoUrl(r) {
   if (r.logo) return r.logo;
-  return null; // nessun logo disponibile
+  return null;
 }
 
-// Genera l'HTML del logo di una radio:
-// - se ha un logo: <img> con fallback sull'emoji se l'immagine non carica
-// - altrimenti: solo l'emoji
 function renderRadioLogo(r) {
   const logo = r.logo || null;
   if (logo) {
@@ -2026,25 +1981,19 @@ function renderRadioLogo(r) {
   return `<span class="radio-logo-emoji">${r.emoji || '📻'}</span>`;
 }
 
-// Ridisegna tutta la griglia delle radio.
-// filter: stringa di ricerca opzionale per filtrare per nome/genere
 function renderRadio(filter = '') {
   const grid = document.getElementById('radioGrid');
-  // Prendo il pool ordinato (rispetta filtro gruppo + ordinamento)
   const pool = getOrderedPool();
-  // Applico eventuale filtro testuale
   const filtered = filter ? pool.filter(r => r.name.toLowerCase().includes(filter) || r.genre.toLowerCase().includes(filter)) : pool;
 
-  // Aggiorno il contatore stazioni
   const countEl = document.getElementById('stationCount');
   if (countEl) {
     const year = new Date().getFullYear();
     countEl.textContent = `${filtered.length} stazioni · Link verificati ${year}`;
   }
 
-  // Genero l'HTML di ogni card
   const cards = filtered.map((r, idx) => {
-    const isActive = currentRadio?.id === r.id; // è quella attualmente in play?
+    const isActive = currentRadio?.id === r.id;
     const btnIcon  = isActive && isPlaying ? '⏸' : '▶';
     return `<div class="radio-card ${isActive ? 'playing' : ''}" draggable="true"
               data-id="${r.id}" data-idx="${idx}" id="rc-${r.id}"
@@ -2064,7 +2013,6 @@ function renderRadio(filter = '') {
     </div>`;
   });
 
-  // Se nessun risultato, mostra messaggio
   if (cards.length === 0) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px;">🔍 Nessuna radio trovata per "' + filter + '"</div>';
   } else {
@@ -2072,9 +2020,6 @@ function renderRadio(filter = '') {
   }
 }
 
-
-// Proxy CORS: lista di servizi pubblici da usare in cascata se lo stream diretto non funziona.
-// Non sempre efficaci per stream continui, ma ci si prova.
 const CORS_PROXIES = [
   'https://cors-anywhere.herokuapp.com/',
   'https://corsproxy.io/?',
@@ -2082,9 +2027,6 @@ const CORS_PROXIES = [
   'https://thingproxy.freeboard.io/fetch/',
 ];
 
-// Avvia la riproduzione di una radio dato il suo ID.
-// fallbackIndex: indice dell'URL da provare (0 = principale, poi i fallback)
-// Se tutti gli URL falliscono, mostra un errore sulla card.
 function playRadio(id, fallbackIndex, useProxy) {
   const all = [...builtinRadios, ...customRadios];
   const radio = all.find(r => r.id === id);
@@ -2093,7 +2035,6 @@ function playRadio(id, fallbackIndex, useProxy) {
   const urls = [radio.url, ...(radio.fallbacks || [])];
   const urlIndex = fallbackIndex || 0;
 
-  // Nessun URL funziona: mostra errore sulla card
   if (urlIndex >= urls.length) {
     showToast('\u26a0\ufe0f ' + radio.name + ': stream non raggiungibile', 'error');
     const card = document.getElementById('rc-' + id);
@@ -2112,29 +2053,23 @@ function playRadio(id, fallbackIndex, useProxy) {
     return;
   }
 
-  // Se stava suonando YouTube, fermalo prima (evita sovrapposizione audio)
   if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
   document.getElementById('ytCard').style.display = 'none';
 
-  // Aggiorna lo stato globale
   currentMode = 'radio';
   currentRadio = radio;
 
-  // Resetta l'eventuale bordo di errore della card
   const card = document.getElementById('rc-' + id);
   if (card) { card.style.borderColor = ''; const e = card.querySelector('.stream-err'); if (e) e.remove(); }
 
   const streamUrl = urls[urlIndex];
 
-  // Gestione degli errori di stream:
-  // - safetyTimer: se dopo 10 secondi il player non ha emesso "playing", prova il prossimo URL
-  // - audio.onerror: se il browser riporta un errore diretto, prova il prossimo URL
   audio.onerror = null;
   let started = false;
   let errorFired = false;
 
   const onPlaying = () => { started = true; clearTimeout(safetyTimer); };
-  audio.addEventListener('playing', onPlaying, { once: true }); // ascolta l'evento una sola volta
+  audio.addEventListener('playing', onPlaying, { once: true });
 
   const tryNext = () => {
     if (errorFired) return;
@@ -2143,11 +2078,10 @@ function playRadio(id, fallbackIndex, useProxy) {
     destroyHls();
     if (!started && currentRadio && currentRadio.id === id) {
       audio.removeEventListener('playing', onPlaying);
-      playRadio(id, urlIndex + 1); // riprova con il prossimo URL
+      playRadio(id, urlIndex + 1);
     }
   };
 
-  // Timeout di sicurezza: se dopo 10s non parte, tenta il fallback
   const safetyTimer = setTimeout(() => {
     if (!started && currentRadio && currentRadio.id === id) tryNext();
   }, 10000);
@@ -2155,13 +2089,11 @@ function playRadio(id, fallbackIndex, useProxy) {
   audio.onerror = tryNext;
   playStream(streamUrl, tryNext);
 
-  // Aggiorna l'interfaccia del player
   isPlaying = true;
-  document.getElementById('playBtn').textContent = '\u23f8'; // ⏸
+  document.getElementById('playBtn').textContent = '\u23f8';
   const artEl = document.getElementById('playerArt');
   const logoUrl = getLogoUrl(radio);
   if (logoUrl) {
-    // Se ha un logo, lo metto come immagine nell'artwork del player
     artEl.innerHTML = '<img src="' + logoUrl + '" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.textContent=\'' + (radio.emoji||'\ud83d\udcfb') + '\'">';
   } else {
     artEl.textContent = radio.emoji || '\ud83d\udcfb';
@@ -2173,18 +2105,14 @@ function playRadio(id, fallbackIndex, useProxy) {
   document.getElementById('npSub').textContent = radio.genre;
   document.getElementById('timeDuration').textContent = 'LIVE';
 
-  renderRadio(getCurrentFilter()); // aggiorna la griglia per mostrare la card in stato "playing"
+  renderRadio(getCurrentFilter());
   if (urlIndex === 0) showToast('\u25b6 ' + radio.name + ' in riproduzione', 'success');
 }
 
-// Restituisce il testo attuale nella barra di ricerca (lowercase)
 function getCurrentFilter() {
   return (document.getElementById('searchInput')?.value || '').toLowerCase();
 }
 
-// Gestisce il click su una card radio:
-// - se è la radio in play → toggle play/pausa
-// - altrimenti → avvia la nuova radio
 function cardClick(id) {
   if (currentRadio && currentRadio.id === id && currentMode === 'radio') {
     if (isPlaying) {
@@ -2199,37 +2127,24 @@ function cardClick(id) {
       renderRadio(getCurrentFilter());
     }
   } else {
-    playRadio(id); // nuova radio
+    playRadio(id);
   }
 }
 
-// ===========================
-// DRAG & DROP PER RIORDINARE LE RADIO
-// L'ordine personalizzato viene salvato in localStorage
-// per persistere tra le sessioni
-// ===========================
-let dragSrcId = null; // ID della card che stiamo trascinando
+let dragSrcId = null;
 
-// Chiave localStorage per l'ordine del gruppo attualmente visualizzato
 function getOrderKey() {
   return 'radioOrder_' + radioGroupFilter;
 }
 
-// Restituisce il pool di radio ordinato secondo:
-// 1. Il filtro gruppo attivo (it / int / fav / all)
-// 2. La modalità di ordinamento (default/az/za/fav/genre/country)
-// 3. L'ordine di drag&drop salvato (solo in modalità 'default')
 function getOrderedPool() {
   let pool;
-  // Prima seleziono il subset di radio in base al filtro gruppo
   if (radioGroupFilter === 'fav')  pool = [...builtinRadios, ...customRadios].filter(r => favorites.has(r.id));
   else if (radioGroupFilter === 'it')  pool = [...builtinRadios.filter(r => r.group === 'it'), ...customRadios];
   else if (radioGroupFilter === 'int') pool = builtinRadios.filter(r => r.group === 'int');
   else pool = [...builtinRadios, ...customRadios];
 
-  // Poi applico l'ordinamento scelto dall'utente
   if (radioSortMode === 'fav') {
-    // Preferiti prima, poi per nome
     pool = [...pool].sort((a, b) => {
       const af = favorites.has(a.id) ? 0 : 1;
       const bf = favorites.has(b.id) ? 0 : 1;
@@ -2247,7 +2162,6 @@ function getOrderedPool() {
     pool = [...pool].sort((a, b) => (a.genre || '').localeCompare(b.genre || '', 'it'));
     return pool;
   } else if (radioSortMode === 'country') {
-    // Italiane prima, poi internazionali, poi alfabetico
     pool = [...pool].sort((a, b) => {
       const ag = a.group === 'it' ? 'it' : 'zz';
       const bg = b.group === 'it' ? 'it' : 'zz';
@@ -2257,52 +2171,44 @@ function getOrderedPool() {
     return pool;
   }
 
-  // Modalità 'default': usa l'ordine personalizzato salvato dal drag&drop
   const saved = JSON.parse(localStorage.getItem(getOrderKey()) || 'null');
-  if (!saved) return pool; // nessun ordine salvato → ordine API
-  // Costruisce una mappa posizione → id per ordinare velocemente
+  if (!saved) return pool;
   const idxMap = {};
   saved.forEach((id, i) => idxMap[id] = i);
   pool.sort((a, b) => {
-    const ia = idxMap[a.id] ?? 9999; // se non in mappa, va in fondo
+    const ia = idxMap[a.id] ?? 9999;
     const ib = idxMap[b.id] ?? 9999;
     return ia - ib;
   });
   return pool;
 }
 
-// Salva l'ordine corrente delle card nel localStorage
 function saveOrder(orderedIds) {
   localStorage.setItem(getOrderKey(), JSON.stringify(orderedIds));
 }
 
-// Evento drag start: memorizza l'ID della card trascinata e la rende semi-trasparente
 function dragStart(e) {
   dragSrcId = e.currentTarget.dataset.id;
-  e.currentTarget.style.opacity = '0.4'; // effetto visivo "la sto spostando"
+  e.currentTarget.style.opacity = '0.4';
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/plain', dragSrcId);
 }
 
-// Evento drag over: consente il drop e evidenzia la card target
 function dragOver(e) {
-  e.preventDefault(); // senza questo il drop non funziona
+  e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
   document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('drag-over'));
-  e.currentTarget.classList.add('drag-over'); // evidenzia la destinazione
+  e.currentTarget.classList.add('drag-over');
 }
 
-// Evento drop: riordina le card nell'array e salva il nuovo ordine
 function dragDrop(e) {
   e.preventDefault();
   const targetId = e.currentTarget.dataset.id;
-  if (!dragSrcId || dragSrcId === targetId) return; // niente da fare se stessa card
+  if (!dragSrcId || dragSrcId === targetId) return;
 
-  // Prendo l'ordine corrente dal DOM (quello visivo)
   const cards = [...document.querySelectorAll('.radio-card[data-id]')];
   const ids = cards.map(c => c.dataset.id);
 
-  // Sposto l'elemento: lo tolgo dalla posizione di partenza e lo inserisco in quella di destinazione
   const fromIdx = ids.indexOf(dragSrcId);
   const toIdx   = ids.indexOf(targetId);
   if (fromIdx < 0 || toIdx < 0) return;
@@ -2310,25 +2216,21 @@ function dragDrop(e) {
   ids.splice(fromIdx, 1);
   ids.splice(toIdx, 0, dragSrcId);
 
-  saveOrder(ids); // persiste in localStorage
-  renderRadio(document.getElementById('searchInput').value.toLowerCase()); // ridisegna
+  saveOrder(ids);
+  renderRadio(document.getElementById('searchInput').value.toLowerCase());
 }
 
-// Evento drag end: ripristina l'opacità e rimuove l'evidenziazione
 function dragEnd(e) {
   e.currentTarget.style.opacity = '';
   document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('drag-over'));
   dragSrcId = null;
 }
 
-// Mostra/nasconde il form per aggiungere una radio personalizzata
 function toggleAddForm() {
   const f = document.getElementById('addRadioForm');
   f.classList.toggle('visible');
 }
 
-// Aggiunge una radio personalizzata (inserita manualmente dall'utente)
-// e la salva in localStorage
 function addCustomRadio() {
   const name = document.getElementById('addName').value.trim();
   const url = document.getElementById('addUrl').value.trim();
@@ -2339,7 +2241,6 @@ function addCustomRadio() {
   customRadios.push(newRadio);
   localStorage.setItem('customRadios', JSON.stringify(customRadios));
   
-  // Pulisce i campi del form
   document.getElementById('addName').value = '';
   document.getElementById('addUrl').value = '';
   document.getElementById('addGenre').value = '';
@@ -2349,12 +2250,8 @@ function addCustomRadio() {
   showToast(`✅ ${name} aggiunta!`, 'success');
 }
 
-// ===========================
-// MODIFICA / ELIMINAZIONE RADIO
-// ===========================
-let editingRadioOriginal = null; // riferimento all'oggetto originale in fase di modifica
+let editingRadioOriginal = null;
 
-// Apre il modal di modifica precompilando i campi con i dati della radio
 function openEditRadio(id) {
   const all = [...builtinRadios, ...customRadios];
   const r = all.find(x => x.id === id);
@@ -2367,7 +2264,6 @@ function openEditRadio(id) {
   document.getElementById('editRadioGenre').value = r.genre;
   document.getElementById('editModalTitle').textContent = '✏️ ' + r.name;
 
-  // Mostra anteprima logo se disponibile
   const logoUrl = getLogoUrl(r);
   const previewDiv = document.getElementById('editLogoPreview');
   if (logoUrl) {
@@ -2382,9 +2278,6 @@ function openEditRadio(id) {
   openModal('editRadioModal');
 }
 
-// Salva le modifiche fatte nel modal di modifica.
-// - Per radio builtin: salva un "override" in localStorage (non tocca i dati originali dell'API)
-// - Per radio custom: aggiorna direttamente l'array customRadios
 function saveEditedRadio() {
   const id = document.getElementById('editRadioId').value;
   const name = document.getElementById('editRadioName').value.trim();
@@ -2396,16 +2289,13 @@ function saveEditedRadio() {
   const customIdx  = customRadios.findIndex(r => r.id === id);
 
   if (builtinIdx >= 0) {
-    // Radio builtin: salvo l'override separatamente per non sporcare i dati API
     let overrides = JSON.parse(localStorage.getItem('radioOverrides') || '{}');
     overrides[id] = { name, url, genre };
     localStorage.setItem('radioOverrides', JSON.stringify(overrides));
-    // Applico anche in-memory per effetto immediato senza ricaricare
     builtinRadios[builtinIdx].name  = name;
     builtinRadios[builtinIdx].url   = url;
     builtinRadios[builtinIdx].genre = genre;
   } else if (customIdx >= 0) {
-    // Radio custom: modifica diretta
     customRadios[customIdx].name  = name;
     customRadios[customIdx].url   = url;
     customRadios[customIdx].genre = genre;
@@ -2417,9 +2307,6 @@ function saveEditedRadio() {
   showToast('✅ ' + name + ' aggiornata!', 'success');
 }
 
-// Elimina una radio dopo conferma dell'utente.
-// - Radio builtin: la segna come "hidden" in localStorage (così non ricompare al prossimo caricamento)
-// - Radio custom: la rimuove dall'array
 function deleteRadio() {
   const id = document.getElementById('editRadioId').value;
   const name = document.getElementById('editRadioName').value;
@@ -2443,39 +2330,27 @@ function deleteRadio() {
   showToast('🗑 ' + name + ' rimossa', 'success');
 }
 
-// Applica gli override e le hidden list salvati in localStorage.
-// Chiamata subito dopo il caricamento delle radio dall'API.
 function applyStoredOverrides() {
   const overrides = JSON.parse(localStorage.getItem('radioOverrides') || '{}');
   const hidden = JSON.parse(localStorage.getItem('radioHidden') || '[]');
-  // Applica le modifiche
   for (const [id, data] of Object.entries(overrides)) {
     const r = builtinRadios.find(x => x.id === id);
     if (r) { r.name = data.name; r.url = data.url; r.genre = data.genre; }
   }
-  // Rimuove le radio nascoste dall'utente
   for (const id of hidden) {
     const idx = builtinRadios.findIndex(x => x.id === id);
     if (idx >= 0) builtinRadios.splice(idx, 1);
   }
 }
 
-// ===========================
-// CONTROLLI PLAYER
-// Gestiscono play/pausa, volume, navigazione nella coda
-// ===========================
-
-// Toggle play/pausa per la sorgente attiva (radio o YouTube)
 function togglePlay() {
-  if (currentMode === 'idle') return; // niente da fare
+  if (currentMode === 'idle') return;
   if (currentMode === 'youtube') {
     if (isPlaying) {
-      // Pausa YouTube: rimuovo l'iframe (unico modo per fermare l'audio)
       if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
       isPlaying = false;
       document.getElementById('playBtn').textContent = '▶';
     } else {
-      // Riprendi YouTube: ricreo l'iframe
       if (currentYTIndex >= 0 && queue[currentYTIndex]) {
         playYTAudio(queue[currentYTIndex].ytId, queue[currentYTIndex]);
         isPlaying = true;
@@ -2484,7 +2359,6 @@ function togglePlay() {
     }
     return;
   }
-  // Radio: uso le API standard HTML5 audio
   if (isPlaying) {
     audio.pause();
     destroyHls();
@@ -2499,36 +2373,28 @@ function togglePlay() {
   }
 }
 
-// Imposta il volume dell'elemento audio (0-100 → 0.0-1.0)
-function setVolume(v) {
-  audio.volume = v / 100;
-}
+function setVolume(v) { audio.volume = v / 100; }
 
-// Toggle mute: silenzia o riattiva l'audio
 function toggleMute() {
   isMuted = !isMuted;
   audio.muted = isMuted;
   document.querySelector('.volume-ctrl span').textContent = isMuted ? '🔇' : '🔊';
 }
 
-// Vai al brano precedente nella coda YouTube
 function prevTrack() {
   if (currentMode === 'youtube' && queue.length > 0) {
-    currentYTIndex = Math.max(0, currentYTIndex - 1); // non va sotto 0
+    currentYTIndex = Math.max(0, currentYTIndex - 1);
     playYT(currentYTIndex);
   }
 }
 
-// Vai al brano successivo nella coda YouTube
 function nextTrack() {
   if (currentMode === 'youtube' && queue.length > 0) {
-    currentYTIndex = Math.min(queue.length - 1, currentYTIndex + 1); // non supera la lunghezza
+    currentYTIndex = Math.min(queue.length - 1, currentYTIndex + 1);
     playYT(currentYTIndex);
   }
 }
 
-// Ascolta il progresso della riproduzione audio e aggiorna la barra di avanzamento
-// Questo evento si scatena molte volte al secondo durante la riproduzione
 audio.addEventListener('timeupdate', () => {
   if (audio.duration) {
     const pct = (audio.currentTime / audio.duration) * 100;
@@ -2538,41 +2404,30 @@ audio.addEventListener('timeupdate', () => {
   }
 });
 
-// Salta a una posizione nell'audio cliccando sulla barra di avanzamento
 function seekTo(e) {
-  if (!audio.duration) return; // stream live: non si può seekare
+  if (!audio.duration) return;
   const bar = document.getElementById('progressBar');
-  const rect = bar.getBoundingClientRect(); // dimensioni e posizione della barra nello schermo
-  const pct = (e.clientX - rect.left) / rect.width; // percentuale del click
+  const rect = bar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
   audio.currentTime = pct * audio.duration;
 }
 
-// Formatta secondi in "M:SS" (es. 125 → "2:05")
 function formatTime(s) {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-// ===========================
-// GESTIONE YOUTUBE / PLAYLIST
-// ===========================
-
-// Estrae l'ID di un video YouTube da un URL (funziona con youtube.com/watch?v= e youtu.be/)
 function getYTId(url) {
   const match = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return match ? match[1] : null;
 }
 
-// Funzioni di utilità per la generazione sicura di HTML
 function escAttr(s) { return (s || '').replace(/'/g, "&#39;").replace(/"/g, '&quot;'); }
 function formatSec(s) { if (!s) return ''; const m = Math.floor(s / 60), sec = s % 60; return m + ':' + sec.toString().padStart(2, '0'); }
 
-// Elemento selezionato nella ricerca YouTube (prima di aggiungerlo alla coda)
 let selectedYTItem = null;
 
-// Cerca video su YouTube tramite il Cloudflare Worker
-// Il Worker chiama l'API YouTube Data v3 con la chiave API sicura (non esposta al client)
 async function searchYT() {
   const q = document.getElementById('ytSearchInput').value.trim();
   if (!q) return;
@@ -2595,10 +2450,9 @@ async function searchYT() {
       throw new Error(err.error || 'HTTP ' + res.status);
     }
 
-    const videos = await res.json(); // array di { ytId, title, channel, dur, thumb }
+    const videos = await res.json();
     if (!videos.length) throw new Error('Nessun risultato');
 
-    // Popola la lista risultati con card cliccabili
     resultsDiv.innerHTML = '';
     videos.forEach(function(v) {
       const div = document.createElement('div');
@@ -2624,7 +2478,6 @@ async function searchYT() {
     });
 
   } catch(e) {
-    // Mostra errore con link diretto a YouTube come fallback
     resultsDiv.innerHTML =
       '<div style="color:var(--accent);font-size:13px;padding:12px;text-align:center;">' +
       '❌ ' + esc(e.message) + '<br><br>' +
@@ -2638,14 +2491,9 @@ async function searchYT() {
   btn.disabled = false;
 }
 
-// Formatta secondi in mm:ss
 function fmtSec(s) { s = parseInt(s); const m = Math.floor(s / 60), sec = s % 60; return m + ':' + (sec < 10 ? '0' : '') + sec; }
-
-// Escape HTML sicuro per evitare XSS (inserire HTML malevolo nel DOM)
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// Gestisce la selezione di un video dai risultati di ricerca.
-// Aggiorna l'anteprima e abilita il pulsante "Aggiungi alla coda".
 function selectYTItem(ytId, title, channel, duration) {
   selectedYTItem = { ytId, title, channel, duration };
   document.getElementById('ytSelThumb').src = 'https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg';
@@ -2655,10 +2503,9 @@ function selectYTItem(ytId, title, channel, duration) {
   document.getElementById('ytSelectedPreview').style.display = 'block';
   document.getElementById('ytPlaylistGroup').style.display = '';
   document.getElementById('btnAddYT').style.display = '';
-  document.getElementById('ytSearchResults').style.display = 'none'; // nasconde la lista risultati
+  document.getElementById('ytSearchResults').style.display = 'none';
 }
 
-// Resetta la selezione del video YouTube
 function clearSelection() {
   selectedYTItem = null;
   document.getElementById('ytSelectedPreview').style.display = 'none';
@@ -2666,12 +2513,9 @@ function clearSelection() {
   document.getElementById('btnAddYT').style.display = 'none';
 }
 
-// Quando l'utente incolla un URL YouTube diretto, prova a recuperarne i metadati
-// Usa noembed.com (API gratuita e senza autenticazione)
 let previewUrlTimeout;
 function previewYTUrl() {
   clearTimeout(previewUrlTimeout);
-  // Debounce: aspetto 600ms prima di fare la richiesta, per non spammare l'API mentre si digita
   previewUrlTimeout = setTimeout(async () => {
     const url = document.getElementById('ytUrlInput').value;
     const id = getYTId(url);
@@ -2681,19 +2525,15 @@ function previewYTUrl() {
       const data = await res.json();
       selectYTItem(id, data.title || 'Video YouTube', data.author_name || 'YouTube', '');
     } catch {
-      // Se noembed fallisce, uso titolo generico
       selectYTItem(id, 'Video YouTube', 'YouTube', '');
     }
   }, 600);
 }
 
-// Apre il modal di ricerca YouTube, preparando la select delle playlist
 function openAddYTModal() {
   const sel = document.getElementById('ytPlaylistSelect');
-  // Popola la select con le playlist esistenti dell'utente
   sel.innerHTML = '<option value="">Solo coda di riproduzione</option>' +
     playlists.map(p => '<option value="' + p.id + '">' + p.emoji + ' ' + p.name + '</option>').join('');
-  // Pulisce i campi e lo stato
   document.getElementById('ytSearchInput').value = '';
   document.getElementById('ytUrlInput').value = '';
   const rd = document.getElementById('ytSearchResults');
@@ -2703,9 +2543,7 @@ function openAddYTModal() {
   openModal('ytModal');
 }
 
-// Aggiunge il video selezionato alla coda (e opzionalmente a una playlist)
 function addYTToQueue() {
-  // Se non c'è una selezione esplicita, prova a usare l'URL incollato
   if (!selectedYTItem) {
     const url = document.getElementById('ytUrlInput').value;
     const id = getYTId(url);
@@ -2713,7 +2551,6 @@ function addYTToQueue() {
     selectedYTItem = { ytId: id, title: 'Video YouTube', channel: 'YouTube', duration: '' };
   }
 
-  // Costruisce l'oggetto elemento della coda
   const item = {
     id: 'yt' + Date.now(),
     ytId: selectedYTItem.ytId,
@@ -2725,7 +2562,6 @@ function addYTToQueue() {
   queue.push(item);
   localStorage.setItem('queue', JSON.stringify(queue));
 
-  // Se l'utente ha scelto anche una playlist, aggiunge lì il brano
   const plId = document.getElementById('ytPlaylistSelect').value;
   if (plId) {
     const pl = playlists.find(p => p.id === plId);
@@ -2739,18 +2575,13 @@ function addYTToQueue() {
   showToast('✅ "' + item.title + '" aggiunto!', 'success');
 }
 
-// ===========================
-// GESTIONE CODA DI RIPRODUZIONE
-// ===========================
-
-// Ridisegna la lista degli elementi in coda
 function renderQueue() {
   const list = document.getElementById('queueList');
   const empty = document.getElementById('queueEmpty');
   const btnClear = document.getElementById('btnClearQueue');
   if (queue.length === 0) {
     list.innerHTML = '';
-    empty.style.display = ''; // mostra il messaggio "coda vuota"
+    empty.style.display = '';
     if (btnClear) btnClear.style.display = 'none';
     return;
   }
@@ -2769,26 +2600,18 @@ function renderQueue() {
   ).join('');
 }
 
-// ===========================
-// RIPRODUZIONE YOUTUBE (AUDIO-ONLY)
-// Non usiamo l'API ufficiale YouTube IFrame Player.
-// Usiamo un iframe nascosto con autoplay=1.
-// Il browser può bloccare l'autoplay su mobile se non c'è interazione utente.
-// ===========================
+let ytAudioFrame = null;
 
-// Avvia la riproduzione di un brano YouTube dalla coda dato il suo indice
 function playYT(index) {
   if (index < 0 || index >= queue.length) return;
   const item = queue[index];
   currentYTIndex = index;
   currentMode = 'youtube';
 
-  // Ferma la radio (se era in play) incluso HLS
   audio.pause();
   audio.src = '';
   destroyHls();
 
-  // Aggiorna la card YouTube in sovrimpressione
   const card = document.getElementById('ytCard');
   document.getElementById('ytCardThumb').src = 'https://img.youtube.com/vi/' + item.ytId + '/mqdefault.jpg';
   document.getElementById('ytCardTitle').textContent = item.title;
@@ -2796,11 +2619,10 @@ function playYT(index) {
   document.getElementById('ytCardLink').href = 'https://www.youtube.com/watch?v=' + item.ytId;
   card.style.display = 'flex';
 
-  // Aggiorna il player bar in basso
   document.getElementById('playerArt').textContent = '🎵';
   document.getElementById('playerTrack').textContent = item.title;
   document.getElementById('playerStation').textContent = item.channel || 'YouTube';
-  document.getElementById('liveBadge').style.display = 'none'; // YouTube non è LIVE
+  document.getElementById('liveBadge').style.display = 'none';
   document.getElementById('npTitle').textContent = item.title;
   document.getElementById('npSub').textContent = item.channel || 'YouTube';
   document.getElementById('playBtn').textContent = '⏸';
@@ -2809,22 +2631,11 @@ function playYT(index) {
   document.getElementById('timeDuration').textContent = item.duration || '—';
   isPlaying = true;
 
-  playYTAudio(item.ytId, item); // avvia la riproduzione tramite iframe
-
-  renderQueue(); // aggiorna la coda per mostrare la freccia "►" sulla riga attiva
+  playYTAudio(item.ytId, item);
+  renderQueue();
   showToast('▶ ' + item.title, 'success');
 }
 
-// Riproduce l'audio YouTube tramite iframe nascosto.
-// Tecnica: creo un iframe 1x1px con opacity quasi zero (non zero! altrimenti i browser
-// lo bloccano come tentativo di autoplay nascosto).
-// L'iframe incorpora il player YouTube embed con autoplay=1.
-// I parametri sono:
-//   autoplay=1      → avvio automatico
-//   playsinline=1   → FONDAMENTALE su iOS Safari, senza questo tenta il fullscreen
-//   mute=0          → voglio l'audio
-//   controls=0      → nasconde i controlli video dell'iframe
-let ytAudioFrame = null;
 function playYTAudio(ytId, item) {
   if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
 
@@ -2833,14 +2644,11 @@ function playYTAudio(ytId, item) {
   f.src = 'https://www.youtube.com/embed/' + ytId + '?' + params;
   f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
   f.setAttribute('allowfullscreen', '');
-  // opacity:0.01 (non 0) + dimensioni 1x1px = invisibile ma "visibile" per il browser
   f.style.cssText = 'position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0.01;border:none;pointer-events:none;z-index:-1;';
-
   document.body.appendChild(f);
   ytAudioFrame = f;
 }
 
-// Chiude la card YouTube e ferma la riproduzione
 function closeYT() {
   document.getElementById('ytCard').style.display = 'none';
   if (ytAudioFrame) { ytAudioFrame.remove(); ytAudioFrame = null; }
@@ -2851,7 +2659,6 @@ function closeYT() {
   }
 }
 
-// Svuota tutta la coda dopo conferma
 function clearQueue() {
   if (!confirm('Svuotare tutta la coda?')) return;
   queue = [];
@@ -2861,30 +2668,22 @@ function clearQueue() {
   renderQueue();
 }
 
-// Rimuove un singolo elemento dalla coda per indice
 function removeFromQueue(i) {
   queue.splice(i, 1);
   localStorage.setItem('queue', JSON.stringify(queue));
-  // Aggiusta l'indice corrente se l'elemento rimosso era prima di quello in play
   if (i < currentYTIndex) currentYTIndex--;
   renderQueue();
 }
 
-// ===========================
-// GESTIONE PLAYLIST UTENTE
-// ===========================
-
-// Apre il modal per creare una nuova playlist
 function openNewPlaylistModal() {
   document.getElementById('plName').value = '';
   document.getElementById('plEmoji').value = '';
   openModal('plModal');
 }
 
-// Crea una nuova playlist e la salva in localStorage
 function createPlaylist() {
   const name = document.getElementById('plName').value.trim();
-  const emoji = document.getElementById('plEmoji').value.trim() || '🎵'; // emoji di default
+  const emoji = document.getElementById('plEmoji').value.trim() || '🎵';
   if (!name) return showToast('Inserisci un nome', 'error');
   playlists.push({ id: 'pl' + Date.now(), name, emoji, tracks: [] });
   localStorage.setItem('playlists', JSON.stringify(playlists));
@@ -2893,54 +2692,125 @@ function createPlaylist() {
   showToast('✅ Playlist "' + name + '" creata!', 'success');
 }
 
-// Ridisegna la lista delle playlist dell'utente
+// ============================================================
+// RENDER PLAYLIST CON ACCORDION (brani visibili)
+// ============================================================
 function renderPlaylist() {
   const list = document.getElementById('playlistList');
   if (playlists.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">🎵 Nessuna playlist. Creane una!</div>';
     return;
   }
-  list.innerHTML = playlists.map((pl, i) =>
-    '<div class="playlist-card">' +
-      '<div class="playlist-thumb">' + pl.emoji + '</div>' +
-      '<div class="playlist-info">' +
-        '<div class="playlist-name">' + pl.name + '</div>' +
-        '<div class="playlist-count">' + (pl.tracks || []).length + ' brani</div>' +
-      '</div>' +
-      '<div class="playlist-actions">' +
-        '<button class="btn btn-primary btn-sm" onclick="playPlaylist(' + i + ')">▶ Play</button>' +
-        '<button class="btn btn-secondary btn-sm" onclick="openAddYTToPlaylist(' + i + ')">+ Brano</button>' +
-        '<button class="btn btn-secondary btn-sm" onclick="deletePlaylist(' + i + ')">🗑</button>' +
-      '</div>' +
-    '</div>'
-  ).join('');
+  list.innerHTML = playlists.map((pl, i) => {
+    const trackCount = (pl.tracks || []).length;
+    return `
+      <div class="playlist-card" id="pl-card-${i}">
+        <div class="playlist-card-header" onclick="togglePlaylistTracks(${i})">
+          <div class="playlist-thumb">${pl.emoji}</div>
+          <div class="playlist-info">
+            <div class="playlist-name">${esc(pl.name)}</div>
+            <div class="playlist-count">${trackCount} brani</div>
+          </div>
+          <div class="playlist-actions" onclick="event.stopPropagation()">
+            <button class="btn btn-primary btn-sm" onclick="playPlaylist(${i})">▶ Play</button>
+            <button class="btn btn-secondary btn-sm" onclick="openAddYTToPlaylist(${i})">+ Brano</button>
+            <button class="btn btn-secondary btn-sm" onclick="deletePlaylist(${i})">🗑</button>
+          </div>
+          <span class="playlist-chevron">▶</span>
+        </div>
+        <div class="playlist-tracks" id="pl-tracks-${i}">
+          ${renderPlaylistTracks(pl, i)}
+        </div>
+      </div>`;
+  }).join('');
 }
 
-// Apre il modal YouTube preselezionando la playlist a cui aggiungere il brano
+// Genera l'HTML dei brani dentro una playlist
+function renderPlaylistTracks(pl, plIdx) {
+  const tracks = pl.tracks || [];
+  if (tracks.length === 0) {
+    return `<div class="playlist-tracks-empty">
+      Nessun brano ancora. Clicca <strong>+ Brano</strong> per aggiungerne uno!
+    </div>`;
+  }
+  const header = `
+    <div class="playlist-tracks-header">
+      <span class="playlist-tracks-label">${tracks.length} brani</span>
+      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();playPlaylist(${plIdx})" style="font-size:12px;padding:4px 10px;">▶ Riproduci tutto</button>
+    </div>`;
+  const rows = tracks.map((t, ti) => `
+    <div class="playlist-track-item" onclick="playTrackFromPlaylist(${plIdx}, ${ti})">
+      <div class="playlist-track-num">${ti + 1}</div>
+      <div class="playlist-track-thumb">
+        <img src="https://img.youtube.com/vi/${t.ytId}/mqdefault.jpg" alt="" loading="lazy">
+      </div>
+      <div class="playlist-track-info">
+        <div class="playlist-track-title">${esc(t.title)}</div>
+        <div class="playlist-track-channel">${esc(t.channel || '')}</div>
+      </div>
+      ${t.duration ? `<div class="playlist-track-dur">${esc(t.duration)}</div>` : ''}
+      <button class="playlist-track-remove" onclick="event.stopPropagation();removeTrackFromPlaylist(${plIdx}, ${ti})" title="Rimuovi">✕</button>
+    </div>`).join('');
+  return header + rows;
+}
+
+// Apre/chiude l'accordion della playlist
+function togglePlaylistTracks(i) {
+  const card = document.getElementById('pl-card-' + i);
+  card.classList.toggle('open');
+}
+
+// Riproduce un singolo brano da una playlist (carica tutto in coda, parte da quel punto)
+function playTrackFromPlaylist(plIdx, trackIdx) {
+  const pl = playlists[plIdx];
+  if (!pl || !pl.tracks || !pl.tracks[trackIdx]) return;
+  queue = [...pl.tracks];
+  localStorage.setItem('queue', JSON.stringify(queue));
+  playYT(trackIdx);
+  // Naviga alla sezione playlist → coda
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-playlist').classList.add('active');
+  document.querySelectorAll('.nav-item')[1].classList.add('active');
+  document.getElementById('pageTitle').textContent = 'Playlist & YouTube';
+  const tabs = document.querySelectorAll('.tab');
+  switchTab('queue', tabs[2]);
+}
+
+// Rimuove un singolo brano da una playlist
+function removeTrackFromPlaylist(plIdx, trackIdx) {
+  if (!playlists[plIdx]) return;
+  playlists[plIdx].tracks = playlists[plIdx].tracks || [];
+  playlists[plIdx].tracks.splice(trackIdx, 1);
+  localStorage.setItem('playlists', JSON.stringify(playlists));
+  renderPlaylist();
+  // Mantieni aperta la card dopo la rimozione
+  const card = document.getElementById('pl-card-' + plIdx);
+  if (card) card.classList.add('open');
+  showToast('Brano rimosso dalla playlist', 'success');
+}
+
 let addingToPlaylistIndex = -1;
 function openAddYTToPlaylist(i) {
   addingToPlaylistIndex = i;
   openAddYTModal();
   setTimeout(() => {
     const sel = document.getElementById('ytPlaylistSelect');
-    if (sel && playlists[i]) sel.value = playlists[i].id; // preseleziona la playlist
+    if (sel && playlists[i]) sel.value = playlists[i].id;
   }, 50);
 }
 
-// Carica tutti i brani di una playlist nella coda e avvia la riproduzione dal primo
 function playPlaylist(i) {
   const pl = playlists[i];
   if (!pl.tracks || pl.tracks.length === 0) return showToast('Playlist vuota. Aggiungi dei brani!', 'error');
-  queue = [...pl.tracks]; // copia i brani nella coda
+  queue = [...pl.tracks];
   localStorage.setItem('queue', JSON.stringify(queue));
-  // Naviga al tab "Coda di riproduzione"
   const tabs = document.querySelectorAll('.tab');
   switchTab('queue', tabs[2]);
   renderQueue();
-  playYT(0); // parte dal primo brano
+  playYT(0);
 }
 
-// Elimina una playlist dopo conferma
 function deletePlaylist(i) {
   if (!confirm('Eliminare la playlist "' + playlists[i].name + '"?')) return;
   playlists.splice(i, 1);
@@ -2949,12 +2819,6 @@ function deletePlaylist(i) {
   showToast('Playlist eliminata', 'success');
 }
 
-
-// ===========================
-// PLAYLIST SUGGERITE PER GENERE
-// Una collezione di playlist predefinite che l'utente può avviare con un click.
-// Ogni voce ha una query YouTube associata che viene cercata tramite il Worker.
-// ===========================
 const suggestedPlaylists = [
   { emoji: '🇮🇹', name: 'Hits Italiane',     desc: 'Il meglio della musica italiana',  ytQuery: 'hits italiane 2024 mix' },
   { emoji: '🎸', name: 'Rock Classics',       desc: 'I classici del rock',               ytQuery: 'rock classics best songs mix' },
@@ -2966,32 +2830,31 @@ const suggestedPlaylists = [
   { emoji: '🎤', name: 'Hip Hop & Rap',        desc: 'Il meglio dell hip hop',             ytQuery: 'hip hop rap best mix 2024' },
 ];
 
-// Ridisegna la griglia delle playlist suggerite
 function renderSuggestedPlaylists() {
   const grid = document.getElementById('suggesteGrid');
   if (!grid) return;
   grid.innerHTML = suggestedPlaylists.map((sp, i) => `
     <div class="playlist-card" style="cursor:pointer;">
-      <div class="playlist-thumb" style="font-size:28px;">${sp.emoji}</div>
-      <div class="playlist-info">
-        <div class="playlist-name">${sp.name}</div>
-        <div class="playlist-count">${sp.desc}</div>
-      </div>
-      <div class="playlist-actions">
-        <button class="btn btn-primary btn-sm" onclick="filterBySuggested(${i})">📻 Ascolta</button>
+      <div class="playlist-card-header" style="cursor:default;">
+        <div class="playlist-thumb" style="font-size:28px;">${sp.emoji}</div>
+        <div class="playlist-info">
+          <div class="playlist-name">${sp.name}</div>
+          <div class="playlist-count">${sp.desc}</div>
+        </div>
+        <div class="playlist-actions">
+          <button class="btn btn-primary btn-sm" onclick="filterBySuggested(${i})">📻 Ascolta</button>
+        </div>
       </div>
     </div>
   `).join('');
 }
 
-// Cerca video YouTube per una playlist suggerita e li aggiunge alla coda
 async function filterBySuggested(idx) {
   const sp = suggestedPlaylists[idx];
   if (!sp) return;
 
   showToast('🔎 Cerco canzoni per "' + sp.name + '"...', 'success');
 
-  // Naviga alla sezione Playlist → tab Coda
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('section-playlist').classList.add('active');
@@ -3000,7 +2863,6 @@ async function filterBySuggested(idx) {
   const tabs = document.querySelectorAll('.tab');
   switchTab('queue', tabs[2]);
 
-  // Cerca tramite Worker e aggiunge i risultati alla coda
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
@@ -3011,7 +2873,6 @@ async function filterBySuggested(idx) {
     const videos = await res.json();
     if (!videos || !videos.length) throw new Error('Nessun risultato');
 
-    // Converto i video nel formato della coda
     const newItems = videos.map(v => ({
       id:       'yt' + Date.now() + Math.random(),
       ytId:     v.ytId,
@@ -3021,7 +2882,6 @@ async function filterBySuggested(idx) {
       url:      'https://www.youtube.com/watch?v=' + v.ytId,
     }));
 
-    // Aggiungo alla coda esistente (non sostituisco)
     queue = [...queue, ...newItems];
     localStorage.setItem('queue', JSON.stringify(queue));
     renderQueue();
@@ -3030,7 +2890,6 @@ async function filterBySuggested(idx) {
 
     showToast('✅ ' + newItems.length + ' brani aggiunti per "' + sp.name + '"', 'success');
 
-    // Avvia il primo brano appena aggiunto
     if (newItems.length > 0) {
       const startIdx = queue.length - newItems.length;
       playYT(startIdx);
@@ -3041,10 +2900,6 @@ async function filterBySuggested(idx) {
   }
 }
 
-// ===========================
-// RICERCA GLOBALE
-// Filtra il contenuto della sezione attiva in base al testo inserito
-// ===========================
 function handleSearch() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   const activeSection = document.querySelector('.section.active')?.id;
@@ -3053,18 +2908,10 @@ function handleSearch() {
   if (activeSection === 'section-news')    renderNews(q);
 }
 
-// ===========================
-// CLASSIFICHE — iTunes RSS Feed
-// Carica le classifiche Top 25 Canzoni da Italia e USA.
-// Il feed è pubblico e aggiornato continuamente da Apple/iTunes.
-// ===========================
-// chartsData ora è diviso per fonte: .it e .global
-// Ogni entry ha: pos, song, artist, art, link, feedKey
 let chartsData = { it: [], global: [] };
 let chartsLoaded = false;
 
 async function fetchCharts() {
-  // Mostra loading in entrambe le colonne
   document.getElementById('chartListIT').innerHTML     = '<div style="text-align:center;padding:48px;color:var(--text3);">⏳ Caricamento...</div>';
   document.getElementById('chartListGlobal').innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);">⏳ Caricamento...</div>';
 
@@ -3075,7 +2922,6 @@ async function fetchCharts() {
 
   chartsData = { it: [], global: [] };
 
-  // Fetch parallelo: le due chiamate partono contemporaneamente
   await Promise.all(feeds.map(async feed => {
     try {
       const controller = new AbortController();
@@ -3087,10 +2933,10 @@ async function fetchCharts() {
       const entries = data?.feed?.entry || [];
       entries.forEach((e, i) => {
         chartsData[feed.key].push({
-          pos:    i + 1,                              // posizione 1-25 per ogni colonna
+          pos:    i + 1,
           song:   e['im:name']?.label || '—',
           artist: e['im:artist']?.label || '—',
-          art:    e['im:image']?.[1]?.label || '',    // copertina 60x60
+          art:    e['im:image']?.[1]?.label || '',
           link:   e?.link?.attributes?.href || '#',
           feedKey: feed.key,
         });
@@ -3105,10 +2951,7 @@ async function fetchCharts() {
   renderCharts();
 }
 
-// Genera l'HTML di una singola riga della classifica.
-// feedKey serve per identificare correttamente il brano quando si clicca "+"
 function renderChartItem(c, feedKey) {
-  // Creo una chiave composta per ritrovare il brano nell'array giusto
   const key = feedKey + '_' + (c.pos - 1);
   return `
     <div class="chart-item" style="padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);"
@@ -3130,8 +2973,6 @@ function renderChartItem(c, feedKey) {
     </div>`;
 }
 
-// Ridisegna entrambe le colonne classifiche.
-// Il filtro testuale viene applicato a entrambe le liste.
 function renderCharts(filter = '') {
   if (!chartsLoaded) { fetchCharts(); return; }
 
@@ -3149,8 +2990,6 @@ function renderCharts(filter = '') {
   });
 }
 
-// Recupera il brano giusto dalla chiave composta "feedKey_indice"
-// e apre la ricerca YouTube precompilata
 function addChartToPlaylistByKey(key) {
   const [feedKey, idxStr] = key.split('_');
   const c = chartsData[feedKey]?.[parseInt(idxStr)];
@@ -3162,16 +3001,8 @@ function addChartToPlaylistByKey(key) {
   }, 100);
 }
 
-// Manteniamo anche questa funzione per compatibilità con eventuali chiamate dirette
-function addChartToPlaylist(idx) {
-  // Non più usata direttamente, ma la lascio come fallback
-}
+function addChartToPlaylist(idx) {}
 
-// ===========================
-// NOTIZIE MUSICALI — RSS Feed
-// Carica notizie da tre fonti: Rockol (IT), NME (UK), Billboard (USA).
-// Usa rss2json.com come middleware per convertire RSS → JSON con CORS abilitato.
-// ===========================
 let newsData = [];
 let newsLoaded = false;
 
@@ -3183,9 +3014,6 @@ const NEWS_FEEDS = [
 
 const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
-// Carica tutte le notizie da tutti i feed in parallelo.
-// Promise.allSettled garantisce che se un feed fallisce,
-// gli altri vengono comunque mostrati.
 async function fetchNews() {
   const el = document.getElementById('newsGrid');
   el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);">📰 Caricamento notizie...</div>';
@@ -3204,16 +3032,14 @@ async function fetchNews() {
     })
   );
 
-  // Processa solo le promesse risolte con successo
   results.forEach(r => {
     if (r.status === 'fulfilled') {
-      r.value.items.slice(0, 6).forEach(item => { // max 6 notizie per fonte
+      r.value.items.slice(0, 6).forEach(item => {
         newsData.push({
           tag:   r.value.tag,
           title: item.title || '',
           date:  item.pubDate ? new Date(item.pubDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
           link:  item.link || '#',
-          // Cerca l'immagine in vari campi possibili del feed (thumbnail, enclosure, content)
           img:   item.thumbnail || item.enclosure?.link || item.enclosure?.url || (item.content ? (item.content.match(/<img[^>]+src=["']([^"']+)["']/i)||[])[1] : '') || '',
           desc:  item.description ? item.description.replace(/<[^>]+>/g, '').slice(0, 100) + '...' : '',
         });
@@ -3221,14 +3047,11 @@ async function fetchNews() {
     }
   });
 
-  // Ordina le notizie dalla più recente alla più vecchia
   newsData.sort((a, b) => new Date(b.date) - new Date(a.date));
-
   newsLoaded = true;
   renderNews();
 }
 
-// Ridisegna la griglia notizie con eventuale filtro testuale
 function renderNews(filter = '') {
   const el = document.getElementById('newsGrid');
   if (!newsLoaded) { fetchNews(); return; }
@@ -3247,8 +3070,6 @@ function renderNews(filter = '') {
     <div class="news-card">
       <div class="news-img" style="background:linear-gradient(135deg,var(--bg3),var(--bg2));padding:0;overflow:hidden;">
         ${n.img
-          // Tenta di caricare l'immagine; se fallisce, prova via proxy wsrv.nl
-          // Se anche quello fallisce, mostra l'emoji 📰
           ? `<img src="${n.img}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.src='https://wsrv.nl/?url='+encodeURIComponent('${n.img}')+'&w=400&h=200&fit=cover';this.onerror=function(){this.style.display='none';this.parentElement.querySelector('.news-fallback').style.display='flex'}">`
           : ''}
         <div class="news-fallback" style="display:${n.img ? 'none' : 'flex'};align-items:center;justify-content:center;width:100%;height:100%;font-size:48px;position:absolute;inset:0;">📰</div>
@@ -3263,52 +3084,82 @@ function renderNews(filter = '') {
   `).join('');
 }
 
-// ===========================
-// GESTIONE MODAL
-// Funzioni generiche per aprire e chiudere qualunque modal
-// ===========================
 function openModal(id) { document.getElementById(id).classList.add('visible'); }
 function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
 
-// Chiude il modal cliccando fuori dal box (sull'overlay semitrasparente)
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('visible'); });
 });
 
-// ===========================
-// TOAST (notifiche temporanee)
-// Mostra un messaggio per 3 secondi poi scompare
-// ===========================
+// ===== POPUP CONTATTO =====
+function openContactPopup() {
+  document.getElementById('contactPopup').classList.add('visible');
+}
+function closeContactPopup() {
+  document.getElementById('contactPopup').classList.remove('visible');
+}
+
+// ===== MOBILE DRAWER =====
+function openDrawer() {
+  document.getElementById('drawerOverlay').classList.add('visible');
+  document.getElementById('mobileDrawer').classList.add('visible');
+  document.getElementById('moreTab').classList.add('active');
+}
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('visible');
+  document.getElementById('mobileDrawer').classList.remove('visible');
+  document.getElementById('moreTab').classList.remove('active');
+}
+// Mostra il 5° tab solo su mobile
+function checkMobileTab() {
+  const moreTab = document.getElementById('moreTab');
+  if (window.innerWidth <= 768) {
+    moreTab.style.display = '';
+  } else {
+    moreTab.style.display = 'none';
+    closeDrawer();
+  }
+}
+window.addEventListener('resize', checkMobileTab);
+checkMobileTab();
+
 let toastTimer;
 function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = `toast ${type} show`; // aggiunge le classi per renderlo visibile
-  clearTimeout(toastTimer);           // annulla il timer precedente (se ancora attivo)
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000); // scompare dopo 3s
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ===========================
-// INIZIALIZZAZIONE APP
-// Eseguita subito al caricamento della pagina
-// ===========================
-
-// Applica il contenuto del CONFIG al logo nella sidebar
 document.getElementById('logoSub').innerHTML = CONFIG.subtitle + '<br><span style="background:#1a6aff;color:white;letter-spacing:4px;font-size:9px;padding:1px 6px;border-radius:3px;">JEAN VERSION</span>';
 document.getElementById('logoSub').style.color  = CONFIG.subtitleColor;
-document.getElementById('logoVer').style.display = 'none'; // nascondo il numero versione
+document.getElementById('logoVer').style.display = 'none';
 
-// Carica le playlist salvate e le mostra nella sezione Playlist
 renderPlaylist();
-
-// Avvia il fetch delle radio dall'API (operazione asincrona)
-// La griglia mostra un messaggio "Caricamento..." finché non arriva la risposta
 fetchRadios();
 </script>
 
-<!-- Tracciamento statistiche invisibile con ShinyStat
-     Carica una singola immagine 1x1px al caricamento della pagina
-     per contare le visite. Non blocca il rendering. -->
+<!-- ========= MOBILE DRAWER ========= -->
+<div class="mobile-drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-handle"></div>
+  <button class="drawer-item" onclick="closeDrawer(); openContactPopup();" style="width:calc(100% - 32px);border:1px solid var(--border);background:var(--bg3);text-align:left;">
+    <span class="drawer-item-icon">💡</span>
+    <span>
+      <span class="drawer-item-label">Suggerisci una modifica</span>
+      <span class="drawer-item-sub">Invia un'idea o segnala un bug</span>
+    </span>
+  </button>
+  <a class="drawer-item" href="https://www.paypal.com/paypalme/xflyracer" target="_blank" rel="noopener" onclick="closeDrawer()">
+    <span class="drawer-item-icon">☕</span>
+    <span>
+      <span class="drawer-item-label">Offrimi un caffè</span>
+      <span class="drawer-item-sub">PayPal · paypal.me/xflyracer</span>
+    </span>
+  </a>
+</div>
+
 <script>
 (function(){
   try {
