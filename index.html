@@ -1006,6 +1006,26 @@ body::before {
 .player-track { font-size: 14px; font-weight: 600; color: var(--text); }
 .player-station { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
 
+/* Titolo canzone in riproduzione: testo scorrevole se troppo lungo */
+.player-nowplaying {
+  font-size: 11px;
+  color: var(--accent3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 3px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.player-nowplaying::before {
+  content: '♪';
+  flex-shrink: 0;
+  font-size: 10px;
+}
+
 .player-controls {
   display: flex;
   align-items: center;
@@ -1618,6 +1638,7 @@ body::before {
     <div>
       <div class="player-track" id="playerTrack">Seleziona una radio</div>
       <div class="player-station" id="playerStation">Radio </div>
+      <div class="player-nowplaying" id="playerNowPlaying" style="display:none;"></div>
     </div>
     <span class="badge live" id="liveBadge" style="display:none"><span class="live-dot"></span>LIVE</span>
   </div>
@@ -2109,6 +2130,7 @@ function playRadio(id, fallbackIndex, useProxy) {
 
   renderRadio(getCurrentFilter());
   if (urlIndex === 0) showToast('\u25b6 ' + radio.name + ' in riproduzione', 'success');
+  if (urlIndex === 0) startNowPlayingPolling();
 }
 
 function getCurrentFilter() {
@@ -2367,11 +2389,13 @@ function togglePlay() {
     isPlaying = false;
     document.getElementById('playBtn').textContent = '▶';
     renderRadio(getCurrentFilter());
+    stopNowPlayingPolling();
   } else {
     audio.play();
     isPlaying = true;
     document.getElementById('playBtn').textContent = '⏸';
     renderRadio(getCurrentFilter());
+    startNowPlayingPolling();
   }
 }
 
@@ -2613,7 +2637,7 @@ function playYT(index) {
   audio.pause();
   audio.src = '';
   destroyHls();
-
+  stopNowPlayingPolling();
   const card = document.getElementById('ytCard');
   document.getElementById('ytCardThumb').src = 'https://img.youtube.com/vi/' + item.ytId + '/mqdefault.jpg';
   document.getElementById('ytCardTitle').textContent = item.title;
@@ -2625,6 +2649,7 @@ function playYT(index) {
   document.getElementById('playerTrack').textContent = item.title;
   document.getElementById('playerStation').textContent = item.channel || 'YouTube';
   document.getElementById('liveBadge').style.display = 'none';
+  document.getElementById('playerNowPlaying').style.display = 'none';
   document.getElementById('npTitle').textContent = item.title;
   document.getElementById('npSub').textContent = item.channel || 'YouTube';
   document.getElementById('playBtn').textContent = '⏸';
@@ -3142,6 +3167,76 @@ function showToast(msg, type = 'success') {
 document.getElementById('logoSub').innerHTML = CONFIG.subtitle + '<br><span style="background:#1a6aff;color:white;letter-spacing:4px;font-size:9px;padding:1px 6px;border-radius:3px;">JEAN VERSION</span>';
 document.getElementById('logoSub').style.color  = CONFIG.subtitleColor;
 document.getElementById('logoVer').style.display = 'none';
+
+// ===========================
+// NOW PLAYING — Radio Browser API
+// Interroga ogni 30s il campo now_playing per la stazione attiva.
+// Funziona solo per radio che trasmettono ICY metadata via Radio Browser.
+// ===========================
+let nowPlayingTimer = null;
+let lastNowPlayingTitle = '';
+
+async function fetchNowPlaying() {
+  // Solo se stiamo riproducendo una radio builtin (hanno id rb_<uuid>)
+  if (currentMode !== 'radio' || !currentRadio || !currentRadio.id.startsWith('rb_')) {
+    clearNowPlaying();
+    return;
+  }
+
+  const uuid = currentRadio.id.replace('rb_', '');
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch(
+      WORKER_URL + '/radio/json/stations/byuuid/' + uuid,
+      { signal: controller.signal }
+    );
+    clearTimeout(timer);
+    if (!res.ok) return;
+    const data = await res.json();
+    const station = Array.isArray(data) ? data[0] : data;
+    const title = station?.now_playing?.trim() || '';
+
+    if (title && title !== lastNowPlayingTitle) {
+      lastNowPlayingTitle = title;
+      setNowPlayingUI(title);
+    } else if (!title) {
+      clearNowPlaying();
+    }
+  } catch(e) {
+    // silenzioso: se fallisce non mostriamo nulla
+  }
+}
+
+function setNowPlayingUI(title) {
+  const el = document.getElementById('playerNowPlaying');
+  const npSub = document.getElementById('npSub');
+  if (el) { el.textContent = title; el.style.display = ''; el.title = title; }
+  // Nella sidebar mostriamo titolo canzone invece del genere
+  if (npSub) npSub.textContent = title;
+}
+
+function clearNowPlaying() {
+  lastNowPlayingTitle = '';
+  const el = document.getElementById('playerNowPlaying');
+  if (el) { el.style.display = 'none'; el.textContent = ''; }
+  // Ripristina genere nella sidebar
+  if (currentRadio && currentMode === 'radio') {
+    const npSub = document.getElementById('npSub');
+    if (npSub) npSub.textContent = currentRadio.genre;
+  }
+}
+
+function startNowPlayingPolling() {
+  stopNowPlayingPolling();
+  fetchNowPlaying(); // subito
+  nowPlayingTimer = setInterval(fetchNowPlaying, 30000); // poi ogni 30s
+}
+
+function stopNowPlayingPolling() {
+  if (nowPlayingTimer) { clearInterval(nowPlayingTimer); nowPlayingTimer = null; }
+  clearNowPlaying();
+}
 
 renderPlaylist();
 fetchRadios();
