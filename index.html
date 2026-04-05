@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioWeb 3.7</title>
+<title>RadioWeb 3.8</title>
   <meta name="version" content="1.0">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1463,7 +1463,7 @@ body::before {
     <button class="sidebar-btn sidebar-btn-suggest" onclick="openContactPopup()">
       💡 Suggerisci una modifica
     </button>
-    <<button class="sidebar-btn sidebar-btn-coffee" onclick="openCoffeePopup()">
+    <button class="sidebar-btn sidebar-btn-coffee" onclick="openCoffeePopup()">
   ☕ Offrimi un caffè
    </button>
   </div>
@@ -1763,6 +1763,30 @@ body::before {
     </a>
     <div class="contact-popup-footer">RadioWeb · fatto con ❤️ da Jean</div>
   </div>
+  </div>
+<!-- ===== POPUP CAFFÈ ===== -->
+<div class="contact-popup-overlay" id="coffeePopup" onclick="if(event.target===this)closeCoffeePopup()">
+  <div class="contact-popup">
+    <button class="contact-popup-close" onclick="closeCoffeePopup()">✕</button>
+    <div class="contact-popup-icon">☕</div>
+    <div class="contact-popup-title">Offrimi un caffè!</div>
+    <div class="contact-popup-body">
+      Se RadioWeb ti fa compagnia e vuoi supportarmi nello sviluppo,<br>
+      <strong>offrimi un caffè per tenermi sveglio la notte</strong> mentre aggiungo nuove funzionalità. 😄<br><br>
+      Anche un piccolo gesto fa davvero la differenza!
+    </div>
+    <a class="contact-mail-link" href="https://www.paypal.com/paypalme/xflyracer" target="_blank" rel="noopener"
+       style="background: linear-gradient(135deg, #f0a830, #c87c10); box-shadow: 0 4px 20px rgba(240,168,48,0.4);">
+      ☕ Offrimi un caffè su PayPal
+    </a>
+    <div class="contact-popup-footer">RadioWeb · fatto con ❤️ da Jean</div>
+  </div>
+</div>
+
+
+
+
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -3143,6 +3167,15 @@ document.getElementById('logoSub').innerHTML = CONFIG.subtitle + '<br><span styl
 document.getElementById('logoSub').style.color  = CONFIG.subtitleColor;
 document.getElementById('logoVer').style.display = 'none';
 
+function openCoffeePopup() {
+  document.getElementById('coffeePopup').classList.add('visible');
+}
+function closeCoffeePopup() {
+  document.getElementById('coffeePopup').classList.remove('visible');
+}
+
+
+
 renderPlaylist();
 fetchRadios();
 </script>
@@ -3158,13 +3191,13 @@ fetchRadios();
       <span class="drawer-item-sub">Invia un'idea o segnala un bug</span>
     </span>
   </button>
-  <a class="drawer-item" href="https://www.paypal.com/paypalme/xflyracer" target="_blank" rel="noopener" onclick="closeDrawer()">
+ <a class="drawer-item" href="#" onclick="closeDrawer(); openCoffeePopup(); return false;">
     <span class="drawer-item-icon">☕</span>
     <span>
       <span class="drawer-item-label">Offrimi un caffè</span>
       <span class="drawer-item-sub">PayPal · paypal.me/xflyracer</span>
     </span>
-  </a>
+</a>
 </div>
 
 <script>
