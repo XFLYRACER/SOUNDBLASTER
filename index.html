@@ -1377,13 +1377,15 @@ body::before {
 .mobile-drawer {
   position: fixed;
   left: 0; right: 0;
-  bottom: -200px; /* fuori schermo di default */
+  bottom: -300px;
   z-index: 401;
   background: var(--bg2);
   border-top: 1px solid var(--border);
   border-radius: 18px 18px 0 0;
-  padding: 0 0 80px; /* 80px = spazio per la bottom nav */
+  padding: 0 0 140px; /* bottom nav 60px + player bar 68px + margine */
   transition: bottom 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 80vh;
+  overflow-y: auto;
 }
 .mobile-drawer.visible { bottom: 0; }
 
@@ -3113,15 +3115,20 @@ function closeDrawer() {
 // Mostra il 5° tab solo su mobile
 function checkMobileTab() {
   const moreTab = document.getElementById('moreTab');
+  if (!moreTab) return;
   if (window.innerWidth <= 768) {
     moreTab.style.display = '';
   } else {
     moreTab.style.display = 'none';
-    closeDrawer();
+    const overlay = document.getElementById('drawerOverlay');
+    const drawer  = document.getElementById('mobileDrawer');
+    if (overlay) overlay.classList.remove('visible');
+    if (drawer)  drawer.classList.remove('visible');
+    moreTab.classList.remove('active');
   }
 }
 window.addEventListener('resize', checkMobileTab);
-checkMobileTab();
+document.addEventListener('DOMContentLoaded', checkMobileTab);
 
 let toastTimer;
 function showToast(msg, type = 'success') {
