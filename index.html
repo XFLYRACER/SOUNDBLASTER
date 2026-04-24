@@ -743,6 +743,33 @@ body::before {
 .playlist-track-item:hover .playlist-track-remove { opacity: 1; }
 .playlist-track-remove:hover { color: var(--accent); }
 
+.playlist-track-item.dragging {
+  opacity: 0.5;
+  background: var(--card2);
+}
+
+.playlist-track-item.drag-over-track {
+  border-top: 2px solid var(--accent2);
+}
+
+.playlist-track-handle {
+  cursor: grab;
+  color: var(--text3);
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-right: 8px;
+}
+
+.playlist-track-item:hover .playlist-track-handle {
+  opacity: 1;
+}
+
+.playlist-track-handle:active {
+  cursor: grabbing;
+}
+
+
 .playlist-tracks-empty {
   text-align: center;
   padding: 24px;
@@ -1776,10 +1803,14 @@ body::before {
       Anche un piccolo gesto fa davvero la differenza!
     </div>
     <a class="contact-mail-link" href="https://www.paypal.com/paypalme/xflyracer" target="_blank" rel="noopener"
-       style="background: linear-gradient(135deg, #f0a830, #c87c10); box-shadow: 0 4px 20px rgba(240,168,48,0.4);">
-      ☕ Offrimi un caffè su PayPal
+       style="background: linear-gradient(135deg, #0070ba, #003087); box-shadow: 0 4px 20px rgba(0,112,186,0.4);">
+      <span style="font-size:20px;">💳</span> PayPal
     </a>
-    <div class="contact-popup-footer">RadioWeb · Creato con ❤️ da Jean</div>
+    <a class="contact-mail-link" href="https://web.satispay.com/download/qrcode/S6Y-CON--8B867DA4-0C79-4B13-A658-8B7F49D9A5AD?locale=it" target="_blank" rel="noopener"
+       style="background: linear-gradient(135deg, #f34040, #c42020); box-shadow: 0 4px 20px rgba(243,64,64,0.4); margin-top: 12px;">
+      <span style="font-size:20px;">📱</span> Satispay
+    </a>
+    <div class="contact-popup-footer" style="margin-top: 16px;">RadioWeb · Creato con ❤️ da Jean</div>
   </div>
 </div>
 
@@ -2721,6 +2752,61 @@ function createPlaylist() {
 // ============================================================
 // RENDER PLAYLIST CON ACCORDION (brani visibili)
 // ============================================================
+
+let dragTrackSrc = null;
+
+function trackDragStart(e) {
+  dragTrackSrc = {
+    plIdx: parseInt(e.currentTarget.dataset.plIdx),
+    trackIdx: parseInt(e.currentTarget.dataset.trackIdx)
+  };
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function trackDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.playlist-track-item').forEach(t => t.classList.remove('drag-over-track'));
+  if (!e.currentTarget.classList.contains('dragging')) {
+    e.currentTarget.classList.add('drag-over-track');
+  }
+}
+
+function trackDragDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const targetPlIdx = parseInt(e.currentTarget.dataset.plIdx);
+  const targetTrackIdx = parseInt(e.currentTarget.dataset.trackIdx);
+  
+  if (!dragTrackSrc || dragTrackSrc.plIdx !== targetPlIdx || dragTrackSrc.trackIdx === targetTrackIdx) return;
+  
+  const pl = playlists[targetPlIdx];
+  if (!pl || !pl.tracks) return;
+  
+  const [movedTrack] = pl.tracks.splice(dragTrackSrc.trackIdx, 1);
+  pl.tracks.splice(targetTrackIdx, 0, movedTrack);
+  
+  localStorage.setItem('playlists', JSON.stringify(playlists));
+  renderPlaylist();
+  
+  setTimeout(() => {
+    const card = document.getElementById('pl-card-' + targetPlIdx);
+    if (card) card.classList.add('open');
+  }, 50);
+}
+
+function trackDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.playlist-track-item').forEach(t => t.classList.remove('drag-over-track'));
+  dragTrackSrc = null;
+}
+
+
+
+
+
 function renderPlaylist() {
   const list = document.getElementById('playlistList');
   if (playlists.length === 0) {
@@ -2765,7 +2851,16 @@ function renderPlaylistTracks(pl, plIdx) {
       <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();playPlaylist(${plIdx})" style="font-size:12px;padding:4px 10px;">▶ Riproduci tutto</button>
     </div>`;
   const rows = tracks.map((t, ti) => `
-    <div class="playlist-track-item" onclick="playTrackFromPlaylist(${plIdx}, ${ti})">
+    <div class="playlist-track-item" 
+         draggable="true"
+         data-pl-idx="${plIdx}"
+         data-track-idx="${ti}"
+         onclick="playTrackFromPlaylist(${plIdx}, ${ti})"
+         ondragstart="trackDragStart(event)"
+         ondragover="trackDragOver(event)"
+         ondrop="trackDragDrop(event)"
+         ondragend="trackDragEnd(event)">
+      <span class="playlist-track-handle">⠿</span>
       <div class="playlist-track-num">${ti + 1}</div>
       <div class="playlist-track-thumb">
         <img src="https://img.youtube.com/vi/${t.ytId}/mqdefault.jpg" alt="" loading="lazy">
@@ -3191,12 +3286,12 @@ fetchRadios();
       <span class="drawer-item-sub">Invia un'idea o segnala un bug</span>
     </span>
   </button>
- <a class="drawer-item" href="#" onclick="closeDrawer(); openCoffeePopup(); return false;">
-    <span class="drawer-item-icon">☕</span>
-    <span>
-      <span class="drawer-item-label">Offrimi un caffè</span>
-      <span class="drawer-item-sub">PayPal · paypal.me/xflyracer</span>
-    </span>
+<a class="drawer-item" href="#" onclick="closeDrawer(); openCoffeePopup(); return false;">
+  <span class="drawer-item-icon">☕</span>
+  <span>
+    <span class="drawer-item-label">Offrimi un caffè</span>
+    <span class="drawer-item-sub">PayPal · Satispay</span>
+  </span>
 </a>
 </div>
 
